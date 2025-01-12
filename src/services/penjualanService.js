@@ -1,9 +1,9 @@
 const MetodePembayaran = require("../models/metodePembayaran");
-const ProdukPenjualan = require("../models/produkPenjualan");
+const Penjualan = require("../models/penjualan");
 
-class ProdukPenjualanService {
+class PenjualanService {
     static async getAll() {
-        return ProdukPenjualan.findAll({
+        return Penjualan.findAll({
             include: [
                 {
                     model: MetodePembayaran,
@@ -14,4 +14,4 @@ class ProdukPenjualanService {
     }
 }
 
-module.exports = ProdukPenjualanService
+module.exports = PenjualanService

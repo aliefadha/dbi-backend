@@ -1,12 +1,12 @@
-const ProdukPenjualanService = require("../services/produkPenjualanService");
+const PenjualanService = require("../services/penjualanService");
 
-class ProdukPenjualanController {
+class PenjualanController {
     static async getAll(req, res) {
         try {
-            const produkPenjualan = await ProdukPenjualanService.getAll();
+            const penjualan = await PenjualanService.getAll();
             res.status(200).json({
                 success: true,
-                data: produkPenjualan,
+                data: penjualan,
                 message: "retrieved successfully"
             });
         } catch (error) {
@@ -19,4 +19,4 @@ class ProdukPenjualanController {
     }
 }
 
-module.exports = ProdukPenjualanController
+module.exports = PenjualanController
