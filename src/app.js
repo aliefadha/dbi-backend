@@ -5,7 +5,7 @@ const errorHandler = require("./utils/errorHandler");
 const tokoRoutes = require("./routes/tokoRoutes");
 const kategoriBarangRoutes = require("./routes/kategoriBarangRoutes");
 const metodePembayaranRoutes = require("./routes/metodePembayaranRoutes");
-const produkPenjualanRoutes = require("./routes/produkPenjualanRoutes");
+const penjualanRoutes = require("./routes/penjualanRoutes");
 
 const app = express();
 const port = 3000;
@@ -14,7 +14,7 @@ const port = 3000;
 app.use(express.json());
 
 //Routes
-app.use("/api", [tokoRoutes, kategoriBarangRoutes, metodePembayaranRoutes, produkPenjualanRoutes]);
+app.use("/api", [tokoRoutes, kategoriBarangRoutes, metodePembayaranRoutes, penjualanRoutes]);
 
 //Error Handling
 app.use(errorHandler);
