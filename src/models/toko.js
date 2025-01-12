@@ -1,7 +1,7 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 
-const Toko = sequelize.define("Toko", {
+const Toko = sequelize.define("toko", {
   nama_toko: {
     type: DataTypes.STRING,
     allowNull: false,
