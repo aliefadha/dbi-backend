@@ -1,6 +1,7 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 const KategoriBarang = require("./kategoriBarang");
+const Packaging = require("./packaging");
 
 const BarangHandmadeNon = sequelize.define("barang_handmadenon", {
     barang_id: {
@@ -40,12 +41,23 @@ const BarangHandmadeNon = sequelize.define("barang_handmadenon", {
         type: DataTypes.INTEGER,
         defaultValue: 0,
     },
+    packaging_id: {
+        type: DataTypes.INTEGER,
+        references: {
+            model: Packaging,
+            key: 'packaging_id'
+        }
+    },
 }, {
     timestamps: false,
 });
 
 BarangHandmadeNon.belongsTo(KategoriBarang, {
     foreignKey: 'kategori_barang_id'
+})
+
+BarangHandmadeNon.belongsTo(Packaging, {
+    foreignKey: 'packaging_id'
 })
 
 module.exports = BarangHandmadeNon;
