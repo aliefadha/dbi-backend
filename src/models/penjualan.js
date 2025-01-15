@@ -3,7 +3,7 @@ const sequelize = require("../config/database");
 const MetodePembayaran = require("./metodePembayaran");
 
 const Penjualan = sequelize.define("penjualan", {
-    produk_penjualan_id: {
+    penjualan_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         primaryKey: true,
