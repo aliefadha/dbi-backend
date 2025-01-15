@@ -3,6 +3,8 @@
 // models/relation.js  
 const sequelize = require('../config/database');
 const BarangHandmadeNon = require('./barangHandmadeNon');
+const DivisiKaryawan = require('./divisiKaryawan');
+const Karyawan = require('./karyawan');
 const KategoriBarang = require('./kategoriBarang');
 
 
@@ -14,6 +16,16 @@ KategoriBarang.hasMany(BarangHandmadeNon, {
 BarangHandmadeNon.belongsTo(KategoriBarang, {
     foreignKey: 'kategori_barang_id',
     as: "kategori"
+})
+
+DivisiKaryawan.hasMany(Karyawan, {
+    foreignKey: "divisi_karyawan_id",
+    as: "karyawan",
+})
+
+Karyawan.belongsTo(DivisiKaryawan, {
+    foreignKey: "divisi_karyawan_id",
+    as: "divisi"
 })
 
 // Sync models with the database  
@@ -29,7 +41,5 @@ const syncDatabase = async () => {
 syncDatabase();
 
 module.exports = {
-    sequelize,
-    KategoriBarang,
-    BarangHandmadeNon,
+    sequelize
 };  

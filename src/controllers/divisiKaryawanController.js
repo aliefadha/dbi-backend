@@ -50,7 +50,31 @@ class DivisiKaryawanController {
                 data: divisi,
                 message: "retrieved successfully",
             });
-        } catch (error) {    
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                data: null,
+                message: error.message,
+            });
+        }
+    }
+
+    static async getKaryawanByDivisi(req, res) {
+        try {
+            const divisi = await DivisiKaryawanService.getKaryawanByDivisi(req.params.id);
+            if (!divisi) {
+                return res.status(404).json({
+                    success: false,
+                    data: null,
+                    message: "Data not found",
+                });
+            }
+            res.status(200).json({
+                success: true,
+                data: divisi,
+                message: "retrieved successfully",
+            });
+        } catch (error) {
             res.status(500).json({
                 success: false,
                 data: null,

@@ -1,5 +1,5 @@
 const express = require("express");
-const sequelize = require("./config/database");
+const sequelize = require("./models/index");
 const errorHandler = require("./utils/errorHandler");
 
 const tokoRoutes = require("./routes/tokoRoutes");
@@ -12,6 +12,7 @@ const rincianBiayaRoutes = require("./routes/rincianBiayaRoutes");
 
 const divisiKaryawanRoutes = require("./routes/divisiKaryawanRoutes");
 const karyawanRoutes = require("./routes/karyawanRoutes");
+const jenisBarangRoutes = require("./routes/jenisBarangRoutes");
 
 const app = express();
 const port = 3000;
@@ -26,15 +27,19 @@ app.use("/api", [
   tokoRoutes,
   kategoriBarangRoutes,
   metodePembayaranRoutes,
-  penjualanRoutes, barangHandmadeNonRoutes, packagingRoutes, rincianBiayaRoutes,
+  penjualanRoutes,
+  barangHandmadeNonRoutes,
+  packagingRoutes,
+  rincianBiayaRoutes,
   divisiKaryawanRoutes,
-  karyawanRoutes
+  karyawanRoutes,
+  jenisBarangRoutes
 ]);
 
 //Error Handling
 app.use(errorHandler);
 
-sequelize.sync({ force: true }).then(() => {
+sequelize.sequelize.sync({ force: true }).then(() => {
   console.log("database synced");
   app.listen(port, () => {
     console.log(`Server runs on ${port}`);
