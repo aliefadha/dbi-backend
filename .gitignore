@@ -1,6 +1,7 @@
 node_modules
+.idea
 .vscode
 *.sqlite
 *.png
+sqlite
 database.sqlite
-*.sqlite

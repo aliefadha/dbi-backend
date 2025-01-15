@@ -9,6 +9,7 @@ const Karyawan = require('./karyawan');
 const KategoriBarang = require('./kategoriBarang');
 const Kpi = require('./kpi');
 const Packaging = require('./packaging');
+const ProdukPenjualan = require('./produkPenjualan');
 const Cabang = require('./cabang');
 const TargetBulananKasir = require('./targetBulananKasir');
 const CutiKaryawan = require('./cutiKaryawan');
@@ -42,6 +43,11 @@ BarangHandmadeNon.belongsTo(JenisBarang, {
 BarangHandmadeNon.belongsTo(Packaging, {
     foreignKey: "packaging_id",
     as: "packaging",
+})
+
+ProdukPenjualan.belongsTo(BarangHandmadeNon, {
+    foreignKey: "barang_id",
+    as: "barang",
 })
 
 DivisiKaryawan.hasMany(Karyawan, {
@@ -84,10 +90,14 @@ CutiKaryawan.belongsTo(Karyawan, {
     as: "karyawan",
 })
 
+
+
 // Sync models with the database  
 const syncDatabase = async () => {
     try {
-        await sequelize.sync({ force: false }); // Use force: true only in development  
+        await sequelize.sync({ force: true }); // Use force: true only in development  
+        //Seederrrr
+        await require('./seed')();
         console.log("Database & tables created!");
     } catch (error) {
         console.error("Error syncing database:", error);
