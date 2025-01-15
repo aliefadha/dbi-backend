@@ -7,7 +7,7 @@ class {{pascalCase name}}Controller {
       res.status(201).json({  
         success: true,  
         data: {{camelCase name}},  
-        message: "{{pascalCase name}} created successfully",  
+        message: "created successfully",  
       });  
     } catch (error) {  
       res.status(400).json({  
@@ -24,7 +24,7 @@ class {{pascalCase name}}Controller {
       res.status(200).json({  
         success: true,  
         data: {{camelCase name}}s,  
-        message: "{{pascalCase name}}s retrieved successfully",  
+        message: "retrieved successfully",  
       });  
     } catch (error) {  
       res.status(500).json({  
@@ -42,13 +42,13 @@ class {{pascalCase name}}Controller {
         return res.status(404).json({  
           success: false,  
           data: null,  
-          message: "{{pascalCase name}} not found",  
+          message: "not found",  
         });  
       }  
       res.status(200).json({  
         success: true,  
         data: {{camelCase name}},  
-        message: "{{pascalCase name}} retrieved successfully",  
+        message: "retrieved successfully",  
       });  
     } catch (error) {  
       res.status(500).json({  
@@ -66,13 +66,13 @@ class {{pascalCase name}}Controller {
         return res.status(404).json({  
           success: false,  
           data: null,  
-          message: "{{pascalCase name}} not found",  
+          message: "not found",  
         });  
       }  
       res.status(200).json({  
         success: true,  
         data: {{camelCase name}},  
-        message: "{{pascalCase name}} updated successfully",  
+        message: "updated successfully",  
       });  
     } catch (error) {  
       res.status(400).json({  
@@ -90,13 +90,13 @@ class {{pascalCase name}}Controller {
         return res.status(404).json({  
           success: false,  
           data: null,  
-          message: "{{pascalCase name}} not found",  
+          message: "not found",  
         });  
       }  
       res.status(200).json({  
         success: true,  
         data: null,  
-        message: "{{pascalCase name}} deleted successfully",  
+        message: "deleted successfully",  
       });  
     } catch (error) {  
       res.status(500).json({  
