@@ -1,3 +1,4 @@
+const { where } = require("sequelize");
 const BarangHandmadeNon = require("../models/barangHandmadeNon");
 const KategoriBarang = require("../models/kategoriBarang");
 const Packaging = require("../models/packaging");
@@ -49,6 +50,20 @@ class BarangHandmadeNonService {
         if (!barang) return null;
         await barang.destroy();
         return true;
+    }
+
+    static async getBarangByKateogri(kategoriId) {
+        return await BarangHandmadeNon.findAll({
+            where: { kategori_barang_id: kategoriId },
+            include: [
+                {
+                    model: Packaging,
+                },
+                {
+                    model: KategoriBarang,
+                }
+            ]
+        });
     }
 }
 

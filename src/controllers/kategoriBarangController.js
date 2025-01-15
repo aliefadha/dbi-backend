@@ -58,10 +58,9 @@ class KategoriBarangController {
             })
         }
     }
-
-    static async getBarangByKategori(req, res) {
+    static async getById(req, res) {
         try {
-            const kategori = await KategoriBarangService.getBarang(req.params.id);
+            const kategori = await KategoriBarangService.getById(req.params.id);
             if (!kategori) {
                 return res.status(404).json({
                     success: false,
