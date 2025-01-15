@@ -1,11 +1,23 @@
 const Karyawan = require("../models/karyawan");
+const DivisiKaryawan = require("../models/divisiKaryawan");
 
 class KaryawanService {
     static async getAll() {
-        return await Karyawan.findAll();
+        return await Karyawan.findAll({
+            include: {
+                model: DivisiKaryawan,
+                as: "divisi"
+            }
+        });
     }
     static async getById(id) {
-        return await Karyawan.findByPk(id);
+        return await Karyawan.findOne({
+            where: { karyawan_id: id },
+            include: {
+                model: DivisiKaryawan,
+                as: "divisi"
+            }
+        });
     }
     static async create(data) {
         return await Karyawan.create(data);

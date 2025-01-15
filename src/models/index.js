@@ -9,6 +9,9 @@ const Karyawan = require('./karyawan');
 const KategoriBarang = require('./kategoriBarang');
 const Kpi = require('./kpi');
 const Packaging = require('./packaging');
+const Cabang = require('./cabang');
+const TargetBulananKasir = require('./targetBulananKasir');
+const CutiKaryawan = require('./cutiKaryawan');
 
 
 KategoriBarang.hasMany(BarangHandmadeNon, {
@@ -59,6 +62,26 @@ DivisiKaryawan.hasMany(Kpi, {
 Kpi.belongsTo(DivisiKaryawan, {
     foreignKey: "divisi_karyawan_id",
     as: "divisi"
+})
+
+Cabang.hasMany(TargetBulananKasir, {
+    foreignKey: "cabang_id",
+    as: "target_bulanan_kasir",
+})
+
+TargetBulananKasir.belongsTo(Cabang, {
+    foreignKey: "cabang_id",
+    as: "cabang",
+})
+
+Karyawan.hasMany(CutiKaryawan, {
+    foreignKey: "karyawan_id",
+    as: "cuti_karyawan",
+})
+
+CutiKaryawan.belongsTo(Karyawan, {
+    foreignKey: "karyawan_id",
+    as: "karyawan",
 })
 
 // Sync models with the database  
