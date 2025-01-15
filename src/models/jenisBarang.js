@@ -6,13 +6,14 @@ const JenisBarang = sequelize.define("jenis_barang", {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true,
-  },  // dont forget to change to snake_case
+  },
   jenis_barang: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  // TODO: add more columns  
-  // TODO: add relation to another table  
-});
+},
+  {
+    timestamps: false,
+  });
 
 module.exports = JenisBarang;  

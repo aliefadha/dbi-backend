@@ -1,7 +1,8 @@
 const { where } = require("sequelize");
-const BarangHandmadeNon = require("../models/index");
-const KategoriBarang = require("../models/index");
+const BarangHandmadeNon = require("../models/barangHandmadeNon");
+const KategoriBarang = require("../models/kategoriBarang");
 const Packaging = require("../models/packaging");
+const JenisBarang = require("../models/jenisBarang");
 
 class BarangHandmadeNonService {
     static async create(data) {
@@ -11,11 +12,14 @@ class BarangHandmadeNonService {
     static async getAll() {
         return await BarangHandmadeNon.findAll({
             include: [
-                {
-                    model: Packaging,
-                },
+
                 {
                     model: KategoriBarang,
+                    as: 'kategori'
+                },
+                {
+                    model: JenisBarang,
+                    as: 'jenis'
                 }
             ]
         });
