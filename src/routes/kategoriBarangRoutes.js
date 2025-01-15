@@ -5,6 +5,8 @@ const router = express.Router();
 
 router.post("/kategori-barang", KategoriBarangController.create);
 router.get("/kategori-barang", KategoriBarangController.getAll);
+router.get("/kategori-barang/:id/barang", KategoriBarangController.getBarangByKategori);
 router.get("/kategori-barang/:id", KategoriBarangController.getById);
+
 
 module.exports = router;

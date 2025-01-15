@@ -1,5 +1,6 @@
-const { DataTypes } = require("sequelize");
+const { DataTypes, Model } = require("sequelize");
 const sequelize = require("../config/database");
+const BarangHandmadeNon = require("./barangHandmadeNon");
 
 const KategoriBarang = sequelize.define("kategori_barang", {
   kategori_barang_id: {
@@ -16,5 +17,6 @@ const KategoriBarang = sequelize.define("kategori_barang", {
 }, {
   timestamps: false,
 });
+
 
 module.exports = KategoriBarang;

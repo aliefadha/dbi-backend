@@ -1,0 +1,111 @@
+const {{pascalCase name}}Service = require("../services/{{camelCase name}}Service");  
+  
+class {{pascalCase name}}Controller {  
+  static async create(req, res) {  
+    try {  
+      const {{camelCase name}} = await {{pascalCase name}}Service.create(req.body);  
+      res.status(201).json({  
+        success: true,  
+        data: {{camelCase name}},  
+        message: "{{pascalCase name}} created successfully",  
+      });  
+    } catch (error) {  
+      res.status(400).json({  
+        success: false,  
+        data: null,  
+        message: error.message,  
+      });  
+    }  
+  }  
+  
+  static async getAll(req, res) {  
+    try {  
+      const {{camelCase name}}s = await {{pascalCase name}}Service.getAll();  
+      res.status(200).json({  
+        success: true,  
+        data: {{camelCase name}}s,  
+        message: "{{pascalCase name}}s retrieved successfully",  
+      });  
+    } catch (error) {  
+      res.status(500).json({  
+        success: false,  
+        data: null,  
+        message: error.message,  
+      });  
+    }  
+  }  
+  
+  static async getById(req, res) {  
+    try {  
+      const {{camelCase name}} = await {{pascalCase name}}Service.getById(req.params.id);  
+      if (!{{camelCase name}}) {  
+        return res.status(404).json({  
+          success: false,  
+          data: null,  
+          message: "{{pascalCase name}} not found",  
+        });  
+      }  
+      res.status(200).json({  
+        success: true,  
+        data: {{camelCase name}},  
+        message: "{{pascalCase name}} retrieved successfully",  
+      });  
+    } catch (error) {  
+      res.status(500).json({  
+        success: false,  
+        data: null,  
+        message: error.message,  
+      });  
+    }  
+  }  
+  
+  static async update(req, res) {  
+    try {  
+      const {{camelCase name}} = await {{pascalCase name}}Service.update(req.params.id, req.body);  
+      if (!{{camelCase name}}) {  
+        return res.status(404).json({  
+          success: false,  
+          data: null,  
+          message: "{{pascalCase name}} not found",  
+        });  
+      }  
+      res.status(200).json({  
+        success: true,  
+        data: {{camelCase name}},  
+        message: "{{pascalCase name}} updated successfully",  
+      });  
+    } catch (error) {  
+      res.status(400).json({  
+        success: false,  
+        data: null,  
+        message: error.message,  
+      });  
+    }  
+  }  
+  
+  static async delete(req, res) {  
+    try {  
+      const deleted = await {{pascalCase name}}Service.delete(req.params.id);  
+      if (!deleted) {  
+        return res.status(404).json({  
+          success: false,  
+          data: null,  
+          message: "{{pascalCase name}} not found",  
+        });  
+      }  
+      res.status(200).json({  
+        success: true,  
+        data: null,  
+        message: "{{pascalCase name}} deleted successfully",  
+      });  
+    } catch (error) {  
+      res.status(500).json({  
+        success: false,  
+        data: null,  
+        message: error.message,  
+      });  
+    }  
+  }  
+}  
+  
+module.exports = {{pascalCase name}}Controller;  

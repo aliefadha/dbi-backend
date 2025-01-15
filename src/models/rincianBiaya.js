@@ -2,7 +2,7 @@ const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 const BarangHandmadeNon = require("./barangHandmadeNon");
 
-const RincianBiaya = sequelize.define('rincian-biaya', {
+const RincianBiaya = sequelize.define('rincian_biaya', {
     rincian_biaya_id: {
         type: DataTypes.INTEGER,
         allowNull: false,

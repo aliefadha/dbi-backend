@@ -82,6 +82,29 @@ class BarangHandmadeNonController {
             });
         }
     }
+
+    static async update(req, res) {
+        try {
+            const barangNonHandmade = await BarangHandmadeNonService.update(req.params.id, req.body);
+            if (!barangNonHandmade) {
+                return res.status(404).json({
+                    success: false,
+                    data: null,
+                    message: "Barang Non Handmade Not Found"
+                });
+            } res.status(200).json({
+                success: true,
+                data: barangNonHandmade,
+                message: "Barang Non Handmade updated successfully",
+            });
+        } catch (error) {
+            res.status(400).json({
+                success: false,
+                data: null,
+                message: error.message,
+            });
+        }
+    }
 }
 
 module.exports = BarangHandmadeNonController;

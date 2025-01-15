@@ -1,3 +1,5 @@
+const BarangHandmade = require("../models/barangHandmade");
+const BarangHandmadeNon = require("../models/barangHandmadeNon");
 const KategoriBarang = require("../models/kategoriBarang");
 
 class KategoriBarangService {
@@ -11,6 +13,15 @@ class KategoriBarangService {
 
     static async getById(id) {
         return await KategoriBarang.findByPk(id);
+    }
+
+    static async getBarang(id) {
+        return await KategoriBarang.findOne({
+            where: { kategori_barang_id: id },
+            includes: {
+                model: BarangHandmadeNon
+            }
+        })
     }
 }
 
