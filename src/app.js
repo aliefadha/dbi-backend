@@ -34,7 +34,7 @@ app.use("/api", [
 //Error Handling
 app.use(errorHandler);
 
-sequelize.sync({ force: false }).then(() => {
+sequelize.sync({ force: true }).then(() => {
   console.log("database synced");
   app.listen(port, () => {
     console.log(`Server runs on ${port}`);
