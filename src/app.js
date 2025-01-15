@@ -13,6 +13,8 @@ const rincianBiayaRoutes = require("./routes/rincianBiayaRoutes");
 const divisiKaryawanRoutes = require("./routes/divisiKaryawanRoutes");
 const karyawanRoutes = require("./routes/karyawanRoutes");
 const jenisBarangRoutes = require("./routes/jenisBarangRoutes");
+const kpiRoutes = require("./routes/kpiRoutes");
+const cabangRoutes = require("./routes/cabangRoutes");  
 
 const app = express();
 const port = 3000;
@@ -33,7 +35,9 @@ app.use("/api", [
   rincianBiayaRoutes,
   divisiKaryawanRoutes,
   karyawanRoutes,
-  jenisBarangRoutes
+  jenisBarangRoutes,
+  kpiRoutes,
+  cabangRoutes
 ]);
 
 //Error Handling

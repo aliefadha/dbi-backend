@@ -11,7 +11,13 @@ class KaryawanService {
         return await Karyawan.create(data);
     }
     static async update(id, data) {
-        return await Karyawan.update(data, { where: { karyawan_id: id } });
+        const karyawan = await Karyawan.findByPk(id);
+        if (!karyawan) return null;
+
+        Object.assign(karyawan, data);
+        await karyawan.save();
+
+        return karyawan;
     }
     static async delete(id) {
         return await Karyawan.destroy({ where: { karyawan_id: id } });

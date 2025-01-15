@@ -3,13 +3,13 @@ const sequelize = require("../config/database");
   
 const {{pascalCase name}} = sequelize.define("{{snakeCase name}}", {  
   {{snakeCase name}}_id: {  
-    type: DataTypes.INTEGER,  
-    allowNull: false,
-    primaryKey: true,
-    autoIncrement: true,
-  },  // dont forget to change to snake_case
+      type: DataTypes.INTEGER,  
+      allowNull: false,
+      primaryKey: true,
+      autoIncrement: true,
+  },  
   img_path: {  
-    type: DataTypes.STRING,  
+      type: DataTypes.STRING,  
   },  
   // TODO: add more columns  
   // TODO: add relation to another table  
