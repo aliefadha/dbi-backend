@@ -18,5 +18,4 @@ const KategoriBarang = sequelize.define("kategori_barang", {
   timestamps: false,
 });
 
-
 module.exports = KategoriBarang;
