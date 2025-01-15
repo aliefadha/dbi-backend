@@ -2,19 +2,8 @@ const express = require("express");
 const sequelize = require("./models/index");
 const errorHandler = require("./utils/errorHandler");
 
-const tokoRoutes = require("./routes/tokoRoutes");
-const kategoriBarangRoutes = require("./routes/kategoriBarangRoutes");
-const metodePembayaranRoutes = require("./routes/metodePembayaranRoutes");
-const penjualanRoutes = require("./routes/penjualanRoutes");
-const barangHandmadeNonRoutes = require("./routes/barangHandmadeNonRoutes");
-const packagingRoutes = require("./routes/packagingRoutes");
-const rincianBiayaRoutes = require("./routes/rincianBiayaRoutes");
-
-const divisiKaryawanRoutes = require("./routes/divisiKaryawanRoutes");
-const karyawanRoutes = require("./routes/karyawanRoutes");
-const jenisBarangRoutes = require("./routes/jenisBarangRoutes");
-const kpiRoutes = require("./routes/kpiRoutes");
-const cabangRoutes = require("./routes/cabangRoutes");  
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
 const port = 3000;
@@ -24,22 +13,45 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
-//Routes
-app.use("/api", [
-  tokoRoutes,
-  kategoriBarangRoutes,
-  metodePembayaranRoutes,
-  penjualanRoutes,
-  barangHandmadeNonRoutes,
-  packagingRoutes,
-  rincianBiayaRoutes,
-  divisiKaryawanRoutes,
-  karyawanRoutes,
-  jenisBarangRoutes,
-  kpiRoutes,
-  cabangRoutes
-]);
+const routesCache = {}; // Object to cache routes  
 
+const loadRoutes = (app) => {
+  const routesPath = path.join(__dirname, 'routes');
+
+  fs.readdir(routesPath, (err, files) => {
+    if (err) {
+      console.error('Error reading routes directory:', err);
+      return;
+    }
+
+    files.forEach(file => {
+      if (file.endsWith('Routes.js')) {
+        if (!routesCache[file]) {
+          const route = require(path.join(routesPath, file));
+          app.use('/api', route);
+          routesCache[file] = route;
+        }
+      }
+    });
+  });
+};
+
+// Watch for changes in the routes directory  
+const watchRoutes = (app) => {
+  const routesPath = path.join(__dirname, 'routes');
+  fs.watch(routesPath, (eventType, filename) => {
+    if (filename && filename.endsWith('Routes.js')) {
+      console.log(`File changed: ${filename}. Reloading routes...`);
+      // Clear the cache and reload routes  
+      delete require.cache[require.resolve(path.join(routesPath, filename))];
+      loadRoutes(app);
+    }
+  });
+};
+
+// Load and watch routes  
+loadRoutes(app);
+watchRoutes(app);
 //Error Handling
 app.use(errorHandler);
 

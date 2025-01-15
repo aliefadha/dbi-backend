@@ -2,3 +2,5 @@ node_modules
 .vscode
 *.sqlite
 *.png
+database.sqlite
+*.sqlite

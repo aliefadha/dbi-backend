@@ -3,7 +3,7 @@ const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 
 const Packaging = sequelize.define("packaging", {
-    packaging: {
+    packaging_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         primaryKey: true,
