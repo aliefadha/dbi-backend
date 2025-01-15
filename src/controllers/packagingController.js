@@ -23,7 +23,7 @@ class PackagingController {
       const packaging = await PackagingService.getAll();
       res.status(200).json({
         success: true,
-        data: toko,
+        data: packaging,
         message: "retrieved successfully",
       });
     } catch (error) {
@@ -48,7 +48,7 @@ class PackagingController {
       res.status(200).json({
         success: true,
         data: packaging,
-        message: "Toko retrieved successfully",
+        message: "retrieved successfully",
       });
     } catch (error) {
       res.status(500).json({

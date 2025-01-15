@@ -7,6 +7,7 @@ const DivisiKaryawan = require('./divisiKaryawan');
 const JenisBarang = require('./jenisBarang');
 const Karyawan = require('./karyawan');
 const KategoriBarang = require('./kategoriBarang');
+const Packaging = require('./packaging');
 
 
 KategoriBarang.hasMany(BarangHandmadeNon, {
@@ -19,14 +20,24 @@ JenisBarang.hasMany(BarangHandmadeNon, {
     as: "barang"
 });
 
+Packaging.hasMany(BarangHandmadeNon, {
+    foreignKey: 'packaging_id',
+    as: "barang"
+})
+
 BarangHandmadeNon.belongsTo(KategoriBarang, {
     foreignKey: 'kategori_barang_id',
-    as: "kategori"
+    as: "kategori",
 })
 
 BarangHandmadeNon.belongsTo(JenisBarang, {
-    foreignKey: "jenis_barang",
+    foreignKey: "jenis_barang_id",
     as: "jenis",
+})
+
+BarangHandmadeNon.belongsTo(Packaging, {
+    foreignKey: "packaging_id",
+    as: "packaging",
 })
 
 DivisiKaryawan.hasMany(Karyawan, {
@@ -42,7 +53,7 @@ Karyawan.belongsTo(DivisiKaryawan, {
 // Sync models with the database  
 const syncDatabase = async () => {
     try {
-        await sequelize.sync({ force: true }); // Use force: true only in development  
+        await sequelize.sync({ force: false }); // Use force: true only in development  
         console.log("Database & tables created!");
     } catch (error) {
         console.error("Error syncing database:", error);

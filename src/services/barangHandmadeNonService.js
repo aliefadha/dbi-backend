@@ -12,7 +12,6 @@ class BarangHandmadeNonService {
     static async getAll() {
         return await BarangHandmadeNon.findAll({
             include: [
-
                 {
                     model: KategoriBarang,
                     as: 'kategori'
@@ -20,7 +19,11 @@ class BarangHandmadeNonService {
                 {
                     model: JenisBarang,
                     as: 'jenis'
-                }
+                },
+                {
+                    model: Packaging,
+                    as: "packaging"
+                },
             ]
         });
     }
@@ -30,11 +33,17 @@ class BarangHandmadeNonService {
             where: { barang_id: id },
             include: [
                 {
-                    model: Packaging,
+                    model: KategoriBarang,
+                    as: 'kategori'
                 },
                 {
-                    model: KategoriBarang,
-                }
+                    model: JenisBarang,
+                    as: 'jenis'
+                },
+                {
+                    model: Packaging,
+                    as: "packaging"
+                },
             ]
         });
     }
