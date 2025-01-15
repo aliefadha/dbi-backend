@@ -1,0 +1,34 @@
+const {{pascalCase name}} = require("../models/{{camelCase name}}");  
+  
+class {{pascalCase name}}Service {  
+  static async create(data) {  
+    return await {{pascalCase name}}.create(data);  
+  }  
+  
+  static async getAll() {  
+    return await {{pascalCase name}}.findAll();  
+  }  
+  
+  static async getById(id) {  
+    return await {{pascalCase name}}.findByPk(id);  
+  }  
+  
+  static async update(id, data) {  
+    const {{camelCase name}} = await {{pascalCase name}}.findByPk(id);  
+    if (!{{camelCase name}}) return null;  
+  
+    Object.assign({{camelCase name}}, data);  
+    await {{camelCase name}}.save();  
+  
+    return {{camelCase name}};  
+  }  
+  
+  static async delete(id) {  
+    const {{camelCase name}} = await {{pascalCase name}}.findByPk(id);  
+    if (!{{camelCase name}}) return null;  
+    await {{camelCase name}}.destroy();  
+    return true;  
+  }  
+}  
+  
+module.exports = {{pascalCase name}}Service;  
