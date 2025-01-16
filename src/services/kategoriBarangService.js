@@ -1,4 +1,4 @@
-const BarangHandmadeNon = require("../models/barangHandmadeNon");
+const BarangHandmadeNon = require("../models/barangNonHandmade");
 const KategoriBarang = require("../models/kategoriBarang");
 
 class KategoriBarangService {

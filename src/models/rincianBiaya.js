@@ -1,6 +1,6 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
-const BarangHandmadeNon = require("./barangHandmadeNon");
+const BarangHandmadeNon = require("./barangNonHandmade");
 
 const RincianBiaya = sequelize.define('rincian_biaya', {
     rincian_biaya_id: {

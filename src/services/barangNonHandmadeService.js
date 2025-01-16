@@ -1,16 +1,15 @@
-const { where } = require("sequelize");
-const BarangHandmadeNon = require("../models/barangHandmadeNon");
+const BarangNonHandmade = require("../models/barangNonHandmade");
 const KategoriBarang = require("../models/kategoriBarang");
 const Packaging = require("../models/packaging");
 const JenisBarang = require("../models/jenisBarang");
 
-class BarangHandmadeNonService {
+class BarangNonHandmadeService {
     static async create(data) {
-        return await BarangHandmadeNon.create(data);
+        return await BarangNonHandmade.create(data);
     }
 
     static async getAll() {
-        return await BarangHandmadeNon.findAll({
+        return await BarangNonHandmade.findAll({
             include: [
                 {
                     model: KategoriBarang,
@@ -29,7 +28,7 @@ class BarangHandmadeNonService {
     }
 
     static async getById(id) {
-        return await BarangHandmadeNon.findOne({
+        return await BarangNonHandmade.findOne({
             where: { barang_id: id },
             include: [
                 {
@@ -49,7 +48,7 @@ class BarangHandmadeNonService {
     }
 
     static async update(id, data) {
-        const barang = await BarangHandmadeNon.findByPk(id);
+        const barang = await BarangNonHandmade.findByPk(id);
         if (!barang) return null;
 
         Object.assign(barang, data);
@@ -59,11 +58,11 @@ class BarangHandmadeNonService {
     }
 
     static async delete(id) {
-        const barang = await BarangHandmadeNon.findByPk(id);
+        const barang = await BarangNonHandmade.findByPk(id);
         if (!barang) return null;
         await barang.destroy();
         return true;
     }
 }
 
-module.exports = BarangHandmadeNonService;
+module.exports = BarangNonHandmadeService;
