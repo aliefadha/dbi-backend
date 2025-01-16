@@ -50,8 +50,8 @@ const seedDatabase = async () => {
         await Karyawan.create({ karyawan_id: 2, nama_karyawan: "Siti", divisi_karyawan_id: 2, email: 'ab@gmail.com', password: '123', jumlah_gaji_pokok: 100, bonus: 0, });
 
         // Seed data for Kpi  
-        await Kpi.create({ divisi_karyawan_id: 1, nama_kpi: "Target Penjualan", persentase: 75, waktu: "Q1 2025" });
-        await Kpi.create({ divisi_karyawan_id: 1, nama_kpi: "Target Beli", persentase: 75, waktu: "Q2 2025" });
+        await Kpi.create({ divisi_karyawan_id: 1, nama_kpi: "Target Penjualan", persentase: 75, waktu: "Bulanan" });
+        await Kpi.create({ divisi_karyawan_id: 1, nama_kpi: "Target Beli", persentase: 75, waktu: "Mingguan" });
 
         // Seed data for ProdukPenjualan  
         await ProdukPenjualan.create({ produk_penjualan_id: 1, barang_id: 1, jumlah: 10 });

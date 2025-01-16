@@ -33,14 +33,25 @@ class KpiService {
   }  
 
   static async getKpiByDivisi() {
-    return await Kpi.findAll({
+    const divisiKaryawanList = await DivisiKaryawan.findAll({
       include: [
         {
-          model: DivisiKaryawan,
-          as: "divisi",
+          model: Kpi,
+          as: "kpi",
         },
       ],
     });
+
+    const result = divisiKaryawanList.map(divisi => {
+      return {
+        divisi_karyawan_id: divisi.divisi_karyawan_id,
+        nama_divisi: divisi.nama_divisi,
+        kpi: divisi.kpi,
+        kpi_count: divisi.kpi.length
+      };
+    });
+
+    return result;
   }
 }  
   
