@@ -12,17 +12,17 @@ const Packaging = require('./packaging');
 const ProdukPenjualan = require('./produkPenjualan');
 
 
-KategoriBarang.hasMany(BarangHandmadeNon, {
+KategoriBarang.hasMany(BarangNonHandmade, {
     foreignKey: 'kategori_barang_id',
     as: "barang"
 });
 
-JenisBarang.hasMany(BarangHandmadeNon, {
+JenisBarang.hasMany(BarangNonHandmade, {
     foreignKey: 'jenis_barang_id',
     as: "barang"
 });
 
-Packaging.hasMany(BarangHandmadeNon, {
+Packaging.hasMany(BarangNonHandmade, {
     foreignKey: 'packaging_id',
     as: "barang"
 })
@@ -42,7 +42,7 @@ BarangNonHandmade.belongsTo(Packaging, {
     as: "packaging",
 })
 
-ProdukPenjualan.belongsTo(BarangHandmadeNon, {
+ProdukPenjualan.belongsTo(BarangNonHandmade, {
     foreignKey: "barang_id",
     as: "barang",
 })
