@@ -4,7 +4,7 @@ const KategoriBarang = require("./kategoriBarang");
 const Packaging = require("./packaging");
 const JenisBarang = require("./jenisBarang");
 
-const BarangHandmadeNon = sequelize.define("barang_handmadenon", {
+const BarangNonHandmade = sequelize.define("barang_nonhandmade", {
     barang_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -56,4 +56,4 @@ const BarangHandmadeNon = sequelize.define("barang_handmadenon", {
     timestamps: false,
 });
 
-module.exports = BarangHandmadeNon;
+module.exports = BarangNonHandmade;

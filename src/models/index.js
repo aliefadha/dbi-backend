@@ -2,7 +2,7 @@
 
 // models/relation.js  
 const sequelize = require('../config/database');
-const BarangHandmadeNon = require('./barangHandmadeNon');
+const BarangNonHandmade = require('./barangNonHandmade');
 const DivisiKaryawan = require('./divisiKaryawan');
 const JenisBarang = require('./jenisBarang');
 const Karyawan = require('./karyawan');
@@ -27,17 +27,17 @@ Packaging.hasMany(BarangHandmadeNon, {
     as: "barang"
 })
 
-BarangHandmadeNon.belongsTo(KategoriBarang, {
+BarangNonHandmade.belongsTo(KategoriBarang, {
     foreignKey: 'kategori_barang_id',
     as: "kategori",
 })
 
-BarangHandmadeNon.belongsTo(JenisBarang, {
+BarangNonHandmade.belongsTo(JenisBarang, {
     foreignKey: "jenis_barang_id",
     as: "jenis",
 })
 
-BarangHandmadeNon.belongsTo(Packaging, {
+BarangNonHandmade.belongsTo(Packaging, {
     foreignKey: "packaging_id",
     as: "packaging",
 })
