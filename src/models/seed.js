@@ -9,6 +9,7 @@ const Kpi = require('./kpi');
 const ProdukPenjualan = require('./produkPenjualan');
 const Penjualan = require('./penjualan');
 const MetodePembayaran = require('./metodePembayaran');
+const Cabang = require('./cabang');
 
 const seedDatabase = async () => {
     try {
@@ -45,9 +46,13 @@ const seedDatabase = async () => {
         await DivisiKaryawan.create({ divisi_karyawan_id: 1, nama_divisi: "Produksi" });
         await DivisiKaryawan.create({ divisi_karyawan_id: 2, nama_divisi: "Pemasaran" });
 
+        // Seed data for Cabang  
+        await Cabang.create({ cabang_id: 1, nama_cabang: "Gor", email:"gor@gmail.com", password:12345678 });
+        await Cabang.create({ cabang_id: 2, nama_cabang: "Upi", email:"upi@gmail.com", password:12345678 });
+
         // Seed data for Karyawan  
-        await Karyawan.create({ karyawan_id: 1, nama_karyawan: "Budi", divisi_karyawan_id: 1, email: 'aa@gmail.com', password: '123', jumlah_gaji_pokok: 100, bonus: 0, });
-        await Karyawan.create({ karyawan_id: 2, nama_karyawan: "Siti", divisi_karyawan_id: 2, email: 'ab@gmail.com', password: '123', jumlah_gaji_pokok: 100, bonus: 0, });
+        await Karyawan.create({ karyawan_id: 1, nama_karyawan: "Budi", divisi_karyawan_id: 1, cabang_id:1,cabang_id_first:1, email: 'aa@gmail.com', password: '123', jumlah_gaji_pokok: 100, bonus: 0, });
+        await Karyawan.create({ karyawan_id: 2, nama_karyawan: "Siti", divisi_karyawan_id: 2, cabang_id:2,cabang_id_first:2, email: 'ab@gmail.com', password: '123', jumlah_gaji_pokok: 100, bonus: 0, });
 
         // Seed data for Kpi  
         await Kpi.create({ divisi_karyawan_id: 1, nama_kpi: "Target Penjualan", persentase: 75, waktu: "Bulanan" });

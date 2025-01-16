@@ -1,6 +1,7 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 const DivisiKaryawan = require("./divisiKaryawan");
+const Cabang = require("./cabang");
 
 const Karyawan = sequelize.define("karyawans", {
     karyawan_id: {
@@ -33,6 +34,22 @@ const Karyawan = sequelize.define("karyawans", {
         references: {
             model: DivisiKaryawan,
             key: "divisi_karyawan_id",
+        },
+    },
+    cabang_id_first: {
+        type: DataTypes.INTEGER,
+        allowNull: false,   
+        references: {
+            model: Cabang,
+            key: "cabang_id",
+        },
+    },
+    cabang_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,   
+        references: {
+            model: Cabang,
+            key: "cabang_id",
         },
     },
     jumlah_gaji_pokok: {

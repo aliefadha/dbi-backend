@@ -26,7 +26,7 @@ class KpiService {
   }  
   
   static async delete(id) {  
-    const kpi = await Kpi.findByPk(id);  
+  const kpi = await Kpi.findByPk(id);  
     if (!kpi) return null;  
     await kpi.destroy();  
     return true;  

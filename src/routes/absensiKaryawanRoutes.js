@@ -7,5 +7,6 @@ router.get('/absensi-karyawan', AbsensiKaryawanController.getAll);
 router.get('/absensi-karyawan/:id', AbsensiKaryawanController.getById);  
 router.put('/absensi-karyawan/:id', AbsensiKaryawanController.update);  
 router.delete('/absensi-karyawan/:id', AbsensiKaryawanController.delete);  
+router.get('/absensi-karyawan/:id/:bulan/:tahun/karyawan', AbsensiKaryawanController.getAbsensiByKaryawan);
   
 module.exports = router;  

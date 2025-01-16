@@ -101,6 +101,26 @@ AbsensiKaryawan.belongsTo(Karyawan, {
     as: "karyawan",
 })
 
+Cabang.hasMany(Karyawan, {
+    foreignKey: "cabang_id",
+    as: "karyawan",
+})
+
+Cabang.hasMany(Karyawan, {
+    foreignKey: "cabang_id_first",
+    as: "karyawan_first",
+})
+
+Karyawan.belongsTo(Cabang, {
+    foreignKey: "cabang_id",
+    as: "cabang",
+})
+
+Karyawan.belongsTo(Cabang, {
+    foreignKey: "cabang_id_first",
+    as: "cabang_first",
+})
+
 
 
 // Sync models with the database  

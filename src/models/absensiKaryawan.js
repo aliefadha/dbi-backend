@@ -45,6 +45,10 @@ const AbsensiKaryawan = sequelize.define("absensi_karyawan", {
       type: DataTypes.STRING,
       allowNull: true,
   },
+  gaji_pokok_perhari: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+  }
 });  
   
 module.exports = AbsensiKaryawan;  
