@@ -122,9 +122,8 @@ class AbsensiKaryawanService {
         totalCutiDays += cutiDays; // Accumulate the total cuti days  
     }  
 
-    let tidakHadir = 28 - totalCutiDays - kehadiran;
+    let tidakHadir = Math.max(0, 28 - totalCutiDays - kehadiran);
   
-    // Return the karyawan data along with the absensi count and total cuti days  
     return {  
         karyawan,  
         kehadiran,  
