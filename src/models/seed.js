@@ -21,8 +21,8 @@ const seedDatabase = async () => {
         await JenisBarang.create({ jenis_barang_id: 2, jenis_barang: "Aksesoris" });
 
         // Seed data for Packaging  
-        await Packaging.create({ packaging_id: 1, nama_packaging: "Kotak Kayu" });
-        await Packaging.create({ packaging_id: 2, nama_packaging: "Kantong Kain" });
+        await Packaging.create({ packaging_id: 1, nama_packaging: "Kotak Kayu", ukuran: "XL", jumlah_minimum_stok: 10, harga: 10, isi:10, harga_satuan: 100, kategori_barang_id: 1 });
+        await Packaging.create({ packaging_id: 2, nama_packaging: "Kantong Kain", ukuran: "Besar", jumlah_minimum_stok: 100, harga: 100, isi:50, harga_satuan: 125, kategori_barang_id: 1  });
 
         // Seed data for BarangHandmadeNon  
         await BarangHandmadeNon.create({ barang_id: 1, nama_barang: "Lukisan", kategori_barang_id: 1, jenis_barang_id: 1, packaging_id: 1 });
