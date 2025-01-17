@@ -15,6 +15,7 @@ const TargetBulananKasir = require('./targetBulananKasir');
 const CutiKaryawan = require('./cutiKaryawan');
 const AbsensiKaryawan = require('./absensiKaryawan');
 const BarangCustom = require("./barangCustom");
+const KpiKaryawan = require("./kpiKaryawan");
 
 
 KategoriBarang.hasMany(BarangNonHandmade, {
@@ -130,6 +131,26 @@ Karyawan.belongsTo(Cabang, {
 Karyawan.belongsTo(Cabang, {
     foreignKey: "cabang_id_first",
     as: "cabang_first",
+})
+
+Karyawan.hasMany(KpiKaryawan, {
+    foreignKey: "karyawan_id",
+    as: "kpi_karyawan",
+})
+
+KpiKaryawan.belongsTo(Karyawan, {
+    foreignKey: "karyawan_id",
+    as: "karyawan",
+})
+
+Kpi.hasMany(KpiKaryawan, {
+    foreignKey: "kpi_id",
+    as: "kpi_karyawan",
+})
+
+KpiKaryawan.belongsTo(Kpi, {
+    foreignKey: "kpi_id",    
+    as: "kpi",
 })
 
 
