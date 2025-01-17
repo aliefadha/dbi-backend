@@ -6,8 +6,8 @@ router.post('/absensi-karyawan', upload.single("image"), AbsensiKaryawanControll
 router.get('/absensi-karyawan', AbsensiKaryawanController.getAll);  
 router.get('/absensi-karyawan/:id', AbsensiKaryawanController.getById);  
 router.put('/absensi-karyawan/:id', AbsensiKaryawanController.update);  
-router.delete('/absensi-karyawan/:id', AbsensiKaryawanController.delete);  
 router.get('/list-absensi-karyawan/:id/:bulan/:tahun/karyawan', AbsensiKaryawanController.getListAbsensiByKaryawan);
 router.get('/data-absensi-karyawan/:id/:bulan/:tahun/karyawan', AbsensiKaryawanController.getDataAbsensiByKaryawan);
+router.delete('/absensi-karyawan/:id', AbsensiKaryawanController.delete);  
   
 module.exports = router;  
