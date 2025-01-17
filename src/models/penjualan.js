@@ -43,12 +43,8 @@ const Penjualan = sequelize.define("penjualan", {
     total_penjualan: {
         type: DataTypes.INTEGER
     }
+},{
+    timestamps: false
 });
-
-Penjualan.belongsTo(MetodePembayaran, {
-    foreignKey: 'metode_pembayaran_id'
-})
-
-
 
 module.exports = Penjualan;

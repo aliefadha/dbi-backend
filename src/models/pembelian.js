@@ -8,6 +8,7 @@ const Pembelian = sequelize.define("pembelian", {
     allowNull: false,
     primaryKey: true,
     autoIncrement: true,
+    unique: true
   },
   tanggal_waktu: {
     type: DataTypes.DATE,
@@ -40,6 +41,8 @@ const Pembelian = sequelize.define("pembelian", {
     type: DataTypes.INTEGER,
     defaultValue: 0,
   }
+},{
+  timestamps: false
 });
 
 module.exports = Pembelian;  

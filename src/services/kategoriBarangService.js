@@ -6,6 +6,23 @@ class KategoriBarangService {
         return await KategoriBarang.create(data);
     }
 
+    static async update(id, data) {
+        const kategoriBarang = await KategoriBarang.findByPk(id);
+        if (!kategoriBarang) return null;
+
+        Object.assign(kategoriBarang, data);
+        await kategoriBarang.save();
+
+        return kategoriBarang;
+    }
+
+    static async delete(id) {
+        const kategoriBarang = await kategoriBarang.findByPk(id);
+        if (!kategoriBarang) return null;
+        await kategoriBarang.destroy();
+        return true;
+    }
+
     static async getAll() {
         return await KategoriBarang.findAll();
     }

@@ -16,6 +16,10 @@ const CutiKaryawan = require('./cutiKaryawan');
 const AbsensiKaryawan = require('./absensiKaryawan');
 const BarangCustom = require("./barangCustom");
 const KpiKaryawan = require("./kpiKaryawan");
+const MetodePembayaran = require('./metodePembayaran');
+const Penjualan = require('./penjualan');
+const Pembelian = require('./pembelian');
+const ProdukPembelian = require('./produkPembelian');
 
 
 KategoriBarang.hasMany(BarangNonHandmade, {
@@ -58,9 +62,59 @@ BarangCustom.belongsTo(KategoriBarang, {
     as: "kategori",
 })
 
+MetodePembayaran.hasMany(Penjualan, {
+    foreignKey: "metode_pembayaran_id",
+    as: 'penjualan'
+});
+
+MetodePembayaran.hasMany(Pembelian, {
+    foreignKey: "metode_pembayaran_id",
+    as: "pembelian"
+})
+
+Penjualan.belongsTo(MetodePembayaran, {
+    foreignKey: "metode_pembayaran_id",
+    as: "metode"
+})
+
 ProdukPenjualan.belongsTo(BarangNonHandmade, {
     foreignKey: "barang_id",
     as: "barang",
+})
+
+Penjualan.hasMany(ProdukPenjualan, {
+    foreignKey: "penjualan_id",
+    as: "produk"
+});
+
+ProdukPenjualan.belongsTo(Penjualan, {
+    foreignKey: "penjualan_id",
+    as: 'penjualan'
+})
+
+Pembelian.hasMany(ProdukPembelian, {
+    foreignKey: "pembelian_id",
+    as: "produk"
+})
+
+ProdukPembelian.belongsTo(Pembelian, {
+    foreignKey: "pembelian_id",
+    as: "pembelian"
+})
+
+ProdukPembelian.belongsTo(Cabang, {
+    foreignKey: "cabang_id",
+    as: "cabang"
+})
+
+ProdukPenjualan.belongsTo(Cabang, {
+    foreignKey: "cabang_id",
+    as: "cabang"
+})
+
+ProdukPembelian.belongsTo(BarangNonHandmade, {
+    foreignKey: "barang_id",
+    as: "barang"
 })
 
 DivisiKaryawan.hasMany(Karyawan, {

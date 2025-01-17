@@ -1,21 +1,21 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
-const BarangNonHandmade = require("./barangNonHandmade");
-const Penjualan = require("./penjualan");
+const Pembelian = require("./pembelian");
 const Cabang = require("./cabang");
+const BarangNonHandmade = require("./barangNonHandmade");
 
-const ProdukPenjualan = sequelize.define("produk_penjualan", {
-  produk_penjualan_id: {
+const ProdukPembelian = sequelize.define("produk_pembelian", {
+  produk_pembelian_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
     primaryKey: true,
     autoIncrement: true,
   },
-  penjualan_id: {
+  pembelian_id: {
     type: DataTypes.INTEGER,
     references: {
-      model: Penjualan,
-      key: 'penjualan_id'
+      model: Pembelian,
+      key: 'pembelian_id'
     },
   },
   barang_id: {
@@ -42,4 +42,4 @@ const ProdukPenjualan = sequelize.define("produk_penjualan", {
   timestamps: false
 });
 
-module.exports = ProdukPenjualan;  
+module.exports = ProdukPembelian;  
