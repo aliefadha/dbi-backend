@@ -1,12 +1,12 @@
-const CutiKaryawanService = require("../services/cutiKaryawanService");  
+const BundlingService = require("../services/bundlingService");  
   
-class CutiKaryawanController {  
+class BundlingController {  
   static async create(req, res) {  
     try {  
-      const cutiKaryawan = await CutiKaryawanService.create(req.body);  
+      const bundling = await BundlingService.create(req.body);  
       res.status(201).json({  
         success: true,  
-        data: cutiKaryawan,  
+        data: bundling,  
         message: "created successfully",  
       });  
     } catch (error) {  
@@ -20,10 +20,10 @@ class CutiKaryawanController {
   
   static async getAll(req, res) {  
     try {  
-      const cutiKaryawans = await CutiKaryawanService.getAll(req.params.bulan, req.params.tahun);  
+      const bundlings = await BundlingService.getAll();  
       res.status(200).json({  
         success: true,  
-        data: cutiKaryawans,  
+        data: bundlings,  
         message: "retrieved successfully",  
       });  
     } catch (error) {  
@@ -37,8 +37,8 @@ class CutiKaryawanController {
   
   static async getById(req, res) {  
     try {  
-      const cutiKaryawan = await CutiKaryawanService.getById(req.params.id);  
-      if (!cutiKaryawan) {  
+      const bundling = await BundlingService.getById(req.params.id);  
+      if (!bundling) {  
         return res.status(404).json({  
           success: false,  
           data: null,  
@@ -47,7 +47,7 @@ class CutiKaryawanController {
       }  
       res.status(200).json({  
         success: true,  
-        data: cutiKaryawan,  
+        data: bundling,  
         message: "retrieved successfully",  
       });  
     } catch (error) {  
@@ -61,8 +61,8 @@ class CutiKaryawanController {
   
   static async update(req, res) {  
     try {  
-      const cutiKaryawan = await CutiKaryawanService.update(req.params.id, req.body);  
-      if (!cutiKaryawan) {  
+      const bundling = await BundlingService.update(req.params.id, req.body);  
+      if (!bundling) {  
         return res.status(404).json({  
           success: false,  
           data: null,  
@@ -71,7 +71,7 @@ class CutiKaryawanController {
       }  
       res.status(200).json({  
         success: true,  
-        data: cutiKaryawan,  
+        data: bundling,  
         message: "updated successfully",  
       });  
     } catch (error) {  
@@ -85,7 +85,7 @@ class CutiKaryawanController {
   
   static async delete(req, res) {  
     try {  
-      const deleted = await CutiKaryawanService.delete(req.params.id);  
+      const deleted = await BundlingService.delete(req.params.id);  
       if (!deleted) {  
         return res.status(404).json({  
           success: false,  
@@ -106,30 +106,6 @@ class CutiKaryawanController {
       });  
     }  
   }  
-
-  static async getByKaryawanId(req, res) {  
-    try {  
-      const cutiKaryawan = await CutiKaryawanService.getByKaryawanId(req.params.id);  
-      if (!cutiKaryawan) {  
-        return res.status(404).json({  
-          success: false,  
-          data: null,  
-          message: "not found",  
-        });  
-      }  
-      res.status(200).json({  
-        success: true,  
-        data: cutiKaryawan,  
-        message: "retrieved successfully",  
-      });  
-    } catch (error) {  
-      res.status(500).json({  
-        success: false,  
-        data: null,  
-        message: error.message,  
-      });  
-    }  
-  }
 }  
   
-module.exports = CutiKaryawanController;  
+module.exports = BundlingController;  

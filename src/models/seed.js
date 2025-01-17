@@ -10,6 +10,7 @@ const ProdukPenjualan = require('./produkPenjualan');
 const Penjualan = require('./penjualan');
 const MetodePembayaran = require('./metodePembayaran');
 const Cabang = require('./cabang');
+const Pembelian = require('./pembelian');
 
 const seedDatabase = async () => {
     try {
@@ -21,8 +22,8 @@ const seedDatabase = async () => {
         await JenisBarang.create({ jenis_barang_id: 2, jenis_barang: "Aksesoris" });
 
         // Seed data for Packaging  
-        await Packaging.create({ packaging_id: 1, nama_packaging: "Kotak Kayu", ukuran: "XL", jumlah_minimum_stok: 10, harga: 10, isi:10, harga_satuan: 100, kategori_barang_id: 1 });
-        await Packaging.create({ packaging_id: 2, nama_packaging: "Kantong Kain", ukuran: "Besar", jumlah_minimum_stok: 100, harga: 100, isi:50, harga_satuan: 125, kategori_barang_id: 1  });
+        await Packaging.create({ packaging_id: 1, nama_packaging: "Kotak Kayu", ukuran: "XL", jumlah_minimum_stok: 10, harga: 10, isi: 10, harga_satuan: 100, kategori_barang_id: 1 });
+        await Packaging.create({ packaging_id: 2, nama_packaging: "Kantong Kain", ukuran: "Besar", jumlah_minimum_stok: 100, harga: 100, isi: 50, harga_satuan: 125, kategori_barang_id: 1 });
 
         // Seed data for BarangHandmadeNon  
         await BarangHandmadeNon.create({ barang_id: 1, nama_barang: "Lukisan", kategori_barang_id: 1, jenis_barang_id: 1, packaging_id: 1 });
@@ -47,20 +48,26 @@ const seedDatabase = async () => {
         await DivisiKaryawan.create({ divisi_karyawan_id: 2, nama_divisi: "Pemasaran" });
 
         // Seed data for Cabang  
-        await Cabang.create({ cabang_id: 1, nama_cabang: "Gor", email:"gor@gmail.com", password:12345678 });
-        await Cabang.create({ cabang_id: 2, nama_cabang: "Upi", email:"upi@gmail.com", password:12345678 });
+        await Cabang.create({ cabang_id: 1, nama_cabang: "Gor", email: "gor@gmail.com", password: 12345678 });
+        await Cabang.create({ cabang_id: 2, nama_cabang: "Upi", email: "upi@gmail.com", password: 12345678 });
 
         // Seed data for Karyawan  
-        await Karyawan.create({ karyawan_id: 1, nama_karyawan: "Budi", divisi_karyawan_id: 1, cabang_id:1,cabang_id_first:1, email: 'aa@gmail.com', password: '123', jumlah_gaji_pokok: 100, bonus: 0, });
-        await Karyawan.create({ karyawan_id: 2, nama_karyawan: "Siti", divisi_karyawan_id: 2, cabang_id:2,cabang_id_first:2, email: 'ab@gmail.com', password: '123', jumlah_gaji_pokok: 100, bonus: 0, });
+        await Karyawan.create({ karyawan_id: 1, nama_karyawan: "Budi", divisi_karyawan_id: 1, cabang_id: 1, cabang_id_first: 1, email: 'aa@gmail.com', password: '123', jumlah_gaji_pokok: 100, bonus: 0, });
+        await Karyawan.create({ karyawan_id: 2, nama_karyawan: "Siti", divisi_karyawan_id: 2, cabang_id: 2, cabang_id_first: 2, email: 'ab@gmail.com', password: '123', jumlah_gaji_pokok: 100, bonus: 0, });
 
         // Seed data for Kpi  
         await Kpi.create({ divisi_karyawan_id: 1, nama_kpi: "Target Penjualan", persentase: 75, waktu: "Bulanan" });
         await Kpi.create({ divisi_karyawan_id: 1, nama_kpi: "Target Beli", persentase: 75, waktu: "Mingguan" });
 
+        // Pembelian
+        await Pembelian.create({ metode_id: 1, sub_total: 100, metode_pembayaran_id: 1, diskon: 10, pajak: 10, total_penjualan: 10 });
+
+        // Penjualan
+        await Penjualan.create({ nama_pembeli: "Pembeli", metode_pembayaran_id: 1, sub_total: 10, diskon: 10, pajak: 10, total_penjualan: 10 })
+
         // Seed data for ProdukPenjualan  
-        await ProdukPenjualan.create({ produk_penjualan_id: 1, barang_id: 1, jumlah: 10 });
-        await ProdukPenjualan.create({ produk_penjualan_id: 2, barang_id: 2, jumlah: 5 });
+        await ProdukPenjualan.create({ produk_penjualan_id: 1, penjualan_id: 1, barang_id: 1, kuantitas: 10, total_biaya: 100, cabang_id: 1 });
+        await ProdukPenjualan.create({ produk_penjualan_id: 2, penjualan_id: 1, barang_id: 2, kuantitas: 5, total_biaya: 200, cabang_id: 2 });
 
         console.log("Seed data created!");
     } catch (error) {

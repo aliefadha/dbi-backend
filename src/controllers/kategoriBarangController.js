@@ -81,6 +81,54 @@ class KategoriBarangController {
             })
         }
     }
+
+    static async update(req, res) {  
+        try {  
+          const kategoriBarang = await KategoriBarangService.update(req.params.id, req.body);  
+          if (!kategoriBarang) {  
+            return res.status(404).json({  
+              success: false,  
+              data: null,  
+              message: "not found",  
+            });  
+          }  
+          res.status(200).json({  
+            success: true,  
+            data: kategoriBarang,  
+            message: "updated successfully",  
+          });  
+        } catch (error) {  
+          res.status(400).json({  
+            success: false,  
+            data: null,  
+            message: error.message,  
+          });  
+        }  
+      }  
+      
+      static async delete(req, res) {  
+        try {  
+          const deleted = await KategoriBarangService.delete(req.params.id);  
+          if (!deleted) {  
+            return res.status(404).json({  
+              success: false,  
+              data: null,  
+              message: "not found",  
+            });  
+          }  
+          res.status(200).json({  
+            success: true,  
+            data: null,  
+            message: "deleted successfully",  
+          });  
+        } catch (error) {  
+          res.status(500).json({  
+            success: false,  
+            data: null,  
+            message: error.message,  
+          });  
+        }  
+      }
 }
 
 module.exports = KategoriBarangController;

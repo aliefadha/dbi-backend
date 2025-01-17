@@ -1,3 +1,5 @@
+const BarangNonHandmade = require("../models/barangNonHandmade");
+const Cabang = require("../models/cabang");
 const ProdukPenjualan = require("../models/produkPenjualan");  
   
 class ProdukPenjualanService {  
@@ -10,7 +12,20 @@ class ProdukPenjualanService {
   }  
   
   static async getById(id) {  
-    return await ProdukPenjualan.findByPk(id);  
+    return await ProdukPenjualan.findByPk(id, {
+      include: [
+        {
+          model: BarangNonHandmade,
+          as: "barang",
+          attributes: ["barang_id", "nama_barang"]
+        },
+        {
+          model: Cabang,
+          as: "cabang",
+          attributes: ["cabang_id", "nama_cabang"]
+        }
+      ]
+    });  
   }  
   
   static async update(id, data) {  
