@@ -53,27 +53,27 @@ class AbsensiKaryawanService {
     return true;  
   }  
 
-  static async getAbsensiByKaryawan(id, bulan, tahun){
+  static async getListAbsensiByKaryawan(id, bulan, tahun){
+    const startDate = new Date(tahun, bulan - 1, 1);
+    const endDate = new Date(tahun, bulan, 0);
+
+    return await AbsensiKaryawan.findAll({
+      where: {
+        karyawan_id: id,
+        tanggal: {
+          [Op.between]: [startDate, endDate]
+        },
+      }
+    })
+  }
+
+  static async getDataAbsensiByKaryawan(id, bulan, tahun){
     const startDate = new Date(tahun, bulan - 1, 1);
     const endDate = new Date(tahun, bulan, 0);
 
     const karyawan = await Karyawan.findOne({
       where: {karyawan_id: id},
       include: [
-        {
-          model: AbsensiKaryawan,
-          as: 'absensi_karyawan',
-          where: {
-            tanggal: {
-              [Op.between]: [startDate, endDate]              
-            }
-          }
-        },
-        {
-          model: DivisiKaryawan,
-          as: 'divisi',
-          attributes: ['nama_divisi']
-        },
         {
           model: Cabang,
           as: 'cabang',
@@ -83,6 +83,11 @@ class AbsensiKaryawanService {
           model: Cabang,
           as: 'cabang_first',
           attributes: ['nama_cabang']
+        },
+        {
+          model: DivisiKaryawan,
+          as: 'divisi',
+          attributes: ['nama_divisi']
         }
     ]});
 
@@ -123,13 +128,13 @@ class AbsensiKaryawanService {
     }  
 
     let tidakHadir = Math.max(0, 28 - totalCutiDays - kehadiran);
-  
+
     return {  
         karyawan,  
         kehadiran,  
         totalCutiDays,
         tidakHadir 
-    };  
+    };
   }
 }  
   

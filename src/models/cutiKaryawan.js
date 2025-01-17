@@ -25,6 +25,10 @@ const CutiKaryawan = sequelize.define("cuti_karyawan", {
       type: DataTypes.DATE,
       allowNull: false,
   },
+  jumlah_cuti: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+  },
   alasan: {
       type: DataTypes.STRING,
       allowNull: false,

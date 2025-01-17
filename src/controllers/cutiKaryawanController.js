@@ -20,7 +20,7 @@ class CutiKaryawanController {
   
   static async getAll(req, res) {  
     try {  
-      const cutiKaryawans = await CutiKaryawanService.getAll();  
+      const cutiKaryawans = await CutiKaryawanService.getAll(req.params.bulan, req.params.tahun);  
       res.status(200).json({  
         success: true,  
         data: cutiKaryawans,  
@@ -106,6 +106,30 @@ class CutiKaryawanController {
       });  
     }  
   }  
+
+  static async getByKaryawanId(req, res) {  
+    try {  
+      const cutiKaryawan = await CutiKaryawanService.getByKaryawanId(req.params.id);  
+      if (!cutiKaryawan) {  
+        return res.status(404).json({  
+          success: false,  
+          data: null,  
+          message: "not found",  
+        });  
+      }  
+      res.status(200).json({  
+        success: true,  
+        data: cutiKaryawan,  
+        message: "retrieved successfully",  
+      });  
+    } catch (error) {  
+      res.status(500).json({  
+        success: false,  
+        data: null,  
+        message: error.message,  
+      });  
+    }  
+  }
 }  
   
 module.exports = CutiKaryawanController;  
