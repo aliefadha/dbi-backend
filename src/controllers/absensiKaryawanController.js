@@ -4,7 +4,7 @@ const path = require("path");
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, path.join(__dirname, "../../public/absensiKaryawan"));
+        cb(null, path.join(__dirname, "../public/absensiKaryawan"));
     },
     filename: function (req, file, cb) {
         cb(null, Date.now() + path.extname(file.originalname));
@@ -19,7 +19,7 @@ class AbsensiKaryawanController {
     try {  
       const absensiKaryawanData = {
         ...req.body,
-        image: req.file.path
+        image: req.file.filename
       }
       const absensiKaryawan = await AbsensiKaryawanService.create(absensiKaryawanData);  
       res.status(201).json({  

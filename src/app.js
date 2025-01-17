@@ -13,6 +13,9 @@ const port = 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
+app.use('/images-karyawan', express.static(path.join(__dirname, 'public/karyawan')));
+app.use('/images-absensi-karyawan', express.static(path.join(__dirname, 'public/absensiKaryawan')));
 
 const corsOptions = {
   origin: ['http://localhost:5173'], 
