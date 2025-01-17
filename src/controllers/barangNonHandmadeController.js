@@ -20,10 +20,10 @@ class BarangNonHandmadeController {
 
     static async getAll(req, res) {
         try {
-            const kategori = await BarangNonHandmadeService.getAll();
+            const barang = await BarangNonHandmadeService.getAll();
             res.status(200).json({
                 success: true,
-                data: kategori,
+                data: barang,
                 message: "retrieved successfully"
             });
         } catch (error) {

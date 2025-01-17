@@ -22,24 +22,24 @@ const Pembelian = require('./pembelian');
 const ProdukPembelian = require('./produkPembelian');
 
 
-KategoriBarang.hasMany(BarangNonHandmade, {
+JenisBarang.hasMany(BarangNonHandmade, {
     foreignKey: 'kategori_barang_id',
     as: "barangNonHandmade",
 });
 
-KategoriBarang.hasMany(BarangCustom, {
+JenisBarang.hasMany(BarangCustom, {
     foreignKey: 'kategori_barang_id',
     as: "barangCustom"
 })
 
-JenisBarang.hasMany(BarangNonHandmade, {
+KategoriBarang.hasMany(BarangNonHandmade, {
     foreignKey: 'jenis_barang_id',
-    as: "barang"
+    as: "barang",
 });
 
 Packaging.hasMany(BarangNonHandmade, {
     foreignKey: 'packaging_id',
-    as: "barang"
+    as: "barang",
 })
 
 BarangNonHandmade.belongsTo(KategoriBarang, {
@@ -84,7 +84,7 @@ ProdukPenjualan.belongsTo(BarangNonHandmade, {
 
 Penjualan.hasMany(ProdukPenjualan, {
     foreignKey: "penjualan_id",
-    as: "produk"
+    as: "produk",
 });
 
 ProdukPenjualan.belongsTo(Penjualan, {
@@ -114,7 +114,7 @@ ProdukPenjualan.belongsTo(Cabang, {
 
 ProdukPembelian.belongsTo(BarangNonHandmade, {
     foreignKey: "barang_id",
-    as: "barang"
+    as: "barang",
 })
 
 DivisiKaryawan.hasMany(Karyawan, {
