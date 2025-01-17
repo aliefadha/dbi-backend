@@ -1,6 +1,7 @@
 const express = require("express");
 const sequelize = require("./models/index");
 const errorHandler = require("./utils/errorHandler");
+const cors = require('cors');
 
 const fs = require('fs');
 const path = require('path');
@@ -12,6 +13,11 @@ const port = 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
+
+const corsOptions = {
+  origin: ['http://localhost:5173'], 
+};
+app.use(cors(corsOptions)); 
 
 const routesCache = {}; // Object to cache routes  
 

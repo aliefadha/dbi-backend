@@ -3,10 +3,11 @@ const KategoriBarangController = require("../controllers/kategoriBarangControlle
 
 const router = express.Router();
 
-router.post("/kategori-barang", KategoriBarangController.create);
-router.get("/kategori-barang", KategoriBarangController.getAll);
-router.get("/kategori-barang/:id/barang", KategoriBarangController.getBarangByKategori);
-router.get("/kategori-barang/:id", KategoriBarangController.getById);
+router.post("/jenis-barang", KategoriBarangController.create);
+router.get("/jenis-barang", KategoriBarangController.getAll);
+router.get("/jenis-barang/:id", KategoriBarangController.getById);
+router.put('/jenis-barang/:id', KategoriBarangController.update);  
+router.delete('/jenis-barang/:id', KategoriBarangController.delete);
 
 
 module.exports = router;
