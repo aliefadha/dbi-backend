@@ -13,15 +13,18 @@ class BarangNonHandmadeService {
             include: [
                 {
                     model: KategoriBarang,
-                    as: 'kategori'
+                    as: 'kategori',
+                    attributes: ["kategori_barang_id", "nama_kategori_barang"]
                 },
                 {
                     model: JenisBarang,
-                    as: 'jenis'
+                    as: 'jenis',
+                    attributes: ["jenis_barang_id", "nama_jenis_barang"]
                 },
                 {
                     model: Packaging,
-                    as: "packaging"
+                    as: "packaging",
+                    attributes: ["packaging_id", "nama_packaging", "harga_satuan"]
                 },
             ]
         });
@@ -33,15 +36,18 @@ class BarangNonHandmadeService {
             include: [
                 {
                     model: KategoriBarang,
-                    as: 'kategori'
+                    as: 'kategori',
+                    attributes: ["kategori_barang_id", "nama_kategori_barang"]
                 },
                 {
                     model: JenisBarang,
-                    as: 'jenis'
+                    as: 'jenis',
+                    attributes: ["jenis_barang_id", "nama_jenis_barang"]
                 },
                 {
                     model: Packaging,
-                    as: "packaging"
+                    as: "packaging",
+                    attributes: ["packaging_id", "nama_packaging", "harga_satuan"]
                 },
             ]
         });

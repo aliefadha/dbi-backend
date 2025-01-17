@@ -1,7 +1,6 @@
-
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
-const KategoriBarang = require("./kategoriBarang");
+const JenisBarang = require("./jenisBarang");
 
 const Packaging = sequelize.define("packaging", {
     packaging_id: {
@@ -34,11 +33,11 @@ const Packaging = sequelize.define("packaging", {
         type: DataTypes.INTEGER,
         defaultValue: 0,
     },
-    kategori_barang_id: {
+    jenis_barang_id: {
         type: DataTypes.INTEGER,
         references: {
-            model: KategoriBarang,
-            key: 'kategori_barang_id'
+            model: JenisBarang,
+            key: 'jenis_barang_id'
         }
     },
 }, {
