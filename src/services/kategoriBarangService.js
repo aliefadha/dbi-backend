@@ -17,7 +17,7 @@ class KategoriBarangService {
     }
 
     static async delete(id) {
-        const kategoriBarang = await kategoriBarang.findByPk(id);
+        const kategoriBarang = await KategoriBarang.findByPk(id);
         if (!kategoriBarang) return null;
         await kategoriBarang.destroy();
         return true;
