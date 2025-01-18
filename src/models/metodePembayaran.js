@@ -13,6 +13,10 @@ const MetodePembayaran = sequelize.define("metode_pembayaran", {
         type: DataTypes.STRING,
         allowNull: false,
     },
+    is_deleted: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    }
 }, {
     timestamps: false,
 });

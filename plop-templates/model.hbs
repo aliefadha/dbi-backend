@@ -8,9 +8,10 @@ const {{pascalCase name}} = sequelize.define("{{snakeCase name}}", {
     primaryKey: true,
     autoIncrement: true,
   }, 
-  img_path: {  
-    type: DataTypes.STRING,  
-  },
+  is_deleted: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  }
 });  
   
 module.exports = {{pascalCase name}};  

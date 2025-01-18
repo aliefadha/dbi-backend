@@ -26,7 +26,7 @@ class {{pascalCase name}}Service {
   static async delete(id) {  
     const {{camelCase name}} = await {{pascalCase name}}.findByPk(id);  
     if (!{{camelCase name}}) return null;  
-    await {{camelCase name}}.destroy();  
+    await {{camelCase name}}.update({ is_deleted: true });  
     return true;  
   }  
 }  
