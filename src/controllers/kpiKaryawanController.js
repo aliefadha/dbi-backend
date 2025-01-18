@@ -20,7 +20,8 @@ class KpiKaryawanController {
   
   static async getAll(req, res) {  
     try {  
-      const kpiKaryawans = await KpiKaryawanService.getAll();  
+      const { bulan, tahun } = req.params;
+      const kpiKaryawans = await KpiKaryawanService.getAll(bulan, tahun);  
       res.status(200).json({  
         success: true,  
         data: kpiKaryawans,  

@@ -4,7 +4,7 @@ const { sequelize } = require('../models');
   
 class KpiService {  
   static async create(data) {  
-    return await Kpi.create(data);  
+    return await Kpi.bulkCreate(data);  
   }  
   
   static async getAll() {  

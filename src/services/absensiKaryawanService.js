@@ -70,6 +70,10 @@ class AbsensiKaryawanService {
     return true;  
   }  
 
+  static async test(){
+    return a;
+  }
+
   static async getListAbsensiByKaryawan(id, bulan, tahun){
     const startDate = new Date(tahun, bulan - 1, 1);
     const endDate = new Date(tahun, bulan, 0);
