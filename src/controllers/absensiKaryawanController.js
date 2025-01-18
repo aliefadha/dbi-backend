@@ -38,7 +38,8 @@ class AbsensiKaryawanController {
   
   static async getAll(req, res) {  
     try {  
-      const absensiKaryawans = await AbsensiKaryawanService.getAll();  
+      const { bulan, tahun } = req.params;
+      const absensiKaryawans = await AbsensiKaryawanService.getAll(bulan, tahun);  
       res.status(200).json({  
         success: true,  
         data: absensiKaryawans,  
