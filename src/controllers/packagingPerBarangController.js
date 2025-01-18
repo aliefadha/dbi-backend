@@ -1,12 +1,12 @@
-const BarangCustomService = require("../services/barangCustomService");  
+const PackagingPerBarangService = require("../services/packagingPerBarangService");  
   
-class BarangCustomController {  
+class PackagingPerBarangController {  
   static async create(req, res) {  
     try {  
-      const barangCustom = await BarangCustomService.create(req.body);  
+      const packagingPerBarang = await PackagingPerBarangService.create(req.body);  
       res.status(201).json({  
         success: true,  
-        data: barangCustom,  
+        data: packagingPerBarang,  
         message: "created successfully",  
       });  
     } catch (error) {  
@@ -20,10 +20,10 @@ class BarangCustomController {
   
   static async getAll(req, res) {  
     try {  
-      const barangCustoms = await BarangCustomService.getAll();  
+      const packagingPerBarangs = await PackagingPerBarangService.getAll();  
       res.status(200).json({  
         success: true,  
-        data: barangCustoms,  
+        data: packagingPerBarangs,  
         message: "retrieved successfully",  
       });  
     } catch (error) {  
@@ -37,8 +37,8 @@ class BarangCustomController {
   
   static async getById(req, res) {  
     try {  
-      const barangCustom = await BarangCustomService.getById(req.params.id);  
-      if (!barangCustom) {  
+      const packagingPerBarang = await PackagingPerBarangService.getById(req.params.id);  
+      if (!packagingPerBarang) {  
         return res.status(404).json({  
           success: false,  
           data: null,  
@@ -47,7 +47,7 @@ class BarangCustomController {
       }  
       res.status(200).json({  
         success: true,  
-        data: barangCustom,  
+        data: packagingPerBarang,  
         message: "retrieved successfully",  
       });  
     } catch (error) {  
@@ -61,8 +61,8 @@ class BarangCustomController {
   
   static async update(req, res) {  
     try {  
-      const barangCustom = await BarangCustomService.update(req.params.id, req.body);  
-      if (!barangCustom) {  
+      const packagingPerBarang = await PackagingPerBarangService.update(req.params.id, req.body);  
+      if (!packagingPerBarang) {  
         return res.status(404).json({  
           success: false,  
           data: null,  
@@ -71,7 +71,7 @@ class BarangCustomController {
       }  
       res.status(200).json({  
         success: true,  
-        data: barangCustom,  
+        data: packagingPerBarang,  
         message: "updated successfully",  
       });  
     } catch (error) {  
@@ -85,7 +85,7 @@ class BarangCustomController {
   
   static async delete(req, res) {  
     try {  
-      const deleted = await BarangCustomService.delete(req.params.id);  
+      const deleted = await PackagingPerBarangService.delete(req.params.id);  
       if (!deleted) {  
         return res.status(404).json({  
           success: false,  
@@ -108,4 +108,4 @@ class BarangCustomController {
   }  
 }  
   
-module.exports = BarangCustomController;  
+module.exports = PackagingPerBarangController;  

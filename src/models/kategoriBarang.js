@@ -1,6 +1,6 @@
-const { DataTypes, Model } = require("sequelize");
+const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
-const BarangHandmadeNon = require("./barangNonHandmade");
+
 
 const KategoriBarang = sequelize.define("kategori_barang", {
   kategori_barang_id: {
@@ -13,6 +13,10 @@ const KategoriBarang = sequelize.define("kategori_barang", {
   nama_kategori_barang: {
     type: DataTypes.STRING,
     allowNull: false,
+  },
+  is_deleted: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
   }
 }, {
   timestamps: false,

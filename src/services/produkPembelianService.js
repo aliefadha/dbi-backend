@@ -1,4 +1,4 @@
-const BarangNonHandmade = require("../models/barangNonHandmade");
+const Barang = require("../models/barang");
 const Cabang = require("../models/cabang");
 const ProdukPembelian = require("../models/produkPembelian");  
   
@@ -16,7 +16,7 @@ class ProdukPembelianService {
           attributes: ["cabang_id", "nama_cabang"]
         },
         {
-          model: BarangNonHandmade,
+          model: Barang,
           as: "barang",
           attributes: ["nama_barang", "harga_jual"]
         },
@@ -33,7 +33,7 @@ class ProdukPembelianService {
           attributes: ["cabang_id", "nama_cabang"]
         },
         {
-          model: BarangNonHandmade,
+          model: Barang,
           as: "barang",
           attributes: ["nama_barang", "harga_jual"]
         }

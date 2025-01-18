@@ -1,4 +1,4 @@
-const BarangNonHandmade = require("../models/barangNonHandmade");
+const Barang = require("../models/barang");
 const MetodePembayaran = require("../models/metodePembayaran");
 const Penjualan = require("../models/penjualan");
 const ProdukPenjualan = require("../models/produkPenjualan");
@@ -9,49 +9,10 @@ class PenjualanService {
     }
 
     static async getAll() {
-        return Penjualan.findAll({
-            include: [
-                {
-                    model: ProdukPenjualan,
-                    as: "produk",
-                    attributes: ["barang_id", "kuantitas"],
-                    include: [
-                      {
-                        model: Cabang,
-                        as: "cabang",
-                        attributes: ["cabang_id", "nama_cabang"],
-                      },
-                    ],
-                  },
-                {
-                    model: MetodePembayaran,
-                    attributes: ['nama_metode'],
-                    as: 'metode'
-                },
-            ]
-        })
+        return Penjualan.findAll()
     }
     static async getById(id) {
-        const penjualan = await Penjualan.findByPk(id, {
-            include: [
-                {
-                    model: MetodePembayaran,
-                    attributes: ['nama_metode'],
-                    as: 'metode'
-                },
-                {
-                    model: ProdukPenjualan,
-                    as: 'produk',
-                    include: [
-                        {
-                            model: BarangNonHandmade,
-                            as: 'barang',
-                            attributes: ["barang_id","nama_barang"]
-                        }
-                    ]
-                }
-            ],
-        });
+        const penjualan = await Penjualan.findByPk(id);
 
         if (!penjualan) {
             return null;

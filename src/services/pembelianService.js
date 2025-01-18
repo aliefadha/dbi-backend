@@ -1,4 +1,4 @@
-const BarangNonHandmade = require("../models/barangNonHandmade");
+const Barang = require("../models/barang");
 const Cabang = require("../models/cabang");
 const Pembelian = require("../models/pembelian");
 const ProdukPembelian = require("../models/produkPembelian");
@@ -40,7 +40,7 @@ class PembelianService {
           as: "produk",
           include: [
             {
-              model: BarangNonHandmade,
+              model: Barang,
               as: "barang",
               attributes: ["barang_id", "nama_barang", "harga_jual"]
             },

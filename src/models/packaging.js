@@ -1,6 +1,7 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 const JenisBarang = require("./jenisBarang");
+const KategoriBarang = require("./kategoriBarang");
 
 const Packaging = sequelize.define("packaging", {
     packaging_id: {
@@ -9,6 +10,16 @@ const Packaging = sequelize.define("packaging", {
         primaryKey: true,
         autoIncrement: true,
         unique: true,
+    },
+    image: {
+        type: DataTypes.STRING
+    },
+    kategori_barang_id: {
+        type: DataTypes.INTEGER,
+        references: {
+            model: KategoriBarang,
+            key: 'kategori_barang_id'
+        }
     },
     nama_packaging: {
         type: DataTypes.STRING,
@@ -33,13 +44,10 @@ const Packaging = sequelize.define("packaging", {
         type: DataTypes.INTEGER,
         defaultValue: 0,
     },
-    jenis_barang_id: {
-        type: DataTypes.INTEGER,
-        references: {
-            model: JenisBarang,
-            key: 'jenis_barang_id'
-        }
-    },
+    is_deleted: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    }
 }, {
     timestamps: false,
 });

@@ -1,4 +1,4 @@
-const BarangNonHandmade = require("../models/barangNonHandmade");
+const Barang = require("../models/barang");
 const Cabang = require("../models/cabang");
 const ProdukPenjualan = require("../models/produkPenjualan");  
   
@@ -15,7 +15,7 @@ class ProdukPenjualanService {
     return await ProdukPenjualan.findByPk(id, {
       include: [
         {
-          model: BarangNonHandmade,
+          model: Barang,
           as: "barang",
           attributes: ["barang_id", "nama_barang"]
         },

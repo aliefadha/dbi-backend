@@ -2,7 +2,6 @@
 
 // models/relation.js  
 const sequelize = require('../config/database');
-const BarangNonHandmade = require('./barangNonHandmade');
 const DivisiKaryawan = require('./divisiKaryawan');
 const JenisBarang = require('./jenisBarang');
 const Karyawan = require('./karyawan');
@@ -14,52 +13,62 @@ const Cabang = require('./cabang');
 const TargetBulananKasir = require('./targetBulananKasir');
 const CutiKaryawan = require('./cutiKaryawan');
 const AbsensiKaryawan = require('./absensiKaryawan');
-const BarangCustom = require("./barangCustom");
 const KpiKaryawan = require("./kpiKaryawan");
 const MetodePembayaran = require('./metodePembayaran');
 const Penjualan = require('./penjualan');
 const Pembelian = require('./pembelian');
 const ProdukPembelian = require('./produkPembelian');
+const Barang = require('./barang');
+const Bundling = require('./bundling');
+const Addons = require('./addons');
 
 
-JenisBarang.hasMany(BarangNonHandmade, {
-    foreignKey: 'kategori_barang_id',
-    as: "barangNonHandmade",
-});
-
-JenisBarang.hasMany(BarangCustom, {
-    foreignKey: 'kategori_barang_id',
-    as: "barangCustom"
-})
-
-KategoriBarang.hasMany(BarangNonHandmade, {
+JenisBarang.hasMany(Barang, {
     foreignKey: 'jenis_barang_id',
-    as: "barang",
-});
+    as: 'barang'
+})
+Barang.belongsTo(JenisBarang, {
+    foreignKey: 'jenis_barang_id',
+    as: 'jenis'
+})
 
-Packaging.hasMany(BarangNonHandmade, {
+KategoriBarang.hasMany(Barang, {
+    foreignKey: 'kategori_barang_id',
+    as: 'barang'
+})
+Barang.belongsTo(KategoriBarang, {
+    foreignKey: 'kategori_barang_id',
+    as: 'kategori'
+})
+
+Bundling.hasMany(Addons, {
+    foreignKey: 'bundling_id',
+    as: 'addons'
+})
+
+Addons.belongsTo(Bundling, {
+    foreignKey: 'bundling_id',
+    as: 'bundling'
+})
+
+Packaging.hasMany(Addons, {
     foreignKey: 'packaging_id',
-    as: "barang",
+    as: 'addons'
 })
 
-BarangNonHandmade.belongsTo(KategoriBarang, {
-    foreignKey: 'kategori_barang_id',
-    as: "kategori",
+Addons.belongsTo(Packaging, {
+    foreignKey: 'packaging_id',
+    as: 'packaging'
 })
 
-BarangNonHandmade.belongsTo(JenisBarang, {
-    foreignKey: "jenis_barang_id",
-    as: "jenis",
+Bundling.belongsTo(Cabang, {
+    foreignKey: 'cabang_id',
+    as: 'cabang'
 })
 
-BarangNonHandmade.belongsTo(Packaging, {
-    foreignKey: "packaging_id",
-    as: "packaging",
-})
-
-BarangCustom.belongsTo(KategoriBarang, {
-    foreignKey: 'kategori_barang_id',
-    as: "kategori",
+Cabang.hasMany(Bundling, {
+    foreignKey: 'cabang_id',
+    as: 'bundling'
 })
 
 MetodePembayaran.hasMany(Penjualan, {
@@ -77,7 +86,7 @@ Penjualan.belongsTo(MetodePembayaran, {
     as: "metode"
 })
 
-ProdukPenjualan.belongsTo(BarangNonHandmade, {
+ProdukPenjualan.belongsTo(Barang, {
     foreignKey: "barang_id",
     as: "barang",
 })
@@ -112,7 +121,7 @@ ProdukPenjualan.belongsTo(Cabang, {
     as: "cabang"
 })
 
-ProdukPembelian.belongsTo(BarangNonHandmade, {
+ProdukPembelian.belongsTo(Barang, {
     foreignKey: "barang_id",
     as: "barang",
 })
@@ -206,8 +215,6 @@ KpiKaryawan.belongsTo(Kpi, {
     foreignKey: "kpi_id",    
     as: "kpi",
 })
-
-
 
 // Sync models with the database  
 const syncDatabase = async () => {

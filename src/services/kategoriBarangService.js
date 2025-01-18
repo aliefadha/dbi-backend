@@ -1,4 +1,4 @@
-const BarangHandmadeNon = require("../models/barangNonHandmade");
+
 const KategoriBarang = require("../models/kategoriBarang");
 
 class KategoriBarangService {
@@ -17,9 +17,9 @@ class KategoriBarangService {
     }
 
     static async delete(id) {
-        const kategoriBarang = await kategoriBarang.findByPk(id);
-        if (!kategoriBarang) return null;
-        await kategoriBarang.destroy();
+        const kategori = await KategoriBarang.findByPk(id);
+        if (!kategori) return null
+        await kategori.update({ is_deleted: true });
         return true;
     }
 
@@ -35,7 +35,7 @@ class KategoriBarangService {
         return await KategoriBarang.findOne({
             where: { kategori_barang_id: id },
             include: {
-                model: BarangHandmadeNon,
+                model: Barang,
                 as: 'barang'
             }
         }
