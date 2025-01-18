@@ -1,11 +1,12 @@
-const express = require("express");
-const DivisiKaryawanController = require("../controllers/divisiKaryawanController");
+const express = require('express');  
+const router = express.Router();  
+const DivisiKaryawanController = require('../controllers/divisiKaryawanController');  
 
-const router = express.Router();
-
-router.post("/divisi-karyawan", DivisiKaryawanController.create);
-router.get("/divisi-karyawan", DivisiKaryawanController.getAll);
-router.get("/divisi-karyawan/:id", DivisiKaryawanController.getById);
+router.post('/divisi-karyawan', DivisiKaryawanController.create);  
+router.get('/divisi-karyawan', DivisiKaryawanController.getAll);  
+router.get('/divisi-karyawan/:id', DivisiKaryawanController.getById);  
 router.get("/divisi-karyawan/:id/karyawan", DivisiKaryawanController.getKaryawanByDivisi);
-
-module.exports = router;
+router.put('/divisi-karyawan/:id', DivisiKaryawanController.update);  
+router.delete('/divisi-karyawan/:id', DivisiKaryawanController.delete);  
+  
+module.exports = router;  
