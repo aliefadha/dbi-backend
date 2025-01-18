@@ -7,7 +7,7 @@ const JenisBarang = sequelize.define("jenis_barang", {
     primaryKey: true,
     autoIncrement: true,
   },
-  jenis_barang: {
+  nama_jenis_barang: {
     type: DataTypes.STRING,
     allowNull: false,
   },
