@@ -4,8 +4,8 @@ const DivisiKaryawan = require("../models/divisiKaryawan");
 const Cabang = require("../models/cabang");
 const { Op } = require("sequelize");
 const CutiKaryawan = require("../models/cutiKaryawan");
-const KpiKaryawanService = require("./kpiKaryawanService");
-  
+const DataKaryawanService = require("./dataKaryawanService");
+
 class AbsensiKaryawanService {  
   static async create(data) {  
     const karyawanData = await Karyawan.findOne({where: {karyawan_id: data.karyawan_id}});
@@ -40,7 +40,7 @@ class AbsensiKaryawanService {
           const id = karyawan.karyawan_id;
     
           // Call the getDataAbsensiByKaryawan function for each employee  
-          const data = await this.getDataAbsensiByKaryawan(id, bulan, tahun);  
+          const data = await DataKaryawanService.getDataAbsensiByKaryawan(id, bulan, tahun);  
 
           results.push(data);  
       }  
@@ -71,116 +71,15 @@ class AbsensiKaryawanService {
   }  
 
   static async test(){
-    return a;
+    return 'a';
   }
 
   static async getListAbsensiByKaryawan(id, bulan, tahun){
-    const startDate = new Date(tahun, bulan - 1, 1);
-    const endDate = new Date(tahun, bulan, 0);
-
-    const absensiRecord = await AbsensiKaryawan.findAll({
-      where: {
-        karyawan_id: id,
-        tanggal: {
-          [Op.between]: [startDate, endDate]
-        },
-      }
-    });
-
-    let totalGajiPokok = 0;
-    let totalMenit = 0;
-
-    absensiRecord.forEach((absensi) => {
-      totalGajiPokok += absensi.gaji_pokok_perhari;
-      totalMenit += absensi.total_menit;
-    });
-
-    return {
-      absensiRecord, 
-      totalGajiPokok,
-      totalMenit,
-    };
+    return await DataKaryawanService.getListAbsensiByKaryawan(id, bulan, tahun);
   }
 
   static async getDataAbsensiByKaryawan(id, bulan, tahun){
-    const startDate = new Date(tahun, bulan - 1, 1);
-    const endDate = new Date(tahun, bulan, 0);
-
-    const karyawan = await Karyawan.findOne({
-      where: {karyawan_id: id},
-      include: [
-        {
-          model: Cabang,
-          as: 'cabang',
-          attributes: ['nama_cabang']
-        },
-        {
-          model: Cabang,
-          as: 'cabang_first',
-          attributes: ['nama_cabang']
-        },
-        {
-          model: DivisiKaryawan,
-          as: 'divisi',
-          attributes: ['nama_divisi']
-        }
-    ]});
-
-    const kehadiran = await AbsensiKaryawan.count({
-      where: {
-        karyawan_id: id,
-        tanggal: {
-          [Op.between]: [startDate, endDate]
-        },
-      }
-    })
-
-    const cutiKaryawanRecords = await CutiKaryawan.findAll({  
-        where: {  
-            karyawan_id: id,  
-            tanggal_mulai: {  
-                [Op.lte]: endDate // Start date should be less than or equal to end of the month  
-            },  
-            tanggal_selesai: {  
-                [Op.gte]: startDate // End date should be greater than or equal to start of the month  
-            }  
-        }  
-    });  
-    let totalCutiDays = 0;  
-    
-    // Calculate the number of days of leave that fall within the specified month  
-    for (const cutiKaryawan of cutiKaryawanRecords) {  
-        const cutiStart = new Date(cutiKaryawan.tanggal_mulai);  
-        const cutiEnd = new Date(cutiKaryawan.tanggal_selesai);  
-  
-        // Calculate the actual start and end dates for the overlap  
-        const overlapStart = cutiStart < startDate ? startDate : cutiStart;  
-        const overlapEnd = cutiEnd > endDate ? endDate : cutiEnd;  
-  
-        // Calculate the number of overlapping days  
-        const cutiDays = Math.max(0, (overlapEnd - overlapStart) / (1000 * 60 * 60 * 24) + 1); // +1 to include the end day  
-        totalCutiDays += cutiDays; // Accumulate the total cuti days  
-    }  
-
-    let tidakHadir = Math.max(0, 28 - totalCutiDays - kehadiran);
-
-    const { totalPersentaseTercapai, totalBonusDiterima } = await KpiKaryawanService.getByKaryawanId(id, bulan, tahun);  
-
-    const { totalGajiPokok, totalMenit } = await AbsensiKaryawanService.getListAbsensiByKaryawan(id, bulan, tahun);
-
-    const totalGajiAkhir = totalGajiPokok + totalBonusDiterima;
-
-    return {  
-        karyawan,  
-        kehadiran,  
-        totalCutiDays,
-        tidakHadir,
-        totalGajiPokok,
-        totalMenit,
-        totalPersentaseTercapai,
-        totalBonusDiterima,
-        totalGajiAkhir
-    };
+    return await DataKaryawanService.getDataAbsensiByKaryawan(id, bulan, tahun);
   }
 }  
   
