@@ -3,12 +3,12 @@ const router = express.Router();
 const BarangController = require('../controllers/barangController');  
 
 router.post('/barang', BarangController.create);
-router.post('/barang/handmade', BarangController.createHandmades);
-router.post('/barang/nonhandmade', BarangController.createNonHandmade);
-router.post('/barang/custom', BarangController.createCustom);
-router.get('/barang', BarangController.getAll);  
+router.get('/barang', BarangController.getAll); 
+router.get('/barang/jenis/:id', BarangController.getAllByJenis); 
+router.get('/barang/kategori/:id', BarangController.getAllByKategori); 
 router.get('/barang/:id', BarangController.getById); 
 router.put('/barang/:id', BarangController.update);  
-router.delete('/barang/:id', BarangController.delete);  
+router.delete('/barang/:id', BarangController.delete); 
+ 
   
 module.exports = router;  

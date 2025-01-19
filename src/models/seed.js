@@ -17,6 +17,7 @@ const seedDatabase = async () => {
         await JenisBarang.create({ jenis_barang_id: 1, nama_jenis_barang: "Handmade" });
         await JenisBarang.create({ jenis_barang_id: 2, nama_jenis_barang: "Non Handmade" });
         await JenisBarang.create({ jenis_barang_id: 3, nama_jenis_barang: "Custom" });
+        await JenisBarang.create({ jenis_barang_id: 4, nama_jenis_barang: "Mentah" });
 
         // Seed data for JenisBarang  
         await KategoriBarang.create({ kategori_barang_id: 1, nama_kategori_barang: "Gelang" });

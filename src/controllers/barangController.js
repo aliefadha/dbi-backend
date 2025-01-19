@@ -18,61 +18,44 @@ class BarangController {
     }
   }
 
-  static async createHandmades(req, res) {
-    try {
-      const barang = await BarangService.createHandmade(req.body);
-
-      res.status(201).json({
-        success: true,
-        data: barang,
-        message: "created successfully",
-      });
-    } catch (error) {
-      res.status(400).json({
-        success: false,
-        data: null,
-        message: error.message,
-      });
-    }
-  }
-
-  static async createNonHandmade(req, res) {
-    try {
-      const barang = await BarangService.createNonHandmade(req.body);
-      res.status(201).json({
-        success: true,
-        data: barang,
-        message: "created successfully",
-      });
-    } catch (error) {
-      res.status(400).json({
-        success: false,
-        data: null,
-        message: error.message,
-      });
-    }
-  }
-
-  static async createCustom(req, res) {
-    try {
-      const barang = await BarangService.createCustom(req.body);
-      res.status(201).json({
-        success: true,
-        data: barang,
-        message: "created successfully",
-      });
-    } catch (error) {
-      res.status(400).json({
-        success: false,
-        data: null,
-        message: error.message,
-      });
-    }
-  }
 
   static async getAll(req, res) {
     try {
       const barangs = await BarangService.getAll();
+      res.status(200).json({
+        success: true,
+        data: barangs,
+        message: "retrieved successfully",
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        data: null,
+        message: error.message,
+      });
+    }
+  }
+  
+  static async getAllByJenis(req, res) {
+    try {
+      const barangs = await BarangService.getAllByJenis(req.params.id);
+      res.status(200).json({
+        success: true,
+        data: barangs,
+        message: "retrieved successfully",
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        data: null,
+        message: error.message,
+      });
+    }
+  }
+
+  static async getAllByKategori(req, res) {
+    try {
+      const barangs = await BarangService.getAllByKategori(req.params.id);
       res.status(200).json({
         success: true,
         data: barangs,

@@ -1,4 +1,5 @@
 
+const { where } = require("sequelize");
 const KategoriBarang = require("../models/kategoriBarang");
 
 class KategoriBarangService {
@@ -7,7 +8,9 @@ class KategoriBarangService {
     }
 
     static async update(id, data) {
-        const kategoriBarang = await KategoriBarang.findByPk(id);
+        const kategoriBarang = await KategoriBarang.findOne({
+            where: { "kategori_barang_id": id, "is_deleted": false }
+        });
         if (!kategoriBarang) return null;
 
         Object.assign(kategoriBarang, data);
@@ -17,18 +20,24 @@ class KategoriBarangService {
     }
 
     static async delete(id) {
-        const kategori = await KategoriBarang.findByPk(id);
+        const kategori = await KategoriBarang.findOne({
+            where: { "kategori_barang_id": id, "is_deleted": false }
+        });;
         if (!kategori) return null
         await kategori.update({ is_deleted: true });
         return true;
     }
 
     static async getAll() {
-        return await KategoriBarang.findAll();
+        return await KategoriBarang.findAll({
+            where: { "is_deleted": false }
+        });
     }
 
     static async getById(id) {
-        return await KategoriBarang.findByPk(id);
+        return await KategoriBarang.findOne({
+            where: { "kategori_barang_id": id, "is_deleted": false }
+        });
     }
 
     static async getBarangByKategori(id) {

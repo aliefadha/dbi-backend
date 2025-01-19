@@ -7,30 +7,6 @@ class BarangService {
     return await Barang.create(data);
   }
 
-  static async createHandmade(data) {
-    const handmadeData = {
-      ...data,
-      jenis_barang_id: 1
-    };
-    return await Barang.create(handmadeData);
-  }
-
-  static async createNonHandmade(data) {
-    const handmadeData = {
-      ...data,
-      jenis_barang_id: 2
-    };
-    return await Barang.create(handmadeData);
-  }
-
-  static async createCustom(data) {
-    const handmadeData = {
-      ...data,
-      jenis_barang_id: 3
-    };
-    return await Barang.create(handmadeData);
-  }
-
   static async getAll() {
     return await Barang.findAll({
       where: { is_deleted: false },
@@ -47,6 +23,38 @@ class BarangService {
         }
       ],
     });
+  }
+
+  static async getAllByJenis(id){
+    return await Barang.findAll({
+      where: {
+        is_deleted: false,
+        jenis_barang_id: id
+      },
+      include: [
+        {
+          model: KategoriBarang,
+          as: "kategori",
+          attributes: ["nama_kategori_barang"]
+        }
+      ]
+    })
+  }
+
+  static async getAllByKategori(id) {
+    return await Barang.findAll({
+      where: {
+        is_deleted: false,
+        kategori_barang_id: id
+      },
+      include: [
+        {
+          model: JenisBarang,
+          as: "jenis",
+          attributes: ["nama_jenis_barang"]
+        }
+      ]
+    })
   }
 
   static async getById(id) {
