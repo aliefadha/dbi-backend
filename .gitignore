@@ -8,3 +8,4 @@ database.sqlite
 .idea
 .sqlite
 .png
+*.jpg
