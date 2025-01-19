@@ -7,7 +7,11 @@ class DivisiKaryawanService {
   }  
   
   static async getAll() {  
-    return await DivisiKaryawan.findAll();  
+    return await DivisiKaryawan.findAll({
+      where: {
+        is_deleted: false
+      }
+    });  
   }  
   
   static async getById(id) {  
@@ -15,7 +19,12 @@ class DivisiKaryawanService {
   }  
   
   static async update(id, data) {  
-    const divisiKaryawan = await DivisiKaryawan.findByPk(id);  
+    const divisiKaryawan = await DivisiKaryawan.findOne({
+      where: {
+        divisi_karyawan_id: id,
+        is_deleted: false
+      }
+    });  
     if (!divisiKaryawan) return null;  
   
     Object.assign(divisiKaryawan, data);  
