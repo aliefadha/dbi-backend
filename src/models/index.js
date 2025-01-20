@@ -20,20 +20,44 @@ const MetodePembayaran = require('./metodePembayaran');
 const Penjualan = require('./penjualan');
 const Pembelian = require('./pembelian');
 const ProdukPembelian = require('./produkPembelian');
+const JenisBarangGudang = require('./jenisBarangGudang');
+const BarangNonHandmadeGudang = require('./barangNonHandmadeGudang');
+const KategoriBarangGudang = require('./kategoriBarangGudang');
+const RincianBiayaGudang = require('./rincianBiayaGudang');
+const RincianBahanGudang = require('./rincianBahanGudang');
+const BarangMentah = require('./barangMentah');
+const PembelianGudang = require('./pembelianGudang');
+const MetodePembayaranGudang = require('./metodePembayaranGudang');
+const ProdukPembelianGudang = require('./produkPembelianGudang');
+const PenjualanGudang = require('./penjualanGudang');
+const ProdukPenjualanGudang = require('./produkPenjualanGudang');
+const PackagingGudang = require('./packagingGudang');
+const StokBarangGudang = require('./stokBarangGudang');
+const BarangProduksiGudang = require('./barangProduksiGudang');
 
 
 JenisBarang.hasMany(BarangNonHandmade, {
-    foreignKey: 'kategori_barang_id',
+    foreignKey: 'jenis_barang_id',
     as: "barangNonHandmade",
 });
 
 JenisBarang.hasMany(BarangCustom, {
-    foreignKey: 'kategori_barang_id',
+    foreignKey: 'jenis_barang_id',
     as: "barangCustom"
 })
 
-KategoriBarang.hasMany(BarangNonHandmade, {
+JenisBarangGudang.hasMany(BarangNonHandmadeGudang, {
     foreignKey: 'jenis_barang_id',
+    as: "barang", 
+})
+
+KategoriBarang.hasMany(BarangNonHandmade, {
+    foreignKey: 'kategori_barang_id',
+    as: "barang",
+});
+
+KategoriBarangGudang.hasMany(BarangNonHandmadeGudang, {
+    foreignKey: 'kategori_barang_id',
     as: "barang",
 });
 
@@ -57,10 +81,166 @@ BarangNonHandmade.belongsTo(Packaging, {
     as: "packaging",
 })
 
+BarangNonHandmadeGudang.belongsTo(KategoriBarangGudang, {
+    foreignKey: 'kategori_barang_id',
+    as: "kategori",
+})
+
+BarangNonHandmadeGudang.belongsTo(JenisBarangGudang, {
+    foreignKey: "jenis_barang_id",
+    as: "jenis",
+})
+
+BarangNonHandmadeGudang.hasMany(RincianBiayaGudang, {
+    foreignKey: "rincian_biaya_id",
+    as: "rincian_biaya"
+})
+
+BarangNonHandmadeGudang.hasMany(ProdukPembelianGudang, {
+    foreignKey: "barang_id",
+    as: "produk_pembelian"
+})
+
+RincianBiayaGudang.belongsTo(BarangNonHandmadeGudang ,{
+    foreignKey: "barang_id",
+    as: "barang_nonhandmade"
+})
+
+BarangNonHandmadeGudang.hasMany(RincianBahanGudang, {
+    foreignKey: "barang_id",
+    as: "rincian_bahan"
+})
+
+RincianBahanGudang.belongsTo(BarangNonHandmadeGudang, {
+    foreignKey: "barang_id",
+    as: "barang_nonhandmade"
+})
+
+BarangMentah.hasMany(RincianBahanGudang, {
+    foreignKey: "barang_mentah_id",
+    as: "rincian_bahan"
+})
+
+BarangMentah.hasMany(ProdukPembelianGudang, {
+    foreignKey: "barang_mentah_id",
+    as: "produk_pembelian"
+})
+
+RincianBahanGudang.belongsTo(BarangMentah, {
+    foreignKey: "barang_mentah_id",
+    as: 'barang_mentah'
+})
+
+PembelianGudang.belongsTo(MetodePembayaranGudang, {
+    foreignKey: "metode_id",
+    as: "metode_pembelian"
+})
+
+PembelianGudang.hasMany(ProdukPembelianGudang, {
+    foreignKey: "pembelian_id",
+    as: "produk"
+})
+
+ProdukPembelianGudang.belongsTo(PembelianGudang, {
+    foreignKey: "pembelian_id",
+    as: "pembelian"
+})
+
+ProdukPembelianGudang.belongsTo(BarangNonHandmadeGudang, {
+    foreignKey: "barang_id",
+    as: "barang_nonhandmade"
+})
+
+ProdukPembelianGudang.belongsTo(BarangMentah, {
+    foreignKey: "barang_mentah_id",
+    as: "barang_mentah"
+})
+
+ProdukPembelianGudang.belongsTo(PackagingGudang, {
+    foreignKey: "packaging_id",
+    as: "packaging"
+})
+
+MetodePembayaranGudang.hasMany(PembelianGudang, {
+    foreignKey: "metode_id",
+    as: "metode_pembelian"
+})
+
+MetodePembayaranGudang.hasMany(PenjualanGudang, {
+    foreignKey: "metode_id",
+    as: "metode_pembayaran"
+})
+
+PenjualanGudang.belongsTo(MetodePembayaranGudang, {
+    foreignKey: "metode_id",
+    as: "metode_pembayaran"
+})
+
+ProdukPenjualanGudang.belongsTo(BarangNonHandmadeGudang, {
+    foreignKey: "barang_id",
+    as: "barang_nonhandmade"
+})
+
+ProdukPenjualanGudang.belongsTo(PackagingGudang, {
+    foreignKey: "packaging_id",
+    as: "packaging",
+})
+
+PackagingGudang.hasMany(ProdukPenjualanGudang, {
+    foreignKey: "packaging_id",
+    as: "produk_penjualan"
+})
+
+PackagingGudang.hasMany(ProdukPembelianGudang, {
+    foreignKey: "packaging_id",
+    as: "produk_pembelian"
+})
+
+PackagingGudang.hasOne(StokBarangGudang, {
+    foreignKey: "packaging_id",
+    as: "stok_barang"
+})
+
+StokBarangGudang.belongsTo(PackagingGudang, {
+    foreignKey: "packaging_id",
+    as: "packaging"
+})
+
+BarangNonHandmadeGudang.hasOne(StokBarangGudang, {
+    foreignKey: "barang_id",
+    as: "stok_barang"
+})
+
+StokBarangGudang.belongsTo(BarangNonHandmadeGudang, {
+    foreignKey: "barang_id",
+    as: "barang_nonhandmade"
+})
+
+StokBarangGudang.belongsTo(BarangMentah, {
+    foreignKey: "barang_mentah_id",
+    as: "barang_mentah"
+})
+
+BarangMentah.hasOne(StokBarangGudang, {
+    foreignKey: "barang_mentah_id",
+    as: "stok_barang"
+})
+
+BarangProduksiGudang.belongsTo(BarangNonHandmadeGudang, {
+    foreignKey: "barang_id",
+    as: "barang"
+})
+
+BarangNonHandmadeGudang.hasMany(BarangProduksiGudang, {
+    foreignKey: "barang_id",
+    as: "barang_produksi"
+})
+
 BarangCustom.belongsTo(KategoriBarang, {
     foreignKey: 'kategori_barang_id',
     as: "kategori",
 })
+
 
 MetodePembayaran.hasMany(Penjualan, {
     foreignKey: "metode_pembayaran_id",
@@ -81,6 +261,7 @@ ProdukPenjualan.belongsTo(BarangNonHandmade, {
     foreignKey: "barang_id",
     as: "barang",
 })
+
 
 Penjualan.hasMany(ProdukPenjualan, {
     foreignKey: "penjualan_id",

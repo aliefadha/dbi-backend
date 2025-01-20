@@ -24,7 +24,11 @@ class KategoriBarangService {
     }
 
     static async getAll() {
-        return await KategoriBarang.findAll();
+        return await KategoriBarang.findAll({
+            where: {
+                "is_deleted": false
+            }
+        });
     }
 
     static async getById(id) {

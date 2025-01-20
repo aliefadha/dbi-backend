@@ -1,6 +1,6 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
-const BarangHandmadeNon = require("./barangNonHandmade");
+const barangNonHandmade = require("./barangNonHandmade");
 
 const RincianBiaya = sequelize.define('rincian_biaya', {
     rincian_biaya_id: {
@@ -13,7 +13,7 @@ const RincianBiaya = sequelize.define('rincian_biaya', {
     barang_id: {
         type: DataTypes.INTEGER,
         references: {
-            model: BarangHandmadeNon,
+            model: barangNonHandmade,
             key: 'barang_id'
         }
     },
@@ -23,11 +23,13 @@ const RincianBiaya = sequelize.define('rincian_biaya', {
     jumlah_biaya: {
         type: DataTypes.INTEGER,
         defaultValue: 0
+    },
+    is_deleted: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
     }
-})
-
-RincianBiaya.belongsTo(BarangHandmadeNon, {
-    foreignKey: 'barang_id'
+}, {
+    timestamps: false
 })
 
 module.exports = RincianBiaya

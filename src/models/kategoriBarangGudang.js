@@ -1,14 +1,12 @@
-const { DataTypes, Model } = require("sequelize");
+const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
-const BarangHandmadeNon = require("./barangNonHandmade");
 
-const KategoriBarang = sequelize.define("kategori_barang", {
+const KategoriBarangGudang = sequelize.define("kategori_barang_gudang", {
   kategori_barang_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
     primaryKey: true,
     autoIncrement: true,
-    unique: true,
   },
   nama_kategori_barang: {
     type: DataTypes.STRING,
@@ -19,7 +17,7 @@ const KategoriBarang = sequelize.define("kategori_barang", {
     defaultValue: false
   }
 }, {
-  timestamps: false,
+  timestamps: false
 });
 
-module.exports = KategoriBarang;
+module.exports = KategoriBarangGudang;  
