@@ -1,13 +1,14 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 
-const JenisBarang = sequelize.define("jenis_barang", {
-  jenis_barang_id: {
+const MetodePembayaranGudang = sequelize.define("metode_pembayaran_gudang", {
+  metode_id: {
     type: DataTypes.INTEGER,
+    allowNull: false,
     primaryKey: true,
     autoIncrement: true,
   },
-  nama_jenis_barang: {
+  nama_metode: {
     type: DataTypes.STRING,
     allowNull: false,
   },
@@ -15,8 +16,8 @@ const JenisBarang = sequelize.define("jenis_barang", {
     type: DataTypes.BOOLEAN,
     defaultValue: false
   }
-},{
-    timestamps: false,
-  });
+}, {
+  timestamps: false
+});
 
-module.exports = JenisBarang;  
+module.exports = MetodePembayaranGudang;  

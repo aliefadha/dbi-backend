@@ -6,11 +6,20 @@ class {{pascalCase name}}Service {
   }  
   
   static async getAll() {  
-    return await {{pascalCase name}}.findAll();  
+    return await {{pascalCase name}}.findAll({
+      where: {
+        is_deleted: false
+      }
+    });  
   }  
   
   static async getById(id) {  
-    return await {{pascalCase name}}.findByPk(id);  
+    return await {{pascalCase name}}.findOne({
+      where: {
+        {{snakeCase name}}_id: id,
+        is_deleted: false
+      }
+    });  
   }  
   
   static async update(id, data) {  
