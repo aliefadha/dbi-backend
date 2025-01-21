@@ -1,4 +1,6 @@
-const BarangCustom = require("../models/barangCustom");  
+const BarangCustom = require("../models/barangCustom"); 
+const JenisBarang = require("../models/jenisBarang");
+const KategoriBarang = require("../models/kategoriBarang"); 
   
 class BarangCustomService {  
   static async create(data) {  
@@ -6,11 +8,28 @@ class BarangCustomService {
   }  
   
   static async getAll() {  
-    return await BarangCustom.findAll();  
+    return await BarangCustom.findAll({
+      where: {
+        is_deleted: false
+      },
+      include: [
+        { model: JenisBarang, as: "jenis_barang" },
+        { model: KategoriBarang, as: "kategori" },
+      ]
+    });  
   }  
   
   static async getById(id) {  
-    return await BarangCustom.findByPk(id);  
+    return await BarangCustom.findOne({
+      where: {
+        barang_custom_id: id,
+        is_deleted: false
+      },
+      include: [
+        { model: JenisBarang, as: "jenis_barang" },
+        { model: KategoriBarang, as: "kategori" },
+      ]
+    });  
   }  
   
   static async update(id, data) {  
@@ -26,7 +45,7 @@ class BarangCustomService {
   static async delete(id) {  
     const barangCustom = await BarangCustom.findByPk(id);  
     if (!barangCustom) return null;  
-    await barangCustom.destroy();  
+    await barangCustom.update({ is_deleted: true });  
     return true;  
   }  
 }  

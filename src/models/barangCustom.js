@@ -1,16 +1,33 @@
 const { DataTypes } = require("sequelize");  
-const sequelize = require("../config/database");
+const sequelize = require("../config/database");  
+const JenisBarang = require("./jenisBarang");
 const KategoriBarang = require("./kategoriBarang");
   
 const BarangCustom = sequelize.define("barang_custom", {  
   barang_custom_id: {  
-    type: DataTypes.INTEGER,  
+    type: DataTypes.STRING,  
     allowNull: false,
     primaryKey: true,
-    autoIncrement: true,
   },
   image: {
     type: DataTypes.STRING,  
+  },
+  jenis_barang_id: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: JenisBarang,
+      defaultValue: 3,
+      key: 'jenis_barang_id'
+    }
+  },
+  kategori_barang_id: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: KategoriBarang,
+      key: 'kategori_barang_id'
+    }
   },
   nama_barang: {
     type: DataTypes.STRING,
@@ -27,14 +44,12 @@ const BarangCustom = sequelize.define("barang_custom", {
   harga_satuan: {
     type: DataTypes.INTEGER,
   },
-  kategori_barang_id: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: KategoriBarang,
-      key: 'kategori_barang_id'
-    }
+  is_deleted: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
   }
-},{timestamps: false});
+},{
+  timestamps: false
+});  
   
 module.exports = BarangCustom;  

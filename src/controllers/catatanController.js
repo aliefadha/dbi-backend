@@ -1,34 +1,12 @@
-const PackagingService = require("../services/packagingService");  
-const multer = require("multer");
-const path = require("path");
-const fs = require('fs');
-const CustomIdGenerateService = require("../services/customIdGenerateService");
-
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, path.join(__dirname, "../public/packaging"));
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + path.extname(file.originalname));
-    },
-});
-
-const upload = multer({ storage: storage });
-
-class PackagingController {  
+const CatatanService = require("../services/catatanService");  
+  
+class CatatanController {  
   static async create(req, res) {  
     try {  
-      const newId = await CustomIdGenerateService.generatePackagingId();
-      const packagingData = {
-        ...req.body,
-        image: req.file.filename,
-        packaging_id: newId,
-        jenis_barang_id: 4,
-      }
-      const packaging = await PackagingService.create(packagingData);  
+      const catatan = await CatatanService.create(req.body);  
       res.status(201).json({  
         success: true,  
-        data: packaging,  
+        data: catatan,  
         message: "created successfully",  
       });  
     } catch (error) {  
@@ -42,10 +20,10 @@ class PackagingController {
   
   static async getAll(req, res) {  
     try {  
-      const packagings = await PackagingService.getAll();  
+      const catatans = await CatatanService.getAll();  
       res.status(200).json({  
         success: true,  
-        data: packagings,  
+        data: catatans,  
         message: "retrieved successfully",  
       });  
     } catch (error) {  
@@ -59,8 +37,8 @@ class PackagingController {
   
   static async getById(req, res) {  
     try {  
-      const packaging = await PackagingService.getById(req.params.id);  
-      if (!packaging) {  
+      const catatan = await CatatanService.getById(req.params.id);  
+      if (!catatan) {  
         return res.status(404).json({  
           success: false,  
           data: null,  
@@ -69,7 +47,7 @@ class PackagingController {
       }  
       res.status(200).json({  
         success: true,  
-        data: packaging,  
+        data: catatan,  
         message: "retrieved successfully",  
       });  
     } catch (error) {  
@@ -83,27 +61,8 @@ class PackagingController {
   
   static async update(req, res) {  
     try {  
-      const existingPackaging = await PackagingService.getById(req.params.id);
-      if (!existingPackaging) {
-        return res.status(404).json({
-          success: false,
-          data: null,
-          message: "not found",
-        });
-      }
-      const updatedData = { ...req.body };
-      if (req.file) {
-        // Delete the old image file  
-        const oldImagePath = path.join(__dirname, "../public/packaging", existingPackaging.image);  
-        fs.unlink(oldImagePath, (err) => {  
-          if (err) {  
-            console.error("Failed to delete old image:", err);  
-          }  
-        });  
-        updatedData.image = req.file.filename;  
-      }
-      const packaging = await PackagingService.update(req.params.id, updatedData);  
-      if (!packaging) {  
+      const catatan = await CatatanService.update(req.params.id, req.body);  
+      if (!catatan) {  
         return res.status(404).json({  
           success: false,  
           data: null,  
@@ -112,7 +71,7 @@ class PackagingController {
       }  
       res.status(200).json({  
         success: true,  
-        data: packaging,  
+        data: catatan,  
         message: "updated successfully",  
       });  
     } catch (error) {  
@@ -126,7 +85,7 @@ class PackagingController {
   
   static async delete(req, res) {  
     try {  
-      const deleted = await PackagingService.delete(req.params.id);  
+      const deleted = await CatatanService.delete(req.params.id);  
       if (!deleted) {  
         return res.status(404).json({  
           success: false,  
@@ -149,4 +108,4 @@ class PackagingController {
   }  
 }  
   
-module.exports = {PackagingController, upload};  
+module.exports = CatatanController;  

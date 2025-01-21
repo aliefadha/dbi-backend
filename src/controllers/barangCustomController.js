@@ -1,9 +1,31 @@
 const BarangCustomService = require("../services/barangCustomService");  
+const multer = require("multer");
+const path = require("path");
+const fs = require('fs');
+const CustomIdGenerateService = require("../services/customIdGenerateService");
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, path.join(__dirname, "../public/barangCustom"));
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + path.extname(file.originalname));
+    },
+});
+
+const upload = multer({ storage: storage });
   
 class BarangCustomController {  
   static async create(req, res) {  
     try {  
-      const barangCustom = await BarangCustomService.create(req.body);  
+      const newId = await CustomIdGenerateService.generateBarangCustomId();
+      const barangCustomData = {
+        ...req.body,
+        image: req.file.filename,
+        barang_custom_id: newId,
+        jenis_barang_id: 3
+      }
+      const barangCustom = await BarangCustomService.create(barangCustomData);  
       res.status(201).json({  
         success: true,  
         data: barangCustom,  
@@ -61,7 +83,27 @@ class BarangCustomController {
   
   static async update(req, res) {  
     try {  
-      const barangCustom = await BarangCustomService.update(req.params.id, req.body);  
+      const existingBarangCustom = await BarangCustomService.getById(req.params.id);  
+      if (!existingBarangCustom) {  
+        return res.status(404).json({  
+          success: false,  
+          data: null,  
+          message: "not found",  
+        });  
+      }
+      const updatedData = { ...req.body };
+
+      if (req.file) {
+        // Delete the old image file
+        const oldImagePath = path.join(__dirname, "../public/barangCustom", existingBarangCustom.image);
+        fs.unlink(oldImagePath, (err) => {
+          if (err) {
+            console.error("Failed to delete old image:", err);
+          }
+        });
+        updatedData.image = req.file.filename;
+      }
+      const barangCustom = await BarangCustomService.update(req.params.id, updatedData);  
       if (!barangCustom) {  
         return res.status(404).json({  
           success: false,  
@@ -108,4 +150,4 @@ class BarangCustomController {
   }  
 }  
   
-module.exports = BarangCustomController;  
+module.exports = {BarangCustomController, upload};  
