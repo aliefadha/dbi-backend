@@ -79,7 +79,7 @@ class BiayaTokoService {
         cabang_id: id
       }
     });  
-    if (!biayaToko) return 'a';  
+    if (!biayaToko) return null;  
     await biayaToko.update({
       total,
       rata_rata,
