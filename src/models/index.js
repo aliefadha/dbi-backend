@@ -37,6 +37,10 @@ const BarangProduksiGudang = require('./barangProduksiGudang');
 const BiayaToko = require('./biayaToko');
 const BiayaOperasional = require('./biayaOperasional');
 const BiayaStaff = require('./biayaStaff');
+const BiayaOperasionalProduksiGudang = require('./biayaOperasionalProduksiGudang');
+const OperasionalProduksiGudang = require('./operasionalProduksiGudang');
+const BiayaOperasionalStaffGudang = require('./biayaOperasionalStaffGudang');
+const OperasionalStaffGudang = require('./operasionalStaffGudang');
 
 
 JenisBarang.hasMany(BarangNonHandmade, {
@@ -149,6 +153,11 @@ BarangMentah.hasMany(ProdukPembelianGudang, {
     as: "produk_pembelian"
 })
 
+BarangMentah.hasMany(ProdukPenjualanGudang, {
+    foreignKey: "barang_mentah_id",
+    as: "produk_penjualan"
+})
+
 RincianBahanGudang.belongsTo(BarangMentah, {
     foreignKey: "barang_mentah_id",
     as: 'barang_mentah'
@@ -167,6 +176,16 @@ PembelianGudang.hasMany(ProdukPembelianGudang, {
 ProdukPembelianGudang.belongsTo(PembelianGudang, {
     foreignKey: "pembelian_id",
     as: "pembelian"
+})
+
+PenjualanGudang.hasMany(ProdukPenjualanGudang, {
+    foreignKey: "penjualan_id",
+    as: "produk"
+})
+
+ProdukPenjualanGudang.belongsTo(PenjualanGudang, {
+    foreignKey: "penjualan_id",
+    as: "penjualan"
 })
 
 ProdukPembelianGudang.belongsTo(BarangNonHandmadeGudang, {
@@ -204,10 +223,16 @@ ProdukPenjualanGudang.belongsTo(BarangNonHandmadeGudang, {
     as: "barang_nonhandmade"
 })
 
+ProdukPenjualanGudang.belongsTo(BarangMentah, {
+    foreignKey: "barang_mentah_id",
+    as: "barang_mentah"
+})
+
 ProdukPenjualanGudang.belongsTo(PackagingGudang, {
     foreignKey: "packaging_id",
     as: "packaging",
 })
+
 
 PackagingGudang.hasMany(ProdukPenjualanGudang, {
     foreignKey: "packaging_id",
@@ -252,6 +277,26 @@ BarangMentah.hasOne(StokBarangGudang, {
 BarangProduksiGudang.belongsTo(BarangNonHandmadeGudang, {
     foreignKey: "barang_id",
     as: "barang"
+})
+
+BiayaOperasionalProduksiGudang.belongsTo(OperasionalProduksiGudang, {
+    foreignKey: "operasional_produksi_id",
+    as: 'operasional'
+})
+
+OperasionalProduksiGudang.hasMany(BiayaOperasionalProduksiGudang, {
+    foreignKey: "operasional_produksi_id",
+    as: "biaya"
+})
+
+BiayaOperasionalStaffGudang.belongsTo(OperasionalStaffGudang, {
+    foreignKey: "operasional_staff_id",
+    as: 'operasional'
+})
+
+OperasionalStaffGudang.hasMany(BiayaOperasionalStaffGudang, {
+    foreignKey: "operasional_staff_id",
+    as: "biaya"
 })
 
 BarangNonHandmadeGudang.hasMany(BarangProduksiGudang, {

@@ -46,7 +46,7 @@ const BarangNonHandmade = sequelize.define("barang_nonhandmade", {
         defaultValue: 0,
     },
     packaging_id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         references: {
             model: Packaging,
             key: 'packaging_id'
