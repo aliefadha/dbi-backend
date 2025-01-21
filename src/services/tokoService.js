@@ -6,11 +6,20 @@ class TokoService {
   }  
   
   static async getAll() {  
-    return await Toko.findAll();  
+    return await Toko.findAll({
+      where: {
+        is_deleted: false
+      }
+    });  
   }  
   
   static async getById(id) {  
-    return await Toko.findByPk(id);  
+    return await Toko.findOne({
+      where: {
+        toko_id: id,
+        is_deleted: false
+      }
+    });  
   }  
   
   static async update(id, data) {  

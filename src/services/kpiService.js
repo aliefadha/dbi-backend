@@ -16,20 +16,39 @@ class KpiService {
   }  
   
   static async update(id, data) {  
-    const kpi = await Kpi.findByPk(id);  
-    if (!kpi) return null;  
-  
-    Object.assign(kpi, data);  
-    await kpi.save();  
-  
-    return kpi;  
+    const existingKpis = await Kpi.findAll({  
+        where: { divisi_karyawan_id: id }  
+    });  
+
+    const existingKpiMap = {};  
+    existingKpis.forEach(kpi => {  
+        existingKpiMap[kpi.kpi_id] = kpi; 
+    });  
+
+    const updatedKpiIds = [];  
+
+    for (const kpiData of data) {  
+        if (existingKpiMap[kpiData.kpi_id]) {  
+            Object.assign(existingKpiMap[kpiData.kpi_id], kpiData);  
+            await existingKpiMap[kpiData.kpi_id].save();  
+            updatedKpiIds.push(kpiData.kpi_id);  
+        } else {  
+            const newKpi = await Kpi.create(kpiData);  
+            updatedKpiIds.push(newKpi.kpi_id); 
+        }  
+    }  
+
+    for (const kpi of existingKpis) {  
+        if (!updatedKpiIds.includes(kpi.kpi_id)) {  
+            await kpi.destroy();  
+        }  
+    }
+
+    return updatedKpiIds;  
   }  
   
   static async delete(id) {  
-  const kpi = await Kpi.findByPk(id);  
-    if (!kpi) return null;  
-    await kpi.destroy();  
-    return true;  
+    return await Kpi.destroy({ where: { divisi_karyawan_id: id } });
   }  
 
   static async getKpiByDivisi() {
