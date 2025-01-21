@@ -46,6 +46,16 @@ JenisBarang.hasMany(BarangCustom, {
     as: "barangCustom"
 })
 
+JenisBarang.hasMany(Packaging, {
+    foreignKey: 'jenis_barang_id',
+    as: "packaging"
+})
+
+Packaging.belongsTo(JenisBarang, {
+    foreignKey: 'jenis_barang_id',
+    as: "jenis_barang"
+})
+
 JenisBarangGudang.hasMany(BarangNonHandmadeGudang, {
     foreignKey: 'jenis_barang_id',
     as: "barang", 
@@ -55,6 +65,16 @@ KategoriBarang.hasMany(BarangNonHandmade, {
     foreignKey: 'kategori_barang_id',
     as: "barang",
 });
+
+KategoriBarang.hasMany(Packaging, {
+    foreignKey: 'kategori_barang_id',
+    as: "packaging"
+})
+
+Packaging.belongsTo(KategoriBarang, {
+    foreignKey: 'kategori_barang_id',
+    as: "kategori_barang"
+})
 
 KategoriBarangGudang.hasMany(BarangNonHandmadeGudang, {
     foreignKey: 'kategori_barang_id',
@@ -236,9 +256,24 @@ BarangNonHandmadeGudang.hasMany(BarangProduksiGudang, {
     as: "barang_produksi"
 })
 
+KategoriBarang.hasMany(BarangCustom, {
+    foreignKey: 'kategori_barang_id',
+    as: "barang_custom"
+})
+
 BarangCustom.belongsTo(KategoriBarang, {
     foreignKey: 'kategori_barang_id',
     as: "kategori",
+})
+
+JenisBarang.hasMany(BarangCustom, {
+    foreignKey: 'jenis_barang_id',
+    as: "barang_custom"
+})
+
+BarangCustom.belongsTo(JenisBarang, {
+    foreignKey: 'jenis_barang_id',
+    as: "jenis_barang"
 })
 
 

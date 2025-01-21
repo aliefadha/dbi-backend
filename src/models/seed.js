@@ -28,6 +28,9 @@ const seedDatabase = async () => {
     try {
         // Seed data for JenisBarang  
         await JenisBarang.create({ jenis_barang_id: 1, nama_jenis_barang: "Handmade" });
+        await JenisBarang.create({ jenis_barang_id: 2, nama_jenis_barang: "Non Handmade" });
+        await JenisBarang.create({ jenis_barang_id: 3, nama_jenis_barang: "Custom" });
+        await JenisBarang.create({ jenis_barang_id: 4, nama_jenis_barang: "Packaging" });
 
         // Seed data for JenisBarangGudang
         await JenisBarangGudang.create({ jenis_barang_gudang_id: 1, nama_jenis_barang: "Handmade" });
@@ -41,8 +44,8 @@ const seedDatabase = async () => {
         await KategoriBarangGudang.create({ kategori_barang_id: 2, nama_kategori_barang: "Kalung" });
 
         // Seed data for Packaging  
-        await Packaging.create({ packaging_id: 1, nama_packaging: "Zipper", ukuran: "XL", jumlah_minimum_stok: 10, harga: 10, isi: 10, harga_satuan: 100, jenis_barang_id: 1 });
-        await Packaging.create({ packaging_id: 2, nama_packaging: "Kantong Kain", ukuran: "XL", jumlah_minimum_stok: 100, harga: 100, isi: 50, harga_satuan: 125, jenis_barang_id: 1 });
+        await Packaging.create({ packaging_id: 'PCK0001', nama_packaging: "Zipper", ukuran: "XL", jumlah_minimum_stok: 10, harga: 10, isi: 10, harga_satuan: 100, jenis_barang_id: 4, kategori_barang_id: 1 });
+        await Packaging.create({ packaging_id: 'PCK0002', nama_packaging: "Kantong Kain", ukuran: "XL", jumlah_minimum_stok: 100, harga: 100, isi: 50, harga_satuan: 125, jenis_barang_id: 4, kategori_barang_id: 2 });
 
         // Seed data for BarangMentah
         await BarangMentah.create({ barang_mentah_id: 1, nama_barang: "Manik-Manik Huruf", jumlah_minimum_stok: 100, harga: 10, isi: 10, harga_satuan: 10 })
