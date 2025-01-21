@@ -34,6 +34,9 @@ const ProdukPenjualanGudang = require('./produkPenjualanGudang');
 const PackagingGudang = require('./packagingGudang');
 const StokBarangGudang = require('./stokBarangGudang');
 const BarangProduksiGudang = require('./barangProduksiGudang');
+const BiayaToko = require('./biayaToko');
+const BiayaOperasional = require('./biayaOperasional');
+const BiayaStaff = require('./biayaStaff');
 
 
 JenisBarang.hasMany(BarangNonHandmade, {
@@ -423,6 +426,35 @@ KpiKaryawan.belongsTo(Kpi, {
     as: "kpi",
 })
 
+Cabang.hasOne(BiayaToko, {
+    foreignKey: "cabang_id",
+    as: "biaya_toko",
+})
+
+BiayaToko.belongsTo(Cabang, {
+    foreignKey: "cabang_id",
+    as: "cabang",
+})
+
+BiayaToko.hasMany(BiayaOperasional, {
+    foreignKey: "biaya_toko_id",
+    as: "biaya_operasional",
+})
+
+BiayaOperasional.belongsTo(BiayaToko, {
+    foreignKey: "biaya_toko_id",
+    as: "biaya_toko",
+})
+
+BiayaToko.hasMany(BiayaStaff, {
+    foreignKey: "biaya_toko_id",
+    as: "biaya_staff",
+})
+
+BiayaStaff.belongsTo(BiayaToko, {
+    foreignKey: "biaya_toko_id",
+    as: "biaya_toko",
+})
 
 
 // Sync models with the database  
