@@ -5,19 +5,20 @@ const StokBarangGudang = require("../models/stokBarangGudang");
 class BarangProduksiGudangService {  
   static async create(data) {  
     const res = await BarangProduksiGudang.create(data);
-    let barang = await StokBarangGudang.findOne({
-      where: {
-        barang_id: res.barang_id,
-        is_deleted: false
-      }
-    })
+    // adjusting the absensi
+    // let barang = await StokBarangGudang.findOne({
+    //   where: {
+    //     barang_id: res.barang_id,
+    //     is_deleted: false
+    //   }
+    // })
 
-    if(barang){
-      await barang.update({jumlah_stok: barang.jumlah_stok + res.jumlah})
-      await barang.save()
-    } else {
-      await StokBarangGudang.create({barang_id: res.barang_id, jumlah_stok: res.jumlah})
-    }
+    // if(barang){
+    //   await barang.update({jumlah_stok: barang.jumlah_stok + res.jumlah})
+    //   await barang.save()
+    // } else {
+    //   await StokBarangGudang.create({barang_id: res.barang_id, jumlah_stok: res.jumlah})
+    // }
     return res
   }  
   
