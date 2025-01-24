@@ -37,6 +37,9 @@ const BarangProduksiGudang = require('./barangProduksiGudang');
 const BiayaToko = require('./biayaToko');
 const BiayaOperasional = require('./biayaOperasional');
 const BiayaStaff = require('./biayaStaff');
+const BarangHandmade = require('./barangHandmade');
+const RincianBiaya = require('./rincianBiaya');
+const DetailRincianBiaya = require('./detailRincianBiaya');
 
 
 JenisBarang.hasMany(BarangNonHandmade, {
@@ -452,6 +455,56 @@ BiayaToko.hasMany(BiayaStaff, {
 })
 
 BiayaStaff.belongsTo(BiayaToko, {
+    foreignKey: "biaya_toko_id",
+    as: "biaya_toko",
+})
+
+JenisBarang.hasMany(BarangHandmade, {
+    foreignKey: "jenis_barang_id",
+    as: "barang_handmade",
+})
+
+BarangHandmade.belongsTo(JenisBarang, { 
+    foreignKey: "jenis_barang_id",
+    as: "jenis_barang",
+})
+
+KategoriBarang.hasMany(BarangHandmade, {
+    foreignKey: "kategori_barang_id",
+    as: "barang_handmade",
+})
+
+BarangHandmade.belongsTo(KategoriBarang, { 
+    foreignKey: "kategori_barang_id",
+    as: "kategori_barang",
+})
+
+BarangHandmade.hasMany(RincianBiaya, {
+    foreignKey: "barang_handmade_id",
+    as: "rincian_biaya",
+})
+
+RincianBiaya.belongsTo(BarangHandmade, {
+    foreignKey: "barang_handmade_id",
+    as: "barang_handmade",
+})
+
+RincianBiaya.hasMany(DetailRincianBiaya, {
+    foreignKey: "rincian_biaya_id",
+    as: "detail_rincian_biaya",
+})
+
+DetailRincianBiaya.belongsTo(RincianBiaya, {
+    foreignKey: "rincian_biaya_id",
+    as: "rincian_biaya",
+})
+
+BiayaToko.hasMany(DetailRincianBiaya, {
+    foreignKey: "biaya_toko_id",
+    as: "detail_rincian_biaya",
+})
+
+DetailRincianBiaya.belongsTo(BiayaToko, {
     foreignKey: "biaya_toko_id",
     as: "biaya_toko",
 })
