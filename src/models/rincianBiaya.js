@@ -1,6 +1,8 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
-const barangNonHandmade = require("./barangNonHandmade");
+const BarangHandmade = require("./barangHandmade");
+const BarangNonHandmade = require("./barangNonHandmade");
+const Cabang = require("./cabang");
 
 const RincianBiaya = sequelize.define('rincian_biaya', {
     rincian_biaya_id: {
@@ -10,19 +12,41 @@ const RincianBiaya = sequelize.define('rincian_biaya', {
         autoIncrement: true,
         unique: true,
     },
-    barang_id: {
-        type: DataTypes.INTEGER,
+    barang_handmade_id: {
+        type: DataTypes.STRING,
+        allowNull: true,
         references: {
-            model: barangNonHandmade,
-            key: 'barang_id'
+            model: BarangHandmade,
+            key: "barang_handmade_id",
         }
     },
-    nama_biaya: {
+    barang_handmade_id: {
         type: DataTypes.STRING,
+        allowNull: true,
+        references: {
+            model: BarangNonHandmade,
+            key: "barang_non_handmade_id",
+        }
     },
-    jumlah_biaya: {
+    cabang_id: {
         type: DataTypes.INTEGER,
-        defaultValue: 0
+        allowNull: false,
+        references: {
+            model: Cabang,
+            key: "cabang_id",
+        }
+    },
+    total_hpp: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+    },
+    keuntungan: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+    },
+    harga_jual: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
     },
     is_deleted: {
         type: DataTypes.BOOLEAN,

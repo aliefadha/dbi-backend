@@ -1,6 +1,6 @@
 const { DataTypes } = require("sequelize");  
 const sequelize = require("../config/database");  
-  
+
 const Cabang = sequelize.define("cabang", {  
   cabang_id: {  
       type: DataTypes.INTEGER,  

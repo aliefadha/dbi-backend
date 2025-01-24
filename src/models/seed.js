@@ -53,7 +53,7 @@ const seedDatabase = async () => {
         await BarangMentah.create({ barang_mentah_id: 1, nama_barang: "Manik-Manik Huruf", jumlah_minimum_stok: 100, harga: 10, isi: 10, harga_satuan: 10 })
 
         // Seed data for BarangNonHandmade  
-        await BarangNonHandmade.create({ barang_id: 1, nama_barang: "Gelang besi", kategori_barang_id: 1, jenis_barang_id: 1, jumlah_minimum_stok: 250, keuntungan: 100, harga_jual: 100, packaging_id: 'PCK0001' });
+        // await BarangNonHandmade.create({ barang_id: 1, nama_barang: "Gelang besi", kategori_barang_id: 1, jenis_barang_id: 1, jumlah_minimum_stok: 250, keuntungan: 100, harga_jual: 100, packaging_id: 1 });
 
         // Seed data for BarangNonHandmadeGudang  
         await BarangNonHandmadeGudang.create({ barang_id: 1, nama_barang: "Gelang besi", kategori_barang_id: 1, jenis_barang_id: 1, waktu_pengerjaan: 60, jumlah_minimum_stok: 250, total_hpp: 10, keuntungan: 100, harga_jual: 100 });
@@ -122,13 +122,13 @@ const seedDatabase = async () => {
         await Kpi.create({ divisi_karyawan_id: 1, nama_kpi: "Sikap", persentase: 10, waktu: "Harian" });
 
         // Pembelian
-        await Pembelian.create({ metode_id: 1, sub_total: 100, metode_pembayaran_id: 1, diskon: 10, pajak: 10, total_penjualan: 10 });
+        // await Pembelian.create({ metode_id: 1, sub_total: 100, metode_pembayaran_id: 1, diskon: 10, pajak: 10, total_penjualan: 10 });
 
-        // Penjualan
-        await Penjualan.create({ nama_pembeli: "Pembeli", metode_pembayaran_id: 1, sub_total: 10, diskon: 10, pajak: 10, total_penjualan: 10 })
+        // // Penjualan
+        // await Penjualan.create({ nama_pembeli: "Pembeli", metode_pembayaran_id: 1, sub_total: 10, diskon: 10, pajak: 10, total_penjualan: 10 })
 
-        // Seed data for ProdukPenjualan  
-        await ProdukPenjualan.create({ produk_penjualan_id: 1, penjualan_id: 1, barang_id: 1, kuantitas: 10, total_biaya: 100, cabang_id: 1 });
+        // // Seed data for ProdukPenjualan  
+        // await ProdukPenjualan.create({ produk_penjualan_id: 1, penjualan_id: 1, barang_id: 1, kuantitas: 10, total_biaya: 100, cabang_id: 1 });
 
         console.log("Seed data created!");
     } catch (error) {

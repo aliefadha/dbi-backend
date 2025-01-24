@@ -2,7 +2,6 @@
 
 // models/relation.js  
 const sequelize = require('../config/database');
-const BarangNonHandmade = require('./barangNonHandmade');
 const DivisiKaryawan = require('./divisiKaryawan');
 const JenisBarang = require('./jenisBarang');
 const Karyawan = require('./karyawan');
@@ -37,6 +36,10 @@ const BarangProduksiGudang = require('./barangProduksiGudang');
 const BiayaToko = require('./biayaToko');
 const BiayaOperasional = require('./biayaOperasional');
 const BiayaStaff = require('./biayaStaff');
+const BarangHandmade = require('./barangHandmade');
+const BarangNonHandmade = require('./barangNonHandmade');
+const RincianBiaya = require('./rincianBiaya');
+const DetailRincianBiaya = require('./detailRincianBiaya');
 const BiayaOperasionalProduksiGudang = require('./biayaOperasionalProduksiGudang');
 const OperasionalProduksiGudang = require('./operasionalProduksiGudang');
 const BiayaOperasionalStaffGudang = require('./biayaOperasionalStaffGudang');
@@ -88,10 +91,6 @@ KategoriBarangGudang.hasMany(BarangNonHandmadeGudang, {
     as: "barang",
 });
 
-Packaging.hasMany(BarangNonHandmade, {
-    foreignKey: 'packaging_id',
-    as: "barang",
-})
 
 BarangNonHandmade.belongsTo(KategoriBarang, {
     foreignKey: 'kategori_barang_id',
@@ -103,10 +102,6 @@ BarangNonHandmade.belongsTo(JenisBarang, {
     as: "jenis",
 })
 
-BarangNonHandmade.belongsTo(Packaging, {
-    foreignKey: "packaging_id",
-    as: "packaging",
-})
 
 BarangNonHandmadeGudang.belongsTo(KategoriBarangGudang, {
     foreignKey: 'kategori_barang_id',
@@ -335,51 +330,51 @@ MetodePembayaran.hasMany(Pembelian, {
     as: "pembelian"
 })
 
-Penjualan.belongsTo(MetodePembayaran, {
-    foreignKey: "metode_pembayaran_id",
-    as: "metode"
-})
+// Penjualan.belongsTo(MetodePembayaran, {
+//     foreignKey: "metode_pembayaran_id",
+//     as: "metode"
+// })
 
-ProdukPenjualan.belongsTo(BarangNonHandmade, {
-    foreignKey: "barang_id",
-    as: "barang",
-})
+// ProdukPenjualan.belongsTo(BarangNonHandmade, {
+//     foreignKey: "barang_id",
+//     as: "barang",
+// })
 
 
-Penjualan.hasMany(ProdukPenjualan, {
-    foreignKey: "penjualan_id",
-    as: "produk",
-});
+// Penjualan.hasMany(ProdukPenjualan, {
+//     foreignKey: "penjualan_id",
+//     as: "produk",
+// });
 
-ProdukPenjualan.belongsTo(Penjualan, {
-    foreignKey: "penjualan_id",
-    as: 'penjualan'
-})
+// ProdukPenjualan.belongsTo(Penjualan, {
+//     foreignKey: "penjualan_id",
+//     as: 'penjualan'
+// })
 
-Pembelian.hasMany(ProdukPembelian, {
-    foreignKey: "pembelian_id",
-    as: "produk"
-})
+// Pembelian.hasMany(ProdukPembelian, {
+//     foreignKey: "pembelian_id",
+//     as: "produk"
+// })
 
-ProdukPembelian.belongsTo(Pembelian, {
-    foreignKey: "pembelian_id",
-    as: "pembelian"
-})
+// ProdukPembelian.belongsTo(Pembelian, {
+//     foreignKey: "pembelian_id",
+//     as: "pembelian"
+// })
 
-ProdukPembelian.belongsTo(Cabang, {
-    foreignKey: "cabang_id",
-    as: "cabang"
-})
+// ProdukPembelian.belongsTo(Cabang, {
+//     foreignKey: "cabang_id",
+//     as: "cabang"
+// })
 
-ProdukPenjualan.belongsTo(Cabang, {
-    foreignKey: "cabang_id",
-    as: "cabang"
-})
+// ProdukPenjualan.belongsTo(Cabang, {
+//     foreignKey: "cabang_id",
+//     as: "cabang"
+// })
 
-ProdukPembelian.belongsTo(BarangNonHandmade, {
-    foreignKey: "barang_id",
-    as: "barang",
-})
+// ProdukPembelian.belongsTo(BarangNonHandmade, {
+//     foreignKey: "barang_id",
+//     as: "barang",
+// })
 
 DivisiKaryawan.hasMany(Karyawan, {
     foreignKey: "divisi_karyawan_id",
@@ -499,6 +494,66 @@ BiayaToko.hasMany(BiayaStaff, {
 BiayaStaff.belongsTo(BiayaToko, {
     foreignKey: "biaya_toko_id",
     as: "biaya_toko",
+})
+
+JenisBarang.hasMany(BarangHandmade, {
+    foreignKey: "jenis_barang_id",
+    as: "barang_handmade",
+})
+
+BarangHandmade.belongsTo(JenisBarang, { 
+    foreignKey: "jenis_barang_id",
+    as: "jenis_barang",
+})
+
+KategoriBarang.hasMany(BarangHandmade, {
+    foreignKey: "kategori_barang_id",
+    as: "barang_handmade",
+})
+
+BarangHandmade.belongsTo(KategoriBarang, { 
+    foreignKey: "kategori_barang_id",
+    as: "kategori_barang",
+})
+
+BarangHandmade.hasMany(RincianBiaya, {
+    foreignKey: "barang_handmade_id",
+    as: "rincian_biaya",
+})
+
+RincianBiaya.belongsTo(BarangHandmade, {
+    foreignKey: "barang_handmade_id",
+    as: "barang_handmade",
+})
+
+RincianBiaya.hasMany(DetailRincianBiaya, {
+    foreignKey: "rincian_biaya_id",
+    as: "detail_rincian_biaya",
+})
+
+DetailRincianBiaya.belongsTo(RincianBiaya, {
+    foreignKey: "rincian_biaya_id",
+    as: "rincian_biaya",
+})
+
+BiayaToko.hasMany(DetailRincianBiaya, {
+    foreignKey: "biaya_toko_id",
+    as: "detail_rincian_biaya",
+})
+
+DetailRincianBiaya.belongsTo(BiayaToko, {
+    foreignKey: "biaya_toko_id",
+    as: "biaya_toko",
+})
+
+BarangNonHandmade.hasMany(RincianBiaya, {
+    foreignKey: "barang_non_handmade_id",
+    as: "rincian_biaya",
+})
+
+RincianBiaya.belongsTo(BarangNonHandmade, {
+    foreignKey: "barang_non_handmade_id",
+    as: "barang_non_handmade",
 })
 
 

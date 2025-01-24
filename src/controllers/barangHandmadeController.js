@@ -1,4 +1,4 @@
-const BarangNonHandmadeService = require("../services/barangNonHandmadeService");  
+const BarangHandmadeService = require("../services/barangHandmadeService");  
 const multer = require("multer");
 const path = require("path");
 const fs = require('fs');
@@ -6,27 +6,29 @@ const CustomIdGenerateService = require("../services/customIdGenerateService");
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, path.join(__dirname, "../public/barangNonHandmade"));
+        cb(null, path.join(__dirname, "../public/barangHandmade"));
     },
     filename: function (req, file, cb) {
         cb(null, Date.now() + path.extname(file.originalname));
     },
 });
-  
-class BarangNonHandmadeController {  
+
+const upload = multer({ storage: storage });
+
+class BarangHandmadeController {  
   static async create(req, res) {  
     try {  
-      const newId = await CustomIdGenerateService.generateBarangNonHandmadeId();
-      const barangNonHandmadeData = {
-        ...req.body,
-        image: req.file.filename,
-        barang_non_handmade_id: newId,
-        jenis_barang_id: 2
+      const newId = await CustomIdGenerateService.generateBarangHandmadeId();
+      const barangHandmadeData = {
+        ...req.body,  
+        image: req.file.filename,  
+        barang_handmade_id: newId,  
+        jenis_barang_id: 1,
       }
-      const barangNonHandmade = await BarangNonHandmadeService.create(barangNonHandmadeData);  
+      const barangHandmade = await BarangHandmadeService.create(barangHandmadeData);  
       res.status(201).json({  
         success: true,  
-        data: barangNonHandmade,  
+        data: barangHandmade,  
         message: "created successfully",  
       });  
     } catch (error) {  
@@ -40,10 +42,10 @@ class BarangNonHandmadeController {
   
   static async getAll(req, res) {  
     try {  
-      const barangNonHandmades = await BarangNonHandmadeService.getAll();  
+      const barangHandmades = await BarangHandmadeService.getAll();  
       res.status(200).json({  
         success: true,  
-        data: barangNonHandmades,  
+        data: barangHandmades,  
         message: "retrieved successfully",  
       });  
     } catch (error) {  
@@ -57,8 +59,8 @@ class BarangNonHandmadeController {
   
   static async getById(req, res) {  
     try {  
-      const barangNonHandmade = await BarangNonHandmadeService.getById(req.params.id);  
-      if (!barangNonHandmade) {  
+      const barangHandmade = await BarangHandmadeService.getById(req.params.id);  
+      if (!barangHandmade) {  
         return res.status(404).json({  
           success: false,  
           data: null,  
@@ -67,7 +69,7 @@ class BarangNonHandmadeController {
       }  
       res.status(200).json({  
         success: true,  
-        data: barangNonHandmade,  
+        data: barangHandmade,  
         message: "retrieved successfully",  
       });  
     } catch (error) {  
@@ -81,25 +83,25 @@ class BarangNonHandmadeController {
   
   static async update(req, res) {  
     try {  
-      const existingBarangNonHandmade = await BarangNonHandmadeService.getById(req.params.id);  
-      if (!existingBarangNonHandmade) {  
-        return res.status(404).json({  
-          success: false,  
-          data: null,  
-          message: "not found",  
-        });  
+      const existingBarangHandmade = await BarangHandmadeService.getById(req.params.id);
+      if (!existingBarangHandmade) {
+        return res.status(404).json({
+          success: false,
+          data: null,
+          message: "not found",
+        });
       }
       const updatedData = { ...req.body };
       if (req.file) {
         // Delete the old image file
-        const oldImagePath = path.join(__dirname, "../public/barangNonHandmade", existingBarangNonHandmade.image);
+        const oldImagePath = path.join(__dirname, "../public/barangHandmade", existingBarangHandmade.image);
         fs.unlink(oldImagePath, (err) => {
           console.error("Failed to delete old image:", err);
         });
         updatedData.image = req.file.filename;
       }
-      const barangNonHandmade = await BarangNonHandmadeService.update(req.params.id, ypdatedData);  
-      if (!barangNonHandmade) {  
+      const barangHandmade = await BarangHandmadeService.update(req.params.id, updatedData);  
+      if (!barangHandmade) {  
         return res.status(404).json({  
           success: false,  
           data: null,  
@@ -108,7 +110,7 @@ class BarangNonHandmadeController {
       }  
       res.status(200).json({  
         success: true,  
-        data: barangNonHandmade,  
+        data: barangHandmade,  
         message: "updated successfully",  
       });  
     } catch (error) {  
@@ -122,7 +124,7 @@ class BarangNonHandmadeController {
   
   static async delete(req, res) {  
     try {  
-      const deleted = await BarangNonHandmadeService.delete(req.params.id);  
+      const deleted = await BarangHandmadeService.delete(req.params.id);  
       if (!deleted) {  
         return res.status(404).json({  
           success: false,  
@@ -145,4 +147,4 @@ class BarangNonHandmadeController {
   }  
 }  
   
-module.exports = BarangNonHandmadeController;  
+module.exports = {BarangHandmadeController, upload};  

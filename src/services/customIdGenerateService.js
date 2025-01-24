@@ -1,5 +1,6 @@
 const Packaging = require("../models/packaging");
 const BarangCustom = require("../models/barangCustom");
+const BarangHandmade = require("../models/barangHandmade");
 
 class CustomIdGenerateService {
     static async generatePackagingId() {
@@ -34,6 +35,40 @@ class CustomIdGenerateService {
         const newId = `CSM${String(newNumericPart).padStart(4, '0')}`;  
     
         return newId;  
+    }
+
+    static async generateBarangHandmadeId() {
+        const lastBarangHandmade = await BarangHandmade.findOne({  
+            order: [['barang_handmade_id', 'DESC']]  
+        });  
+    
+        if (!lastBarangHandmade) {  
+            return 'BHM0001';  
+        }  
+    
+        const lastId = lastBarangHandmade.barang_handmade_id;  
+        const numericPart = parseInt(lastId.slice(3), 10);  
+        const newNumericPart = numericPart + 1;  
+        const newId = `BHM${String(newNumericPart).padStart(4, '0')}`;  
+    
+        return newId;  
+    }
+
+    static async generateBarangNonHandmadeId() {
+        const lastBarangNonHandmade = await BarangNonHandmade.findOne({  
+            order: [['barang_non_handmade_id', 'DESC']]  
+        });  
+    
+        if (!lastBarangNonHandmade) {  
+            return 'BNH0001';  
+        }  
+    
+        const lastId = lastBarangNonHandmade.barang_non_handmade_id;  
+        const numericPart = parseInt(lastId.slice(3), 10);  
+        const newNumericPart = numericPart + 1;  
+        const newId = `BNH${String(newNumericPart).padStart(4, '0')}`;  
+    
+        return newId;
     }
 }
 

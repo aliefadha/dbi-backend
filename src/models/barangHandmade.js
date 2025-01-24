@@ -3,8 +3,8 @@ const sequelize = require("../config/database");
 const KategoriBarang = require("./kategoriBarang");
 const JenisBarang = require("./jenisBarang");
   
-const BarangNonHandmade = sequelize.define("barang_non_handmade", {  
-  barang_non_handmade_id: {  
+const BarangHandmade = sequelize.define("barang_handmade", {  
+  barang_handmade_id: {  
     type: DataTypes.STRING,  
     allowNull: false,
     primaryKey: true,
@@ -24,7 +24,7 @@ const BarangNonHandmade = sequelize.define("barang_non_handmade", {
   jenis_barang_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
-    defaultValue: 2,
+    defaultValue: 1,
     references: {
         model: JenisBarang,
         key: "jenis_barang_id",
@@ -46,4 +46,4 @@ const BarangNonHandmade = sequelize.define("barang_non_handmade", {
   timestamps: false
 });  
   
-module.exports = BarangNonHandmade;  
+module.exports = BarangHandmade;  

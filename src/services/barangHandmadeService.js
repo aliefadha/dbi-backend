@@ -1,27 +1,26 @@
-const BarangNonHandmade = require("../models/barangNonHandmade");  
+const BarangHandmade = require("../models/barangHandmade");  
 const RincianBiaya = require("../models/rincianBiaya");
 const DetailRincianBiaya = require("../models/detailRincianBiaya");
 const KategoriBarang = require("../models/kategoriBarang");
 const JenisBarang = require("../models/jenisBarang");
-  
-class BarangNonHandmadeService {  
-  static async create(data) {  
-    const { image, barang_non_handmade_id, jenis_barang_id, kategori_barang_id, nama_barang, jumlah_minimum_stok, rincian_biaya } = data;
 
-    const barangNonHandmade = await BarangNonHandmade.create({
+class BarangHandmadeService {  
+  static async create(data) {  
+    const { image, barang_handmade_id, jenis_barang_id, kategori_barang_id, nama_barang, jumlah_minimum_stok, rincian_biaya } = data;
+
+    const barangHandmade = await BarangHandmade.create({
       image,
-      barang_non_handmade_id,
+      barang_handmade_id,
       jenis_barang_id,
       kategori_barang_id,
       nama_barang,
       jumlah_minimum_stok
     });
-
     for (const rincian of rincian_biaya) {
       const { cabang_id, detail_rincian_biaya, total_hpp, keuntungan, harga_jual} = rincian;
 
       const rincianBiaya = await RincianBiaya.create({
-        barang_non_handmade_id: barangNonHandmade.barang_non_handmade_id,
+        barang_handmade_id: barangHandmade.barang_handmade_id,
         cabang_id,
         total_hpp,
         keuntungan,
@@ -38,24 +37,22 @@ class BarangNonHandmadeService {
       }
     }
 
-    return barangNonHandmade;
+    return barangHandmade;
   }  
   
   static async getAll() {  
-    return await BarangNonHandmade.findAll({
+    return await BarangHandmade.findAll({
       where: {
         is_deleted: false
       },
       include: [
         {
           model: KategoriBarang,
-          as: "kategori",
-          attributes: ["nama_kategori_barang"]
+          as: "kategori_barang",
         },
         {
           model: JenisBarang,
-          as: "jenis",
-          attributes: ["nama_jenis_barang"]
+          as: "jenis_barang",
         },
         {
           model: RincianBiaya,
@@ -72,22 +69,12 @@ class BarangNonHandmadeService {
   }  
   
   static async getById(id) {  
-    return await BarangNonHandmade.findOne({
+    return await BarangHandmade.findOne({
       where: {
-        barang_non_handmade_id: id,
+        barang_handmade_id: id,
         is_deleted: false
       },
       include: [
-        {
-          model: KategoriBarang,
-          as: "kategori",
-          attributes: ["nama_kategori_barang"]
-        },
-        {
-          model: JenisBarang,
-          as: "jenis",
-          attributes: ["nama_jenis_barang"]
-        },
         {
           model: RincianBiaya,
           as: "rincian_biaya",
@@ -103,19 +90,19 @@ class BarangNonHandmadeService {
   }  
   
   static async update(id, data) {  
-    const { image, barang_non_handmade_id, jenis_barang_id, kategori_barang_id, nama_barang, jumlah_minimum_stok } = data;
+    const { image, jenis_barang_id, kategori_barang_id, nama_barang, jumlah_minimum_stok, rincian_biaya } = data;
 
-    const barangNonHandmade = await BarangNonHandmade.findOne({
+    const barangHandmade = await BarangHandmade.findOne({
       where: {
-        barang_non_handmade_id: id,
+        barang_handmade_id: id,
         is_deleted: false
       }
-    });  
-    if (!barangNonHandmade) return null;
+    });
 
-    await barangNonHandmade.update({
+    if (!barangHandmade) return null;
+
+    await barangHandmade.update({
       image,
-      barang_non_handmade_id,
       jenis_barang_id,
       kategori_barang_id,
       nama_barang,
@@ -125,16 +112,16 @@ class BarangNonHandmadeService {
     for (const rincian of rincian_biaya) {
       const { cabang_id, detail_rincian_biaya, total_hpp, keuntungan, harga_jual} = rincian;
 
-      let rincianBiaya = await RincianBiaya.findOne({
+      let rincianBiaya = await RincianBiaya.findOne({ 
         where: {
-          barang_non_handmade_id: barangNonHandmade.barang_non_handmade_id,
+          barang_handmade_id: barangHandmade.barang_handmade_id,
           cabang_id: cabang_id
         }
       });
 
       if (!rincianBiaya) {
         rincianBiaya = await RincianBiaya.create({
-          barang_non_handmade_id: barangNonHandmade.barang_non_handmade_id,
+          barang_handmade_id: barangHandmade.barang_handmade_id,
           cabang_id,
           total_hpp,
           keuntungan,
@@ -142,7 +129,7 @@ class BarangNonHandmadeService {
         });
       } else {
         await rincianBiaya.update({
-          total_hpp,
+          total_hpp,  
           keuntungan,
           harga_jual
         });
@@ -164,15 +151,15 @@ class BarangNonHandmadeService {
       }
     }
 
-    return barangNonHandmade;
+    return barangHandmade;
   }  
   
   static async delete(id) {  
-    const barangNonHandmade = await BarangNonHandmade.findByPk(id);  
-    if (!barangNonHandmade) return null;  
-    await barangNonHandmade.update({ is_deleted: true });  
+    const barangHandmade = await BarangHandmade.findByPk(id);  
+    if (!barangHandmade) return null;  
+    await barangHandmade.update({ is_deleted: true });  
     return true;  
   }  
 }  
   
-module.exports = BarangNonHandmadeService;  
+module.exports = BarangHandmadeService;  
