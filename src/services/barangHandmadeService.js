@@ -1,6 +1,9 @@
 const BarangHandmade = require("../models/barangHandmade");  
 const RincianBiaya = require("../models/rincianBiaya");
 const DetailRincianBiaya = require("../models/detailRincianBiaya");
+const KategoriBarang = require("../models/kategoriBarang");
+const JenisBarang = require("../models/jenisBarang");
+
 class BarangHandmadeService {  
   static async create(data) {  
     const { image, barang_handmade_id, jenis_barang_id, kategori_barang_id, nama_barang, jumlah_minimum_stok, rincian_biaya } = data;
@@ -41,7 +44,27 @@ class BarangHandmadeService {
     return await BarangHandmade.findAll({
       where: {
         is_deleted: false
-      }
+      },
+      include: [
+        {
+          model: KategoriBarang,
+          as: "kategori_barang",
+        },
+        {
+          model: JenisBarang,
+          as: "jenis_barang",
+        },
+        {
+          model: RincianBiaya,
+          as: "rincian_biaya",
+          include: [
+            {
+              model: DetailRincianBiaya,
+              as: "detail_rincian_biaya"
+            }
+          ]
+        }
+      ]
     });  
   }  
   

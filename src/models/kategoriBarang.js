@@ -1,6 +1,5 @@
 const { DataTypes, Model } = require("sequelize");
 const sequelize = require("../config/database");
-const BarangHandmadeNon = require("./barangNonHandmade");
 
 const KategoriBarang = sequelize.define("kategori_barang", {
   kategori_barang_id: {

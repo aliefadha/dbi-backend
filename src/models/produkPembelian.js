@@ -19,7 +19,7 @@ const ProdukPembelian = sequelize.define("produk_pembelian", {
     },
   },
   barang_id: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
     references: {
       model: BarangNonHandmade,
       key: 'barang_id'

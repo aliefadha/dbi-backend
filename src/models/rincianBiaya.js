@@ -1,7 +1,7 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
-const barangNonHandmade = require("./barangNonHandmade");
 const BarangHandmade = require("./barangHandmade");
+const BarangNonHandmade = require("./barangNonHandmade");
 const Cabang = require("./cabang");
 
 const RincianBiaya = sequelize.define('rincian_biaya', {
@@ -18,6 +18,14 @@ const RincianBiaya = sequelize.define('rincian_biaya', {
         references: {
             model: BarangHandmade,
             key: "barang_handmade_id",
+        }
+    },
+    barang_handmade_id: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        references: {
+            model: BarangNonHandmade,
+            key: "barang_non_handmade_id",
         }
     },
     cabang_id: {

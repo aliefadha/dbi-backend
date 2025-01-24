@@ -1,74 +1,178 @@
-const BarangNonHandmade = require("../models/barangNonHandmade");
+const BarangNonHandmade = require("../models/barangNonHandmade");  
+const RincianBiaya = require("../models/rincianBiaya");
+const DetailRincianBiaya = require("../models/detailRincianBiaya");
 const KategoriBarang = require("../models/kategoriBarang");
-const Packaging = require("../models/packaging");
 const JenisBarang = require("../models/jenisBarang");
+  
+class BarangNonHandmadeService {  
+  static async create(data) {  
+    const { image, barang_non_handmade_id, jenis_barang_id, kategori_barang_id, nama_barang, jumlah_minimum_stok, rincian_biaya } = data;
 
-class BarangNonHandmadeService {
-    static async create(data) {
-        return await BarangNonHandmade.create(data);
-    }
+    const barangNonHandmade = await BarangNonHandmade.create({
+      image,
+      barang_non_handmade_id,
+      jenis_barang_id,
+      kategori_barang_id,
+      nama_barang,
+      jumlah_minimum_stok
+    });
 
-    static async getAll() {
-        return await BarangNonHandmade.findAll({
-            include: [
-                {
-                    model: KategoriBarang,
-                    as: 'kategori',
-                    attributes: ["kategori_barang_id", "nama_kategori_barang"]
-                },
-                {
-                    model: JenisBarang,
-                    as: 'jenis',
-                    attributes: ["jenis_barang_id", "nama_jenis_barang"]
-                },
-                {
-                    model: Packaging,
-                    as: "packaging",
-                    attributes: ["packaging_id", "nama_packaging", "harga_satuan"]
-                },
-            ]
+    for (const rincian of rincian_biaya) {
+      const { cabang_id, detail_rincian_biaya, total_hpp, keuntungan, harga_jual} = rincian;
+
+      const rincianBiaya = await RincianBiaya.create({
+        barang_non_handmade_id: barangNonHandmade.barang_non_handmade_id,
+        cabang_id,
+        total_hpp,
+        keuntungan,
+        harga_jual
+      });
+
+      for (const detail of detail_rincian_biaya) {
+        await DetailRincianBiaya.create({
+          rincian_biaya_id: rincianBiaya.rincian_biaya_id,
+          biaya_toko_id: detail.biaya_toko_id,
+          nama_biaya: detail.nama_biaya,
+          jumlah_biaya: detail.jumlah_biaya
         });
+      }
     }
 
-    static async getById(id) {
-        return await BarangNonHandmade.findOne({
-            where: { barang_id: id },
-            include: [
-                {
-                    model: KategoriBarang,
-                    as: 'kategori',
-                    attributes: ["kategori_barang_id", "nama_kategori_barang"]
-                },
-                {
-                    model: JenisBarang,
-                    as: 'jenis',
-                    attributes: ["jenis_barang_id", "nama_jenis_barang"]
-                },
-                {
-                    model: Packaging,
-                    as: "packaging",
-                    attributes: ["packaging_id", "nama_packaging", "harga_satuan"]
-                },
-            ]
+    return barangNonHandmade;
+  }  
+  
+  static async getAll() {  
+    return await BarangNonHandmade.findAll({
+      where: {
+        is_deleted: false
+      },
+      include: [
+        {
+          model: KategoriBarang,
+          as: "kategori",
+          attributes: ["nama_kategori_barang"]
+        },
+        {
+          model: JenisBarang,
+          as: "jenis",
+          attributes: ["nama_jenis_barang"]
+        },
+        {
+          model: RincianBiaya,
+          as: "rincian_biaya",
+          include: [
+            {
+              model: DetailRincianBiaya,
+              as: "detail_rincian_biaya"
+            }
+          ]
+        }
+      ]
+    });  
+  }  
+  
+  static async getById(id) {  
+    return await BarangNonHandmade.findOne({
+      where: {
+        barang_non_handmade_id: id,
+        is_deleted: false
+      },
+      include: [
+        {
+          model: KategoriBarang,
+          as: "kategori",
+          attributes: ["nama_kategori_barang"]
+        },
+        {
+          model: JenisBarang,
+          as: "jenis",
+          attributes: ["nama_jenis_barang"]
+        },
+        {
+          model: RincianBiaya,
+          as: "rincian_biaya",
+          include: [
+            {
+              model: DetailRincianBiaya,
+              as: "detail_rincian_biaya"
+            }
+          ]
+        }
+      ]
+    });  
+  }  
+  
+  static async update(id, data) {  
+    const { image, barang_non_handmade_id, jenis_barang_id, kategori_barang_id, nama_barang, jumlah_minimum_stok } = data;
+
+    const barangNonHandmade = await BarangNonHandmade.findOne({
+      where: {
+        barang_non_handmade_id: id,
+        is_deleted: false
+      }
+    });  
+    if (!barangNonHandmade) return null;
+
+    await barangNonHandmade.update({
+      image,
+      barang_non_handmade_id,
+      jenis_barang_id,
+      kategori_barang_id,
+      nama_barang,
+      jumlah_minimum_stok
+    });
+
+    for (const rincian of rincian_biaya) {
+      const { cabang_id, detail_rincian_biaya, total_hpp, keuntungan, harga_jual} = rincian;
+
+      let rincianBiaya = await RincianBiaya.findOne({
+        where: {
+          barang_non_handmade_id: barangNonHandmade.barang_non_handmade_id,
+          cabang_id: cabang_id
+        }
+      });
+
+      if (!rincianBiaya) {
+        rincianBiaya = await RincianBiaya.create({
+          barang_non_handmade_id: barangNonHandmade.barang_non_handmade_id,
+          cabang_id,
+          total_hpp,
+          keuntungan,
+          harga_jual
         });
+      } else {
+        await rincianBiaya.update({
+          total_hpp,
+          keuntungan,
+          harga_jual
+        });
+      }
+
+      await DetailRincianBiaya.destroy({
+        where: {
+          rincian_biaya_id: rincianBiaya.rincian_biaya_id
+        }
+      });
+
+      for (const detail of detail_rincian_biaya) {
+        await DetailRincianBiaya.create({
+          rincian_biaya_id: rincianBiaya.rincian_biaya_id,
+          biaya_toko_id: detail.biaya_toko_id,
+          nama_biaya: detail.nama_biaya,
+          jumlah_biaya: detail.jumlah_biaya
+        });
+      }
     }
 
-    static async update(id, data) {
-        const barang = await BarangNonHandmade.findByPk(id);
-        if (!barang) return null;
-
-        Object.assign(barang, data);
-        await barang.save();
-
-        return barang;
-    }
-
-    static async delete(id) {
-        const barang = await BarangNonHandmade.findByPk(id);
-        if (!barang) return null;
-        await barang.destroy();
-        return true;
-    }
-}
-
-module.exports = BarangNonHandmadeService;
+    return barangNonHandmade;
+  }  
+  
+  static async delete(id) {  
+    const barangNonHandmade = await BarangNonHandmade.findByPk(id);  
+    if (!barangNonHandmade) return null;  
+    await barangNonHandmade.update({ is_deleted: true });  
+    return true;  
+  }  
+}  
+  
+module.exports = BarangNonHandmadeService;  

@@ -19,6 +19,7 @@ app.use('/images-absensi-karyawan', express.static(path.join(__dirname, 'public/
 app.use('/images-packaging', express.static(path.join(__dirname, 'public/packaging')));
 app.use('/images-barang-custom', express.static(path.join(__dirname, 'public/barangCustom')));
 app.use('/images-barang-handmade', express.static(path.join(__dirname, 'public/barangHandmade')));
+app.use('/images-barang-non-handmade', express.static(path.join(__dirname, 'public/barangNonHandmade')));
 app.use('/images-toko', express.static(path.join(__dirname, 'public/toko')));
 
 const corsOptions = {

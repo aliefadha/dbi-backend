@@ -53,6 +53,23 @@ class CustomIdGenerateService {
     
         return newId;  
     }
+
+    static async generateBarangNonHandmadeId() {
+        const lastBarangNonHandmade = await BarangNonHandmade.findOne({  
+            order: [['barang_non_handmade_id', 'DESC']]  
+        });  
+    
+        if (!lastBarangNonHandmade) {  
+            return 'BNH0001';  
+        }  
+    
+        const lastId = lastBarangNonHandmade.barang_non_handmade_id;  
+        const numericPart = parseInt(lastId.slice(3), 10);  
+        const newNumericPart = numericPart + 1;  
+        const newId = `BNH${String(newNumericPart).padStart(4, '0')}`;  
+    
+        return newId;
+    }
 }
 
 module.exports = CustomIdGenerateService;

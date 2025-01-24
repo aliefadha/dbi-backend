@@ -83,7 +83,24 @@ class BarangHandmadeController {
   
   static async update(req, res) {  
     try {  
-      const barangHandmade = await BarangHandmadeService.update(req.params.id, req.body);  
+      const existingBarangHandmade = await BarangHandmadeService.getById(req.params.id);
+      if (!existingBarangHandmade) {
+        return res.status(404).json({
+          success: false,
+          data: null,
+          message: "not found",
+        });
+      }
+      const updatedData = { ...req.body };
+      if (req.file) {
+        // Delete the old image file
+        const oldImagePath = path.join(__dirname, "../public/barangHandmade", existingBarangHandmade.image);
+        fs.unlink(oldImagePath, (err) => {
+          console.error("Failed to delete old image:", err);
+        });
+        updatedData.image = req.file.filename;
+      }
+      const barangHandmade = await BarangHandmadeService.update(req.params.id, updatedData);  
       if (!barangHandmade) {  
         return res.status(404).json({  
           success: false,  
