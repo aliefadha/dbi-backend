@@ -90,7 +90,82 @@ class ProdukPenjualanGudangService {
     }
   }
 
+  static async createMany(dataArray, options = {}) {
+    const transaction = options.transaction;
 
+    try {
+      for (const data of dataArray) {
+        const { packaging_id, barang_mentah_id, barang_id, kuantitas } = data;
+
+        let fieldName, fieldValue;
+        if (packaging_id) {
+          fieldName = 'packaging_id';
+          fieldValue = packaging_id;
+        } else if (barang_mentah_id) {
+          fieldName = 'barang_mentah_id';
+          fieldValue = barang_mentah_id;
+        } else if (barang_id) {
+          fieldName = 'barang_id';
+          fieldValue = barang_id;
+        } else {
+          continue;
+        }
+
+        const stockRecord = await StokBarangGudang.findOne({
+          where: {
+            [fieldName]: fieldValue,
+            is_deleted: false
+          },
+          transaction
+        });
+
+        if (!stockRecord || stockRecord.jumlah_stok < kuantitas) {
+          const availableStock = stockRecord ? stockRecord.jumlah_stok : 0;
+          throw new Error(`Stok barang ${fieldName}: ${fieldValue}. Tersedia: ${availableStock}, Stok: ${kuantitas}`);
+        }
+      }
+
+      const createdProdukList = await ProdukPenjualanGudang.bulkCreate(dataArray, {
+        transaction,
+        returning: true,
+      });
+
+      for (const produk of createdProdukList) {
+        const { packaging_id, barang_mentah_id, barang_id, kuantitas } = produk;
+
+        let fieldName, fieldValue;
+        if (packaging_id) {
+          fieldName = 'packaging_id';
+          fieldValue = packaging_id;
+        } else if (barang_mentah_id) {
+          fieldName = 'barang_mentah_id';
+          fieldValue = barang_mentah_id;
+        } else if (barang_id) {
+          fieldName = 'barang_id';
+          fieldValue = barang_id;
+        } else {
+          continue;
+        }
+
+        const stokEntry = await StokBarangGudang.findOne({
+          where: {
+            [fieldName]: fieldValue,
+            is_deleted: false,
+          },
+          transaction,
+        });
+
+        await stokEntry.decrement('jumlah_stok', {
+          by: kuantitas,
+          transaction,
+        });
+      }
+
+      return createdProdukList;
+    } catch (error) {
+      throw new Error(`error: ${error.message}`);
+    }
+  }
 
   static async getAll() {
     return await ProdukPenjualanGudang.findAll({
@@ -146,4 +221,4 @@ class ProdukPenjualanGudangService {
   }
 }
 
-module.exports = ProdukPenjualanGudangService;  
+module.exports = ProdukPenjualanGudangService;
