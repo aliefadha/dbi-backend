@@ -1,36 +1,42 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
-const KategoriBarangGudang = require("./kategoriBarangGudang");
+const { DataTypes } = require("sequelize");  
+const sequelize = require("../config/database");  
 const JenisBarangGudang = require("./jenisBarangGudang");
-
-const BarangNonHandmadeGudang = sequelize.define("barang_non_handmade_gudang", {
-  barang_nonhandmade_id: {
-    type: DataTypes.STRING,
+const KategoriBarangGudang = require("./kategoriBarangGudang");
+  
+const BarangHandmadeGudang = sequelize.define("barang_handmade_gudang", {  
+  barang_handmade_id: {  
+    type: DataTypes.STRING,  
     allowNull: false,
     primaryKey: true,
-  },
+  }, 
   image: {
     type: DataTypes.STRING,
-  },
-  nama_barang: {
-    type: DataTypes.STRING,
-    allowNull: false
+    allowNull: true,
   },
   kategori_barang_id: {
     type: DataTypes.INTEGER,
+    allowNull: false,
     references: {
-      model: KategoriBarangGudang,
-      key: 'kategori_barang_id'
+        model: KategoriBarangGudang,
+        key: "kategori_barang_id",
     }
   },
   jenis_barang_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
-    defaultValue: 2,
+    defaultValue: 1,
     references: {
         model: JenisBarangGudang,
         key: "jenis_barang_id",
     }
+  },
+  nama_barang: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  waktu_pengerjaan: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
   },
   jumlah_minimum_stok: {
     type: DataTypes.INTEGER,
@@ -52,8 +58,8 @@ const BarangNonHandmadeGudang = sequelize.define("barang_non_handmade_gudang", {
     type: DataTypes.BOOLEAN,
     defaultValue: false
   }
-}, {
+},{
   timestamps: false
-});
-
-module.exports = BarangNonHandmadeGudang;  
+});  
+  
+module.exports = BarangHandmadeGudang;  

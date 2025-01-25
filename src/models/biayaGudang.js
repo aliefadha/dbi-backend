@@ -1,18 +1,22 @@
 const { DataTypes } = require("sequelize");  
-const sequelize = require("../config/database");  
+const sequelize = require("../config/database");
   
-const OperasionalProduksiGudang = sequelize.define("operasional_produksi_gudang", {  
-  operasional_produksi_id: {  
+const BiayaGudang = sequelize.define("biaya_gudang", {  
+  biaya_gudang_id: {  
     type: DataTypes.INTEGER,  
     allowNull: false,
     primaryKey: true,
     autoIncrement: true,
   },
-  nama_tabel: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
   total: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0
+  },
+  rata_rata: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0
+  },
+  total_biaya: {
     type: DataTypes.INTEGER,
     defaultValue: 0
   },
@@ -32,4 +36,4 @@ const OperasionalProduksiGudang = sequelize.define("operasional_produksi_gudang"
   timestamps: false
 });  
   
-module.exports = OperasionalProduksiGudang;  
+module.exports = BiayaGudang;  

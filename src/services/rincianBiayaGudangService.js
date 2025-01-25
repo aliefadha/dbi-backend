@@ -1,9 +1,13 @@
 const RincianBiayaGudang = require("../models/rincianBiayaGudang");  
   
 class RincianBiayaGudangService {  
-  static async create(data) {  
-    return await RincianBiayaGudang.create(data);  
+  static async create(data, options = {}) {  
+    return await RincianBiayaGudang.create(data, options);  
   }  
+  
+  static async createMany(data, options = {}) {
+      return await RincianBiayaGudang.bulkCreate(data, options);
+    }
   
   static async getAll() {  
     return await RincianBiayaGudang.findAll({
@@ -37,6 +41,19 @@ class RincianBiayaGudangService {
     await rincianBiayaGudang.update({ is_deleted: true });  
     return true;  
   }  
+
+  static async deleteByBarangId(barangHandmadeId, options = {}) {
+    return await RincianBiayaGudang.update(
+      { is_deleted: true },
+      {
+        where: {
+          barang_handmade_id: barangHandmadeId,
+          is_deleted: false
+        },
+        ...options
+      }
+    );
+  }
 }  
   
-module.exports = RincianBiayaGudangService;  
+module.exports = RincianBiayaGudangService;
