@@ -20,7 +20,7 @@ const RincianBiaya = sequelize.define('rincian_biaya', {
             key: "barang_handmade_id",
         }
     },
-    barang_handmade_id: {
+    barang_non_handmade_id: {
         type: DataTypes.STRING,
         allowNull: true,
         references: {

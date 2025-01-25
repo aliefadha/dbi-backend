@@ -76,6 +76,14 @@ class BarangHandmadeService {
       },
       include: [
         {
+          model: KategoriBarang,
+          as: "kategori_barang",
+        },
+        {
+          model: JenisBarang,
+          as: "jenis_barang",
+        },
+        {
           model: RincianBiaya,
           as: "rincian_biaya",
           include: [
