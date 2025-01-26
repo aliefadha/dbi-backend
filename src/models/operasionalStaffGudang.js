@@ -1,28 +1,28 @@
 const { DataTypes } = require("sequelize");  
 const sequelize = require("../config/database");  
-const BiayaGudang = require("./biayaGudang");
   
-const BiayaOperasionalStaffGudang = sequelize.define("biaya_operasional_staff_gudang", {  
-  biaya_staff_gudang_id: {  
+const OperasionalStaffGudang = sequelize.define("operasional_staff_gudang", {  
+  operasional_staff_id: {  
     type: DataTypes.INTEGER,  
     allowNull: false,
     primaryKey: true,
     autoIncrement: true,
-  }, 
-  nama_biaya: {
+  },
+  nama_tabel: {
     type: DataTypes.STRING,
-    allowNull: false
+    defaultValue: "Biaya Operasional dan Staff"
+  },
+  total: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0
+  },
+  rata_rata: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0
   },
   total_biaya: {
     type: DataTypes.INTEGER,
     defaultValue: 0
-  },
-  biaya_gudang_id: {
-    type: DataTypes.INTEGER,
-    references: {
-      model: BiayaGudang,
-      key: "biaya_gudang_id"
-    }
   },
   is_deleted: {
     type: DataTypes.BOOLEAN,
@@ -32,4 +32,4 @@ const BiayaOperasionalStaffGudang = sequelize.define("biaya_operasional_staff_gu
   timestamps: false
 });  
   
-module.exports = BiayaOperasionalStaffGudang;  
+module.exports = OperasionalStaffGudang;  

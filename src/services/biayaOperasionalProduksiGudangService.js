@@ -1,8 +1,9 @@
 const BiayaOperasionalProduksiGudang = require("../models/biayaOperasionalProduksiGudang");  
+const OperasionalProduksiGudang = require("../models/operasionalProduksiGudang");
   
 class BiayaOperasionalProduksiGudangService {  
   static async create(data) {  
-    return await BiayaOperasionalProduksiGudang.create(data);  
+    return await BiayaOperasionalProduksiGudang.create(data);
   }  
   
   static async getAll() {  

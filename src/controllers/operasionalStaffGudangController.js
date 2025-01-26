@@ -1,13 +1,12 @@
-const BarangNonHandmadeGudangService = require("../services/barangNonHandmadeGudangService");  
+const OperasionalStaffGudangService = require("../services/operasionalStaffGudangService");  
   
-class BarangNonHandmadeGudangController {  
+class OperasionalStaffGudangController {  
   static async create(req, res) {  
     try {  
-      const { rincian_biaya, ...barangData } = req.body;
-      const barangNonHandmadeGudang = await BarangNonHandmadeGudangService.createWithDetails(barangData, rincian_biaya); 
+      const operasionalStaffGudang = await OperasionalStaffGudangService.create(req.body);  
       res.status(201).json({  
         success: true,  
-        data: barangNonHandmadeGudang,  
+        data: operasionalStaffGudang,  
         message: "created successfully",  
       });  
     } catch (error) {  
@@ -21,10 +20,10 @@ class BarangNonHandmadeGudangController {
   
   static async getAll(req, res) {  
     try {  
-      const barangNonHandmadeGudangs = await BarangNonHandmadeGudangService.getAll();  
+      const operasionalStaffGudangs = await OperasionalStaffGudangService.getAll();  
       res.status(200).json({  
         success: true,  
-        data: barangNonHandmadeGudangs,  
+        data: operasionalStaffGudangs,  
         message: "retrieved successfully",  
       });  
     } catch (error) {  
@@ -38,8 +37,8 @@ class BarangNonHandmadeGudangController {
   
   static async getById(req, res) {  
     try {  
-      const barangNonHandmadeGudang = await BarangNonHandmadeGudangService.getById(req.params.id);  
-      if (!barangNonHandmadeGudang) {  
+      const operasionalStaffGudang = await OperasionalStaffGudangService.getById(req.params.id);  
+      if (!operasionalStaffGudang) {  
         return res.status(404).json({  
           success: false,  
           data: null,  
@@ -48,7 +47,7 @@ class BarangNonHandmadeGudangController {
       }  
       res.status(200).json({  
         success: true,  
-        data: barangNonHandmadeGudang,  
+        data: operasionalStaffGudang,  
         message: "retrieved successfully",  
       });  
     } catch (error) {  
@@ -62,8 +61,8 @@ class BarangNonHandmadeGudangController {
   
   static async update(req, res) {  
     try {  
-      const barangNonHandmadeGudang = await BarangNonHandmadeGudangService.update(req.params.id, req.body);  
-      if (!barangNonHandmadeGudang) {  
+      const operasionalStaffGudang = await OperasionalStaffGudangService.update(req.params.id, req.body);  
+      if (!operasionalStaffGudang) {  
         return res.status(404).json({  
           success: false,  
           data: null,  
@@ -72,7 +71,7 @@ class BarangNonHandmadeGudangController {
       }  
       res.status(200).json({  
         success: true,  
-        data: barangNonHandmadeGudang,  
+        data: operasionalStaffGudang,  
         message: "updated successfully",  
       });  
     } catch (error) {  
@@ -86,7 +85,7 @@ class BarangNonHandmadeGudangController {
   
   static async delete(req, res) {  
     try {  
-      const deleted = await BarangNonHandmadeGudangService.delete(req.params.id);  
+      const deleted = await OperasionalStaffGudangService.delete(req.params.id);  
       if (!deleted) {  
         return res.status(404).json({  
           success: false,  
@@ -109,4 +108,4 @@ class BarangNonHandmadeGudangController {
   }  
 }  
   
-module.exports = BarangNonHandmadeGudangController;  
+module.exports = OperasionalStaffGudangController;  

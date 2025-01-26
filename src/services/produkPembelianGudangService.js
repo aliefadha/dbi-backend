@@ -59,6 +59,62 @@ class ProdukPembelianGudangService {
     return res
   }  
   
+  static async createMany(dataArray, options = {}) {
+    const transaction = options.transaction;
+  
+    try {
+      const createdProdukList = await ProdukPembelianGudang.bulkCreate(dataArray, {
+        transaction,
+        returning: true,
+      });
+  
+      for (const produk of createdProdukList) {
+        const { packaging_id, barang_mentah_id, barang_id, kuantitas } = produk;
+  
+        let fieldName, fieldValue;
+        if (packaging_id) {
+          fieldName = 'packaging_id';
+          fieldValue = packaging_id;
+        } else if (barang_mentah_id) {
+          fieldName = 'barang_mentah_id';
+          fieldValue = barang_mentah_id;
+        } else if (barang_id) {
+          fieldName = 'barang_id';
+          fieldValue = barang_id;
+        } else {
+          continue;
+        }
+  
+        let stokEntry = await StokBarangGudang.findOne({
+          where: {
+            [fieldName]: fieldValue,
+            is_deleted: false,
+          },
+          transaction,
+        });
+  
+        if (stokEntry) {
+          await stokEntry.increment('jumlah_stok', {
+            by: kuantitas,
+            transaction,
+          });
+        } else {
+          await StokBarangGudang.create(
+            {
+              [fieldName]: fieldValue,
+              jumlah_stok: kuantitas,
+            },
+            { transaction }
+          );
+        }
+      }
+  
+      return createdProdukList;
+    } catch (error) {
+      throw new Error(`createMany failed: ${error.message}`);
+    }
+  }
+
   static async getAll() {  
     return await ProdukPembelianGudang.findAll({
       where: {

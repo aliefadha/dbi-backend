@@ -1,13 +1,15 @@
 const BarangMentah = require("../models/barangMentah");
 const BarangNonHandmadeGudang = require("../models/barangNonHandmadeGudang");
-const JenisBarangGudang = require("../models/jenisBarangGudang");
-const KategoriBarangGudang = require("../models/kategoriBarangGudang");
 const RincianBahanGudang = require("../models/rincianBahanGudang");  
   
 class RincianBahanGudangService {  
   static async create(data) {  
     return await RincianBahanGudang.create(data);  
   }  
+
+  static async createMany(data, options = {}) {
+      return await RincianBahanGudang.bulkCreate(data, options);
+  }
   
   static async getAll() {  
     return await RincianBahanGudang.findAll({
@@ -53,6 +55,19 @@ class RincianBahanGudangService {
     await rincianBahanGudang.update({ is_deleted: true });  
     return true;  
   }  
+
+  static async deleteByBarangId(barangHandmadeId, options = {}) {
+    return await RincianBahanGudang.update(
+      { is_deleted: true },
+      {
+        where: {
+          barang_handmade_id: barangHandmadeId,
+          is_deleted: false
+        },
+        ...options
+      }
+    );
+  }
 }  
   
-module.exports = RincianBahanGudangService;  
+module.exports = RincianBahanGudangService;

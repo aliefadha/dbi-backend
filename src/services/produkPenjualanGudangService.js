@@ -1,70 +1,181 @@
+const { sequelize } = require("../models");
 const BarangNonHandmadeGudang = require("../models/barangNonHandmadeGudang");
 const JenisBarangGudang = require("../models/jenisBarangGudang");
 const PackagingGudang = require("../models/packagingGudang");
-const ProdukPenjualanGudang = require("../models/produkPenjualanGudang");  
+const ProdukPenjualanGudang = require("../models/produkPenjualanGudang");
 const StokBarangGudang = require("../models/stokBarangGudang");
-  
-class ProdukPenjualanGudangService {  
-  static async create(data) {  
-    const res =  await ProdukPenjualanGudang.create(data);
-    if(res.packaging_id){
-      let packaging = await StokBarangGudang.findOne({
-        where: {
-          packaging_id: res.packaging_id,
-          is_deleted: false
+
+class ProdukPenjualanGudangService {
+  static async create(data) {
+    const transaction = await sequelize.transaction();
+
+    try {
+      // Check stock levels before creating the record  
+      const checkStock = async (model, idField, idValue, quantity) => {
+        const stockRecord = await model.findOne({
+          where: {
+            [idField]: idValue,
+            is_deleted: false
+          },
+          transaction
+        });
+
+        if (!stockRecord) {
+          throw new Error(`Stock record not found for ${idField}: ${idValue}`);
         }
-      })
-      if(packaging){
-        await packaging.update({jumlah_stok: packaging.jumlah_stok - res.kuantitas})
-        await packaging.save()
-      } else {
-        await StokBarangGudang.create({packaging_id: res.packaging_id, jumlah_stok: res.kuantitas * -1})
-      }
-    }
 
-    if(res.barang_mentah_id){
-      let barang_mentah = await StokBarangGudang.findOne({
-        where: {
-          barang_mentah_id: res.barang_mentah_id,
-          is_deleted: false
+        if (stockRecord.jumlah_stok < quantity) {
+          throw new Error(`Insufficient stock for ${idField}: ${idValue}. Available: ${stockRecord.jumlah_stok}, Required: ${quantity}`);
         }
-      })
-      if(barang_mentah){
-        await barang_mentah.update({jumlah_stok: barang_mentah.jumlah_stok - res.kuantitas})
-        await barang_mentah.save()
-      } else {
-        await StokBarangGudang.create({barang_mentah_id: res.barang_mentah_id, jumlah_stok: res.kuantitas * -1})
-      }
-    }
+      };
 
-    if(res.barang_id){
-      let barang = await StokBarangGudang.findOne({
-        where: {
-          barang_id: res.barang_id,
-          is_deleted: false
+      if (data.packaging_id) {
+        await checkStock(StokBarangGudang, 'packaging_id', data.packaging_id, data.kuantitas);
+      }
+
+      if (data.barang_mentah_id) {
+        await checkStock(StokBarangGudang, 'barang_mentah_id', data.barang_mentah_id, data.kuantitas);
+      }
+
+      if (data.barang_id) {
+        await checkStock(StokBarangGudang, 'barang_id', data.barang_id, data.kuantitas);
+      }
+
+      // Create the new record after stock checks  
+      const res = await ProdukPenjualanGudang.create(data, { transaction });
+
+      // Update stock levels  
+      const updateStock = async (model, idField, idValue, quantity) => {
+        const stockRecord = await model.findOne({
+          where: {
+            [idField]: idValue,
+            is_deleted: false
+          },
+          transaction
+        });
+
+        if (stockRecord) {
+          await stockRecord.update(
+            { jumlah_stok: stockRecord.jumlah_stok - quantity },
+            { transaction }
+          );
+        } else {
+          await model.create(
+            {
+              [idField]: idValue,
+              jumlah_stok: quantity * -1
+            },
+            { transaction }
+          );
         }
-      })
+      };
 
-      if(barang){
-        await barang.update({jumlah_stok: barang.jumlah_stok - res.kuantitas})
-        await barang.save()
-      } else {
-        await StokBarangGudang.create({barang_id: res.barang_id, jumlah_stok: res.kuantitas * -1})
+      if (res.packaging_id) {
+        await updateStock(StokBarangGudang, 'packaging_id', res.packaging_id, res.kuantitas);
       }
-    }
 
-    return data
-  }  
-  
-  static async getAll() {  
+      if (res.barang_mentah_id) {
+        await updateStock(StokBarangGudang, 'barang_mentah_id', res.barang_mentah_id, res.kuantitas);
+      }
+
+      if (res.barang_id) {
+        await updateStock(StokBarangGudang, 'barang_id', res.barang_id, res.kuantitas);
+      }
+
+      await transaction.commit();
+      return res;
+    } catch (error) {
+      await transaction.rollback();
+      throw error;
+    }
+  }
+
+  static async createMany(dataArray, options = {}) {
+    const transaction = options.transaction;
+
+    try {
+      for (const data of dataArray) {
+        const { packaging_id, barang_mentah_id, barang_id, kuantitas } = data;
+
+        let fieldName, fieldValue;
+        if (packaging_id) {
+          fieldName = 'packaging_id';
+          fieldValue = packaging_id;
+        } else if (barang_mentah_id) {
+          fieldName = 'barang_mentah_id';
+          fieldValue = barang_mentah_id;
+        } else if (barang_id) {
+          fieldName = 'barang_id';
+          fieldValue = barang_id;
+        } else {
+          continue;
+        }
+
+        const stockRecord = await StokBarangGudang.findOne({
+          where: {
+            [fieldName]: fieldValue,
+            is_deleted: false
+          },
+          transaction
+        });
+
+        if (!stockRecord || stockRecord.jumlah_stok < kuantitas) {
+          const availableStock = stockRecord ? stockRecord.jumlah_stok : 0;
+          throw new Error(`Stok barang ${fieldName}: ${fieldValue}. Tersedia: ${availableStock}, Stok: ${kuantitas}`);
+        }
+      }
+
+      const createdProdukList = await ProdukPenjualanGudang.bulkCreate(dataArray, {
+        transaction,
+        returning: true,
+      });
+
+      for (const produk of createdProdukList) {
+        const { packaging_id, barang_mentah_id, barang_id, kuantitas } = produk;
+
+        let fieldName, fieldValue;
+        if (packaging_id) {
+          fieldName = 'packaging_id';
+          fieldValue = packaging_id;
+        } else if (barang_mentah_id) {
+          fieldName = 'barang_mentah_id';
+          fieldValue = barang_mentah_id;
+        } else if (barang_id) {
+          fieldName = 'barang_id';
+          fieldValue = barang_id;
+        } else {
+          continue;
+        }
+
+        const stokEntry = await StokBarangGudang.findOne({
+          where: {
+            [fieldName]: fieldValue,
+            is_deleted: false,
+          },
+          transaction,
+        });
+
+        await stokEntry.decrement('jumlah_stok', {
+          by: kuantitas,
+          transaction,
+        });
+      }
+
+      return createdProdukList;
+    } catch (error) {
+      throw new Error(`error: ${error.message}`);
+    }
+  }
+
+  static async getAll() {
     return await ProdukPenjualanGudang.findAll({
       where: {
         is_deleted: false
       }
-    });  
-  }  
-  
-  static async getById(id) {  
+    });
+  }
+
+  static async getById(id) {
     return await ProdukPenjualanGudang.findOne({
       where: {
         produk_penjualan_id: id,
@@ -89,25 +200,25 @@ class ProdukPenjualanGudangService {
           attributes: ["image", "nama_packaging", "ukuran", "harga_satuan"]
         }
       ]
-    });  
-  }  
-  
-  static async update(id, data) {  
-    const produkPenjualanGudang = await ProdukPenjualanGudang.findByPk(id);  
-    if (!produkPenjualanGudang) return null;  
-  
-    Object.assign(produkPenjualanGudang, data);  
-    await produkPenjualanGudang.save();  
-  
-    return produkPenjualanGudang;  
-  }  
-  
-  static async delete(id) {  
-    const produkPenjualanGudang = await ProdukPenjualanGudang.findByPk(id);  
-    if (!produkPenjualanGudang) return null;  
-    await produkPenjualanGudang.update({ is_deleted: true });  
-    return true;  
-  }  
-}  
-  
-module.exports = ProdukPenjualanGudangService;  
+    });
+  }
+
+  static async update(id, data) {
+    const produkPenjualanGudang = await ProdukPenjualanGudang.findByPk(id);
+    if (!produkPenjualanGudang) return null;
+
+    Object.assign(produkPenjualanGudang, data);
+    await produkPenjualanGudang.save();
+
+    return produkPenjualanGudang;
+  }
+
+  static async delete(id) {
+    const produkPenjualanGudang = await ProdukPenjualanGudang.findByPk(id);
+    if (!produkPenjualanGudang) return null;
+    await produkPenjualanGudang.update({ is_deleted: true });
+    return true;
+  }
+}
+
+module.exports = ProdukPenjualanGudangService;

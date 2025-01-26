@@ -40,6 +40,12 @@ const BarangHandmade = require('./barangHandmade');
 const BarangNonHandmade = require('./barangNonHandmade');
 const RincianBiaya = require('./rincianBiaya');
 const DetailRincianBiaya = require('./detailRincianBiaya');
+const BiayaOperasionalProduksiGudang = require('./biayaOperasionalProduksiGudang');
+const OperasionalProduksiGudang = require('./operasionalProduksiGudang');
+const BiayaOperasionalStaffGudang = require('./biayaOperasionalStaffGudang');
+const OperasionalStaffGudang = require('./operasionalStaffGudang');
+const BarangHandmadeGudang = require('./barangHandmadeGudang');
+const BiayaGudang = require('./biayaGudang');
 
 
 JenisBarang.hasMany(BarangNonHandmade, {
@@ -84,9 +90,13 @@ Packaging.belongsTo(KategoriBarang, {
 
 KategoriBarangGudang.hasMany(BarangNonHandmadeGudang, {
     foreignKey: 'kategori_barang_id',
-    as: "barang",
+    as: "barang_nonhandmade",
 });
 
+KategoriBarangGudang.hasMany(BarangHandmadeGudang, {
+    foreignKey: 'kategori_barang_id',
+    as: "barang_handmade",
+});
 
 BarangNonHandmade.belongsTo(KategoriBarang, {
     foreignKey: 'kategori_barang_id',
@@ -104,34 +114,50 @@ BarangNonHandmadeGudang.belongsTo(KategoriBarangGudang, {
     as: "kategori",
 })
 
+BarangHandmadeGudang.belongsTo(KategoriBarangGudang, {
+    foreignKey: 'kategori_barang_id',
+    as: "kategori",
+})
+
 BarangNonHandmadeGudang.belongsTo(JenisBarangGudang, {
     foreignKey: "jenis_barang_id",
     as: "jenis",
 })
 
 BarangNonHandmadeGudang.hasMany(RincianBiayaGudang, {
-    foreignKey: "rincian_biaya_id",
+    foreignKey: "barang_nonhandmade_id",
     as: "rincian_biaya"
 })
 
+RincianBiayaGudang.belongsTo(BarangNonHandmadeGudang ,{
+    foreignKey: "barang_nonhandmade_id",
+    as: "barang_nonhandmade"
+})
+
+
 BarangNonHandmadeGudang.hasMany(ProdukPembelianGudang, {
-    foreignKey: "barang_id",
+    foreignKey: "barang_nonhandmade_id",
     as: "produk_pembelian"
 })
 
-RincianBiayaGudang.belongsTo(BarangNonHandmadeGudang ,{
-    foreignKey: "barang_id",
-    as: "barang_nonhandmade"
+BarangHandmadeGudang.hasMany(RincianBiayaGudang, {
+    foreignKey: "barang_handmade_id",
+    as: "rincian_biaya",
 })
 
-BarangNonHandmadeGudang.hasMany(RincianBahanGudang, {
-    foreignKey: "barang_id",
-    as: "rincian_bahan"
+RincianBiayaGudang.belongsTo(BarangHandmadeGudang ,{
+    foreignKey: "barang_handmade_id",
+    as: "barang_handmade"
 })
 
-RincianBahanGudang.belongsTo(BarangNonHandmadeGudang, {
-    foreignKey: "barang_id",
-    as: "barang_nonhandmade"
+BarangHandmadeGudang.hasMany(RincianBahanGudang, {
+    foreignKey: "barang_handmade_id",
+    as: "rincian_bahan",
+})
+
+RincianBahanGudang.belongsTo(BarangHandmadeGudang, {
+    foreignKey: "barang_handmade_id",
+    as: "barang_handmade",
 })
 
 BarangMentah.hasMany(RincianBahanGudang, {
@@ -142,6 +168,11 @@ BarangMentah.hasMany(RincianBahanGudang, {
 BarangMentah.hasMany(ProdukPembelianGudang, {
     foreignKey: "barang_mentah_id",
     as: "produk_pembelian"
+})
+
+BarangMentah.hasMany(ProdukPenjualanGudang, {
+    foreignKey: "barang_mentah_id",
+    as: "produk_penjualan"
 })
 
 RincianBahanGudang.belongsTo(BarangMentah, {
@@ -164,8 +195,18 @@ ProdukPembelianGudang.belongsTo(PembelianGudang, {
     as: "pembelian"
 })
 
+PenjualanGudang.hasMany(ProdukPenjualanGudang, {
+    foreignKey: "penjualan_id",
+    as: "produk"
+})
+
+ProdukPenjualanGudang.belongsTo(PenjualanGudang, {
+    foreignKey: "penjualan_id",
+    as: "penjualan"
+})
+
 ProdukPembelianGudang.belongsTo(BarangNonHandmadeGudang, {
-    foreignKey: "barang_id",
+    foreignKey: "barang_nonhandmade_id",
     as: "barang_nonhandmade"
 })
 
@@ -195,14 +236,20 @@ PenjualanGudang.belongsTo(MetodePembayaranGudang, {
 })
 
 ProdukPenjualanGudang.belongsTo(BarangNonHandmadeGudang, {
-    foreignKey: "barang_id",
+    foreignKey: "barang_nonhandmade_id",
     as: "barang_nonhandmade"
+})
+
+ProdukPenjualanGudang.belongsTo(BarangMentah, {
+    foreignKey: "barang_mentah_id",
+    as: "barang_mentah"
 })
 
 ProdukPenjualanGudang.belongsTo(PackagingGudang, {
     foreignKey: "packaging_id",
     as: "packaging",
 })
+
 
 PackagingGudang.hasMany(ProdukPenjualanGudang, {
     foreignKey: "packaging_id",
@@ -225,12 +272,12 @@ StokBarangGudang.belongsTo(PackagingGudang, {
 })
 
 BarangNonHandmadeGudang.hasOne(StokBarangGudang, {
-    foreignKey: "barang_id",
+    foreignKey: "barang_nonhandmade_id",
     as: "stok_barang"
 })
 
 StokBarangGudang.belongsTo(BarangNonHandmadeGudang, {
-    foreignKey: "barang_id",
+    foreignKey: "barang_nonhandmade_id",
     as: "barang_nonhandmade"
 })
 
@@ -247,6 +294,26 @@ BarangMentah.hasOne(StokBarangGudang, {
 BarangProduksiGudang.belongsTo(BarangNonHandmadeGudang, {
     foreignKey: "barang_id",
     as: "barang"
+})
+
+BiayaOperasionalProduksiGudang.belongsTo(BiayaGudang, {
+    foreignKey: "biaya_gudang_id",
+    as: 'biaya_gudang'
+})
+
+BiayaGudang.hasMany(BiayaOperasionalProduksiGudang, {
+    foreignKey: "biaya_gudang_id",
+    as: "biaya_operasional"
+})
+
+BiayaOperasionalStaffGudang.belongsTo(BiayaGudang, {
+    foreignKey: "biaya_gudang_id",
+    as: 'biaya_gudang'
+})
+
+BiayaGudang.hasMany(BiayaOperasionalStaffGudang, {
+    foreignKey: "biaya_gudang_id",
+    as: "biaya_staff"
 })
 
 BarangNonHandmadeGudang.hasMany(BarangProduksiGudang, {
@@ -528,4 +595,4 @@ syncDatabase();
 
 module.exports = {
     sequelize
-};  
+};
