@@ -3,7 +3,8 @@ const RincianBiaya = require("../models/rincianBiaya");
 const DetailRincianBiaya = require("../models/detailRincianBiaya");
 const KategoriBarang = require("../models/kategoriBarang");
 const JenisBarang = require("../models/jenisBarang");
-  
+const Cabang = require("../models/cabang");
+const BiayaToko = require("../models/biayaToko");
 class BarangNonHandmadeService {  
   static async create(data) {  
     const { image, barang_non_handmade_id, jenis_barang_id, kategori_barang_id, nama_barang, jumlah_minimum_stok, rincian_biaya } = data;
@@ -62,6 +63,11 @@ class BarangNonHandmadeService {
           as: "rincian_biaya",
           include: [
             {
+              model: Cabang,
+              as: "cabang",
+              attributes: ["nama_cabang"]
+            },
+            {
               model: DetailRincianBiaya,
               as: "detail_rincian_biaya"
             }
@@ -93,8 +99,19 @@ class BarangNonHandmadeService {
           as: "rincian_biaya",
           include: [
             {
+              model: Cabang,
+              as: "cabang",
+              attributes: ["nama_cabang"]
+            },
+            {
               model: DetailRincianBiaya,
-              as: "detail_rincian_biaya"
+              as: "detail_rincian_biaya",
+              include: [
+                {
+                  model: BiayaToko,
+                  as: "biaya_toko"
+                }
+              ]
             }
           ]
         }
@@ -103,7 +120,7 @@ class BarangNonHandmadeService {
   }  
   
   static async update(id, data) {  
-    const { image, barang_non_handmade_id, jenis_barang_id, kategori_barang_id, nama_barang, jumlah_minimum_stok } = data;
+    const { image, barang_non_handmade_id, jenis_barang_id, kategori_barang_id, nama_barang, jumlah_minimum_stok, rincian_biaya } = data;
 
     const barangNonHandmade = await BarangNonHandmade.findOne({
       where: {

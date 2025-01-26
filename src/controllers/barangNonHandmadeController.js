@@ -101,7 +101,7 @@ class BarangNonHandmadeController {
         });
         updatedData.image = req.file.filename;
       }
-      const barangNonHandmade = await BarangNonHandmadeService.update(req.params.id, ypdatedData);  
+      const barangNonHandmade = await BarangNonHandmadeService.update(req.params.id, updatedData);  
       if (!barangNonHandmade) {  
         return res.status(404).json({  
           success: false,  

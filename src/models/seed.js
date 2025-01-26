@@ -6,11 +6,8 @@ const BarangNonHandmade = require('./barangNonHandmade');
 const DivisiKaryawan = require('./divisiKaryawan');
 const Karyawan = require('./karyawan');
 const Kpi = require('./kpi');
-const ProdukPenjualan = require('./produkPenjualan');
-const Penjualan = require('./penjualan');
 const MetodePembayaran = require('./metodePembayaran');
 const Cabang = require('./cabang');
-const Pembelian = require('./pembelian');
 const JenisBarangGudang = require('./jenisBarangGudang');
 const KategoriBarangGudang = require('./kategoriBarangGudang');
 const BarangMentah = require('./barangMentah');
@@ -70,16 +67,16 @@ const seedDatabase = async () => {
         await PembelianGudang.create({cash_or_non: true, metode_id: 1, sub_total: 100, diskon: 20, pajak: 5, total_penjualan: 10})
 
         // Seed data for Penjualan
-        await Penjualan.create({
-            tanggal_waktu: new Date(),
-            nama_pembeli: "John Doe",
-            cash_or_non: true,
-            metode_pembayaran_id: 1,
-            sub_total: 100000,
-            diskon: 5000,
-            pajak: 10000,
-            total_penjualan: 105000
-        });
+        // await Penjualan.create({
+        //     tanggal_waktu: new Date(),
+        //     nama_pembeli: "John Doe",
+        //     cash_or_non: true,
+        //     metode_pembayaran_id: 1,
+        //     sub_total: 100000,
+        //     diskon: 5000,
+        //     pajak: 10000,
+        //     total_penjualan: 105000
+        // });
 
 
         // Seed data for DivisiKaryawan  
