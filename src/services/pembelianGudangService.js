@@ -220,19 +220,13 @@ class PembelianGudangService {
       await pembelianGudang.update(pembelianData, { transaction });
 
       if (produk && Array.isArray(produk)) {
-        // Delete existing produk
-        await ProdukPembelianGudang.destroy({
-          where: { pembelian_id: id },
-          transaction
-        });
-
-        // Create new produk
+        // Update or create new produk
         const produkData = produk.map(item => ({
           ...item,
           pembelian_id: id
         }));
 
-        await ProdukPembelianGudangService.createMany(produkData, { transaction });
+        await ProdukPembelianGudangService.updateMany(produkData, { transaction });
       }
 
       await transaction.commit();

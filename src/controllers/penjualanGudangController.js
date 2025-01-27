@@ -72,28 +72,32 @@ class PenjualanGudangController {
     }  
   }  
   
-  static async update(req, res) {  
-    try {  
-      const penjualanGudang = await PenjualanGudangService.update(req.params.id, req.body);  
-      if (!penjualanGudang) {  
-        return res.status(404).json({  
-          success: false,  
-          data: null,  
-          message: "not found",  
-        });  
-      }  
-      res.status(200).json({  
-        success: true,  
-        data: penjualanGudang,  
-        message: "updated successfully",  
-      });  
-    } catch (error) {  
-      res.status(400).json({  
-        success: false,  
-        data: null,  
-        message: error.message,  
-      });  
-    }  
+  static async update(req, res) {
+    try {
+      const { ...penjualanData } = req.body;
+
+      const penjualanGudang = await PenjualanGudangService.update(req.params.id, penjualanData);
+      if (!penjualanGudang) {
+        return res.status(404).json({
+          success: false,
+          data: null,
+          message: "not found",
+        });
+      }
+      res.status(200).json({
+        success: true,
+        data: {
+          penjualan: penjualanGudang,
+        },
+        message: "updated successfully",
+      });
+    } catch (error) {
+      res.status(400).json({
+        success: false,
+        data: null,
+        message: error.message,
+      });
+    }
   }  
   
   static async delete(req, res) {  
