@@ -18,7 +18,7 @@ const RincianBahanGudang = sequelize.define("rincian_bahan_gudang", {
     }
   },
   barang_mentah_id: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
     references: {
       model: BarangMentah,
       key: 'barang_mentah_id'

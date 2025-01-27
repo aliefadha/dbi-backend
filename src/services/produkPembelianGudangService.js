@@ -8,55 +8,7 @@ const StokBarangGudang = require("../models/stokBarangGudang");
   
 class ProdukPembelianGudangService {  
   static async create(data) {  
-    const res =  await ProdukPembelianGudang.create(data)
-
-    if(res.packaging_id){
-      let packaging = await StokBarangGudang.findOne({
-        where: {
-          packaging_id: res.packaging_id,
-          is_deleted: false
-        }
-      })
-      if(packaging){
-        await packaging.update({jumlah_stok: packaging.jumlah_stok + res.kuantitas})
-        await packaging.save()
-      } else {
-        await StokBarangGudang.create({packaging_id: res.packaging_id, jumlah_stok: res.kuantitas})
-      }
-    }
-
-    if(res.barang_mentah_id){
-      let barang_mentah = await StokBarangGudang.findOne({
-        where: {
-          barang_mentah_id: res.barang_mentah_id,
-          is_deleted: false
-        }
-      })
-      if(barang_mentah){
-        await barang_mentah.update({jumlah_stok: barang_mentah.jumlah_stok + res.kuantitas})
-        await barang_mentah.save()
-      } else {
-        await StokBarangGudang.create({barang_mentah_id: res.barang_mentah_id, jumlah_stok: res.kuantitas})
-      }
-    }
-
-    if(res.barang_id){
-      let barang = await StokBarangGudang.findOne({
-        where: {
-          barang_id: res.barang_id,
-          is_deleted: false
-        }
-      })
-
-      if(barang){
-        await barang.update({jumlah_stok: barang.jumlah_stok + res.kuantitas})
-        await barang.save()
-      } else {
-        await StokBarangGudang.create({barang_id: res.barang_id, jumlah_stok: res.kuantitas})
-      }
-    }
-
-    return res
+    return await ProdukPembelianGudang.create(data);
   }  
   
   static async createMany(dataArray, options = {}) {
@@ -69,7 +21,7 @@ class ProdukPembelianGudangService {
       });
   
       for (const produk of createdProdukList) {
-        const { packaging_id, barang_mentah_id, barang_id, kuantitas } = produk;
+        const { packaging_id, barang_mentah_id, barang_nonhandmade_id, kuantitas } = produk;
   
         let fieldName, fieldValue;
         if (packaging_id) {
@@ -78,10 +30,11 @@ class ProdukPembelianGudangService {
         } else if (barang_mentah_id) {
           fieldName = 'barang_mentah_id';
           fieldValue = barang_mentah_id;
-        } else if (barang_id) {
-          fieldName = 'barang_id';
-          fieldValue = barang_id;
-        } else {
+        } else if (barang_nonhandmade_id) {
+          fieldName = 'barang_nonhandmade_id';
+          fieldValue = barang_nonhandmade_id;
+        }
+         else {
           continue;
         }
   

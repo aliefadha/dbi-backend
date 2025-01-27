@@ -1,9 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 const BarangHandmadeGudangService = require("../services/barangHandmadeGudangService");
-const RincianBahanGudangService = require("../services/rincianBahanGudangService");
-const sequelize = require("../config/database");
 const multer = require("multer");
+const CustomIdGenerateService = require('../services/customIdGenerateService');
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -19,18 +18,15 @@ const upload = multer({ storage: storage });
 class BarangHandmadeGudangController {
   static async create(req, res) {
     try {
-      const { rincian_bahan, ...barangData } = req.body;
-  
-      if (!rincian_bahan || !Array.isArray(rincian_bahan) || rincian_bahan.length === 0) {
-        return res.status(400).json({
-          success: false,
-          data: null,
-          message: "rincian bahan kosong",
-        });
+      const newId = await CustomIdGenerateService.generateBarangHandmadeGudangId();
+      const barangHandmadeData = {
+        ...req.body,
+        image: req.file ? req.file.filename : null,
+        barang_handmade_id: newId,
       }
-  
-      const result = await BarangHandmadeGudangService.createWithDetails(barangData, rincian_bahan);
-  
+
+      const result = await BarangHandmadeGudangService.create(barangHandmadeData);
+
       res.status(201).json({
         success: true,
         data: result,
@@ -87,11 +83,7 @@ class BarangHandmadeGudangController {
   }
 
   static async update(req, res) {
-    let transaction;
-
     try {
-      const { rincian_bahan, ...barangData } = req.body;
-
       const existingBarangHandmadeGudang = await BarangHandmadeGudangService.getById(req.params.id);
       if (!existingBarangHandmadeGudang) {
         return res.status(404).json({
@@ -101,47 +93,36 @@ class BarangHandmadeGudangController {
         });
       }
 
-      transaction = await sequelize.transaction();
+      const updatedData = { ...req.body };
 
-      // Handle image update
+      // Check if a new file is uploaded
       if (req.file) {
+        // Delete the old image file
         const oldImagePath = path.join(__dirname, "../public/barangHandmadeGudang", existingBarangHandmadeGudang.image);
         fs.unlink(oldImagePath, (err) => {
           if (err) {
             console.error("Failed to delete old image:", err);
           }
         });
-        barangData.image = req.file.filename;
+
+        updatedData.image = req.file.filename;
       }
 
-      const barangHandmadeGudang = await BarangHandmadeGudangService.update(req.params.id, barangData, { transaction });
-
-      // Update rincian bahan if provided
-      if (rincian_bahan && Array.isArray(rincian_bahan)) {
-        await RincianBahanGudangService.deleteByBarangId(barangHandmadeGudang.barang_handmade_id, { transaction });
-
-        const rincianBahanToCreate = rincian_bahan.map((bahan) => ({
-          ...bahan,
-          barang_handmade_id: req.params.id,
-        }));
-
-        await RincianBahanGudangService.createMany(rincianBahanToCreate, { transaction });
+      const barangHandmadeGudang = await BarangHandmadeGudangService.update(req.params.id, updatedData);
+      if (!barangHandmadeGudang) {
+        return res.status(404).json({
+          success: false,
+          data: null,
+          message: "not found",
+        });
       }
-
-      await transaction.commit();
-
-      const updatedBarangHandmadeGudang = await BarangHandmadeGudangService.getById(req.params.id);
 
       res.status(200).json({
         success: true,
-        data: updatedBarangHandmadeGudang,
+        data: barangHandmadeGudang,
         message: "updated successfully",
       });
     } catch (error) {
-      if (transaction && !transaction.finished) {
-        await transaction.rollback();
-      }
-
       res.status(400).json({
         success: false,
         data: null,
@@ -175,4 +156,4 @@ class BarangHandmadeGudangController {
   }
 }
 
-module.exports = BarangHandmadeGudangController;
+module.exports = { BarangHandmadeGudangController, upload };

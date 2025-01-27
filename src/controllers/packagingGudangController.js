@@ -1,9 +1,30 @@
+const multer = require("multer");
+const path = require("path");
+const fs = require('fs');
 const PackagingGudangService = require("../services/packagingGudangService");  
+const CustomIdGenerateService = require("../services/customIdGenerateService");
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, path.join(__dirname, "../public/packagingGudang"));
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname));
+  },
+});
+
+const upload = multer({ storage: storage });
   
 class PackagingGudangController {  
   static async create(req, res) {  
     try {  
-      const packagingGudang = await PackagingGudangService.create(req.body);  
+    const newId = await CustomIdGenerateService.generatePackagingGudangId();
+      const data = {
+        ...req.body,
+        packaging_id: newId,
+        image: req.file ? req.file.filename : null,
+      };
+      const packagingGudang = await PackagingGudangService.create(data); 
       res.status(201).json({  
         success: true,  
         data: packagingGudang,  
@@ -61,7 +82,31 @@ class PackagingGudangController {
   
   static async update(req, res) {  
     try {  
-      const packagingGudang = await PackagingGudangService.update(req.params.id, req.body);  
+      const existingPackagingGudang = await PackagingGudangService.getById(req.params.id);  
+      if (!existingPackagingGudang) {  
+        return res.status(404).json({  
+          success: false,  
+          data: null,  
+          message: "not found",  
+        });  
+      }  
+  
+      const updatedData = { ...req.body };  
+  
+      // Check if a new file is uploaded  
+      if (req.file) {  
+        // Delete the old image file  
+        const oldImagePath = path.join(__dirname, "../public/packagingGudang", existingPackagingGudang.image);  
+        fs.unlink(oldImagePath, (err) => {  
+          if (err) {  
+            console.error("Failed to delete old image:", err);  
+          }  
+        });  
+  
+        updatedData.image = req.file.filename;  
+      }  
+  
+      const packagingGudang = await PackagingGudangService.update(req.params.id, updatedData);  
       if (!packagingGudang) {  
         return res.status(404).json({  
           success: false,  
@@ -69,6 +114,7 @@ class PackagingGudangController {
           message: "not found",  
         });  
       }  
+  
       res.status(200).json({  
         success: true,  
         data: packagingGudang,  
@@ -108,4 +154,4 @@ class PackagingGudangController {
   }  
 }  
   
-module.exports = PackagingGudangController;  
+module.exports = {PackagingGudangController, upload};

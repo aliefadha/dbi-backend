@@ -1,3 +1,4 @@
+const BarangHandmadeGudang = require("../models/barangHandmadeGudang");
 const BarangMentah = require("../models/barangMentah");
 const BarangNonHandmadeGudang = require("../models/barangNonHandmadeGudang");
 const JenisBarangGudang = require("../models/jenisBarangGudang");
@@ -6,17 +7,47 @@ const MetodePembayaranGudang = require("../models/metodePembayaranGudang");
 const PackagingGudang = require("../models/packagingGudang");
 const PembelianGudang = require("../models/pembelianGudang");
 const ProdukPembelianGudang = require("../models/produkPembelianGudang");
+const { sequelize } = require("../models");
+const ProdukPembelianGudangService = require("./produkPembelianGudangService");
 
 class PembelianGudangService {
   static async create(data) {
-    return await PembelianGudang.create(data);
+    const transaction = await sequelize.transaction();
 
+    try {
+      const { produk, ...pembelianData } = data;
+      
+      // Create the purchase record
+      const pembelian = await PembelianGudang.create(pembelianData, {
+        transaction
+      });
+
+      // If products are provided, create them using ProdukPembelianGudangService
+      if (produk && produk.length > 0) {
+        // Add pembelian_id to each product
+        const productsWithPembelianId = produk.map(item => ({
+          ...item,
+          pembelian_id: pembelian.pembelian_id
+        }));
+
+        await ProdukPembelianGudangService.createMany(productsWithPembelianId, { transaction });
+      }
+
+      await transaction.commit();
+      return pembelian;
+    } catch (error) {
+      await transaction.rollback();
+      throw new Error(`Failed to create purchase: ${error.message}`);
+    }
   }
 
   static async getAll() {
-    return await PembelianGudang.findAll({
+    const data = await PembelianGudang.findAll({
       where: {
         is_deleted: false
+      },
+      attributes: {
+        exclude: ["is_deleted", "metode_id"]
       },
       include: [
         {
@@ -27,10 +58,30 @@ class PembelianGudangService {
         {
           model: ProdukPembelianGudang,
           as: "produk",
+          attributes: {
+            exclude: ["is_deleted", "barang_mentah_id", "barang_nonhandmade_id", "packaging_id", "produk_pembelian_id", "pembelian_id"]
+          },
           include: [
             {
               model: BarangNonHandmadeGudang,
               as: "barang_nonhandmade",
+              attributes: ["image", "nama_barang", "harga_jual", "is_deleted"],
+              include: [
+                {
+                  model: KategoriBarangGudang,
+                  as: "kategori",
+                  attributes: ["nama_kategori_barang", "is_deleted"]
+                },
+                {
+                  model: JenisBarangGudang,
+                  as: "jenis",
+                  attributes: ["nama_jenis_barang", "is_deleted"]
+                }
+              ]
+            },
+            {
+              model: BarangHandmadeGudang,
+              as: "barang_handmade",
               attributes: ["image", "nama_barang", "kategori_barang_id", "jenis_barang_id", "harga_jual", "is_deleted"],
               include: [
                 {
@@ -59,6 +110,42 @@ class PembelianGudangService {
         }
       ]
     });
+
+    // Transform the data to include only the relevant product type
+    const transformedData = data.map(pembelian => {
+      const plainPembelian = pembelian.get({ plain: true });
+      
+      if (plainPembelian.produk) {
+        plainPembelian.produk = plainPembelian.produk.map(produk => {
+          const transformedProduk = { ...produk };
+          
+          // Keep only the non-null product type
+          if (produk.barang_nonhandmade) {
+            delete transformedProduk.barang_mentah;
+            delete transformedProduk.packaging;
+            delete transformedProduk.barang_handmade;
+          } else if (produk.barang_mentah) {
+            delete transformedProduk.barang_nonhandmade;
+            delete transformedProduk.packaging;
+            delete transformedProduk.barang_handmade;
+          } else if (produk.packaging) {
+            delete transformedProduk.barang_nonhandmade;
+            delete transformedProduk.barang_mentah;
+            delete transformedProduk.barang_handmade;
+          } else {
+            delete transformedProduk.barang_nonhandmade;
+            delete transformedProduk.barang_mentah;
+            delete transformedProduk.packaging;
+          }
+          
+          return transformedProduk;
+        });
+      }
+      
+      return plainPembelian;
+    });
+
+    return transformedData;
   }
 
   static async getById(id) {
@@ -128,4 +215,4 @@ class PembelianGudangService {
   }
 }
 
-module.exports = PembelianGudangService;  
+module.exports = PembelianGudangService;

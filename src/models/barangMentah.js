@@ -3,10 +3,9 @@ const sequelize = require("../config/database");
   
 const BarangMentah = sequelize.define("barang_mentah", {  
   barang_mentah_id: {  
-    type: DataTypes.INTEGER,  
+    type: DataTypes.STRING,  
     allowNull: false,
     primaryKey: true,
-    autoIncrement: true,
   }, 
   image: {
     type: DataTypes.STRING,  
