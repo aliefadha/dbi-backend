@@ -54,6 +54,20 @@ class RincianBiayaGudangService {
       }
     );
   }
+
+  static async deleteByBarangNonhandmadeId(barangNonhandmadeId, options = {}) {
+    return await RincianBiayaGudang.update(
+      { is_deleted: true },
+      {
+        where: {
+          barang_nonhandmade_id: barangNonhandmadeId,
+          is_deleted: false
+        },
+        ...options
+      }
+    );
+  }
+
 }  
   
 module.exports = RincianBiayaGudangService;

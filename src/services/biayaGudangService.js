@@ -34,10 +34,12 @@ class BiayaGudangService {
   }
 
   static async getAll() {
-    return await BiayaGudang.findAll({
+    return await BiayaGudang.findOne({
       where: {
+        biaya_gudang_id: 1,
         is_deleted: false
       },
+      attributes: ["total", "rata_rata", "total_biaya", "waktu_kerja", "total_modal"],
       include: [
         {
           model: BiayaOperasionalProduksiGudang,

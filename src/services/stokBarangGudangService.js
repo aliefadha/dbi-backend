@@ -1,5 +1,8 @@
+const BarangHandmadeGudang = require("../models/barangHandmadeGudang");
 const BarangMentah = require("../models/barangMentah");
 const BarangNonHandmadeGudang = require("../models/barangNonHandmadeGudang");
+const JenisBarangGudang = require("../models/jenisBarangGudang");
+const KategoriBarangGudang = require("../models/kategoriBarangGudang");
 const Packaging = require("../models/packaging");
 const PackagingGudang = require("../models/packagingGudang");
 const StokBarangGudang = require("../models/stokBarangGudang");  
@@ -14,23 +17,58 @@ class StokBarangGudangService {
       where: {
         is_deleted: false
       },
+      attributes: {
+        exclude: ["stok_barang_gudang_id", "barang_nonhandmade_id", "barang_mentah_id", "packaging_id", "barang_handmade_id"]
+      },
       include: [
         {
           model: BarangNonHandmadeGudang,
-          as: "barang_nonhandmade"
+          as: "barang_nonhandmade",
+          attributes: ["image", "barang_nonhandmade_id", "nama_barang", "harga_jual", "is_deleted"],
+          include: [
+            {
+              model: KategoriBarangGudang,
+              as: "kategori",
+              attributes: ["nama_kategori_barang", "is_deleted"]
+            },
+            {
+              model: JenisBarangGudang,
+              as: "jenis",
+              attributes: ["nama_jenis_barang", "is_deleted"]
+            }
+          ]
+        },
+        {
+          model: BarangHandmadeGudang,
+          as: "barang_handmade",
+          attributes: ["image", "barang_handmade_id", "nama_barang", "harga_jual", "is_deleted"],
+          include: [
+            {
+              model: KategoriBarangGudang,
+              as: "kategori",
+              attributes: ["nama_kategori_barang", "is_deleted"]
+            },
+            {
+              model: JenisBarangGudang,
+              as: "jenis",
+              attributes: ["nama_jenis_barang", "is_deleted"]
+            }
+          ]
         },
         {
           model: BarangMentah,
-          as: "barang_mentah"
+          as: "barang_mentah",
+          attributes: ["image", "barang_mentah_id", "nama_barang", "harga_satuan", "is_deleted"],
         },
         {
           model: PackagingGudang,
-          as: "packaging"
-        }
+          as: "packaging",
+          attributes: ["image", "packaging_id", "nama_packaging", "ukuran", "harga_satuan"]
+        },
       ]
     });  
     const response = stokBarangGudangList.map(item => {  
-    const { barang_nonhandmade, barang_mentah, packaging, ...rest } = item.toJSON();
+    const { barang_nonhandmade, barang_mentah, packaging, barang_handmade,...rest } = item.toJSON();
     
       let barang = null;  
       if (barang_nonhandmade) {  
@@ -39,7 +77,9 @@ class StokBarangGudangService {
         barang = barang_mentah;  
       } else if (packaging) {  
         barang = packaging;  
-      }  
+      } else if (barang_handmade) {
+        barang = barang_handmade;
+      }
       return {  
         ...rest,  
         barang,  

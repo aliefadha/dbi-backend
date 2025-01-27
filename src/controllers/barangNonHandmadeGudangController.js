@@ -1,10 +1,30 @@
 const BarangNonHandmadeGudangService = require("../services/barangNonHandmadeGudangService");  
+const fs = require('fs');
+const path = require('path');
+const multer = require("multer");
+const CustomIdGenerateService = require('../services/customIdGenerateService');
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, path.join(__dirname, "../public/barangNonHandmadeGudang"));
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname));
+  },
+});
+
+const upload = multer({ storage: storage });
   
 class BarangNonHandmadeGudangController {  
   static async create(req, res) {  
     try {  
-      const { rincian_biaya, ...barangData } = req.body;
-      const barangNonHandmadeGudang = await BarangNonHandmadeGudangService.createWithDetails(barangData, rincian_biaya); 
+      const newId = await CustomIdGenerateService.generateBarangNonHandmadeGudangId();
+      const barangNonHandmadeData = {
+        ...req.body,
+        image: req.file ? req.file.filename : null,
+        barang_nonhandmade_id: newId,
+      }
+      const barangNonHandmadeGudang = await BarangNonHandmadeGudangService.create(barangNonHandmadeData); 
       res.status(201).json({  
         success: true,  
         data: barangNonHandmadeGudang,  
@@ -109,4 +129,4 @@ class BarangNonHandmadeGudangController {
   }  
 }  
   
-module.exports = BarangNonHandmadeGudangController;  
+module.exports = { BarangNonHandmadeGudangController, upload };

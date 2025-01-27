@@ -1,9 +1,30 @@
 const BarangMentahService = require("../services/barangMentahService");  
+const CustomIdGenerateService = require("../services/customIdGenerateService");
+const multer = require("multer");
+const path = require("path");
+const fs = require('fs');
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+      cb(null, path.join(__dirname, "../public/barangMentah"));
+  },
+  filename: function (req, file, cb) {
+      cb(null, Date.now() + path.extname(file.originalname));
+  },
+});
+
+const upload = multer({ storage: storage });
   
 class BarangMentahController {  
   static async create(req, res) {  
     try {  
-      const barangMentah = await BarangMentahService.create(req.body);  
+      const newId = await CustomIdGenerateService.generateBarangMentahId();
+      const data = {
+        ...req.body,
+        barang_mentah_id: newId,
+        image: req.file ? req.file.filename : null,
+      };
+      const barangMentah = await BarangMentahService.create(data);  
       res.status(201).json({  
         success: true,  
         data: barangMentah,  
@@ -61,7 +82,31 @@ class BarangMentahController {
   
   static async update(req, res) {  
     try {  
-      const barangMentah = await BarangMentahService.update(req.params.id, req.body);  
+      const existingBarangMentah = await BarangMentahService.getById(req.params.id);  
+      if (!existingBarangMentah) {  
+        return res.status(404).json({  
+          success: false,  
+          data: null,  
+          message: "not found",  
+        });  
+      }  
+
+      const updatedData = { ...req.body };  
+
+      // Handle image update only if new file is uploaded
+      if (req.file) {  
+        if (existingBarangMentah.image) {
+          const oldImagePath = path.join(__dirname, "../public/barangMentah", existingBarangMentah.image);  
+          fs.unlink(oldImagePath, (err) => {  
+            if (err) {  
+              console.error("Failed to delete old image:", err);  
+            }  
+          });  
+        }
+        updatedData.image = req.file.filename;  
+      }
+
+      const barangMentah = await BarangMentahService.update(req.params.id, updatedData);  
       if (!barangMentah) {  
         return res.status(404).json({  
           success: false,  
@@ -69,6 +114,7 @@ class BarangMentahController {
           message: "not found",  
         });  
       }  
+
       res.status(200).json({  
         success: true,  
         data: barangMentah,  
@@ -108,4 +154,4 @@ class BarangMentahController {
   }  
 }  
   
-module.exports = BarangMentahController;  
+module.exports = {BarangMentahController, upload};
