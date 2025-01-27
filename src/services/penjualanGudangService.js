@@ -271,28 +271,21 @@ class PenjualanGudangService {
       await penjualanGudang.update(penjualanData, { transaction });
 
       if (produk && Array.isArray(produk)) {
-        // Delete existing produk
-        await ProdukPenjualanGudang.destroy({
-          where: { penjualan_id: id },
-          transaction
-        });
-
-        // Create new produk
+        // Update or create new produk
         const produkData = produk.map(item => ({
           ...item,
           penjualan_id: id
         }));
 
-        await ProdukPenjualanGudangService.createMany(produkData, { transaction });
+        await ProdukPenjualanGudangService.updateMany(produkData, { transaction });
       }
 
       await transaction.commit();
 
-      const updatedPenjualanGudang = await this.getById(id);
-      return updatedPenjualanGudang;
+      return penjualanGudang;
     } catch (error) {
       await transaction.rollback();
-      throw error;
+      throw new Error(`Failed to update sale: ${error.message}`);
     }
   }
 

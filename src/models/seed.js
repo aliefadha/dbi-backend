@@ -5,7 +5,6 @@ const Packaging = require('./packaging');
 const DivisiKaryawan = require('./divisiKaryawan');
 const Karyawan = require('./karyawan');
 const Kpi = require('./kpi');
-const Penjualan = require('./penjualan');
 const MetodePembayaran = require('./metodePembayaran');
 const Cabang = require('./cabang');
 const JenisBarangGudang = require('./jenisBarangGudang');
