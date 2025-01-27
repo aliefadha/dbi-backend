@@ -21,7 +21,7 @@ class ProdukPembelianGudangService {
       });
   
       for (const produk of createdProdukList) {
-        const { packaging_id, barang_mentah_id, barang_nonhandmade_id, kuantitas } = produk;
+        const { packaging_id, barang_mentah_id, barang_nonhandmade_id, barang_handmade_id, kuantitas } = produk;
   
         let fieldName, fieldValue;
         if (packaging_id) {
@@ -33,6 +33,9 @@ class ProdukPembelianGudangService {
         } else if (barang_nonhandmade_id) {
           fieldName = 'barang_nonhandmade_id';
           fieldValue = barang_nonhandmade_id;
+        } else if (barang_handmade_id) {
+          fieldName = 'barang_handmade_id';
+          fieldValue = barang_handmade_id;
         }
          else {
           continue;

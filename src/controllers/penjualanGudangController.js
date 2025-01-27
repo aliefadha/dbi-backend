@@ -1,47 +1,28 @@
-const sequelize = require("../config/database")
 const PenjualanGudangService = require("../services/penjualanGudangService");  
-const ProdukPenjualanGudangService = require("../services/produkPenjualanGudangService");
+const CustomIdGenerateService = require("../services/customIdGenerateService");
   
 class PenjualanGudangController {  
   static async create(req, res) {
-    let transaction;
 
     try {
-      const { produk, ...penjualanData } = req.body;
+      const newId = await CustomIdGenerateService.generatePenjualanGudangId();
+      const { ...penjualanData } = req.body;
 
-      if (!produk || produk.length === 0) {
-        throw new Error("produk kosong");
-      }
-      transaction = await sequelize.transaction();
 
-      const penjualanGudang = await PenjualanGudangService.create(penjualanData, { transaction });
-
-      const produkToCreate = produk.map((product) => ({
-        ...product,
-        penjualan_id: penjualanGudang.penjualan_id,
-      }));
-
-      const createdProduk = await ProdukPenjualanGudangService.createMany(
-        produkToCreate,
-        { transaction }
-      );
-
-      await transaction.commit();
+      const penjualanGudang = await PenjualanGudangService.create({
+        ...penjualanData,
+        penjualan_id: newId
+      });
 
       res.status(201).json({
         success: true,
         data: {
           penjualan: penjualanGudang,
-          produk: createdProduk,
         },
         message: "created successfully",
       });
 
     } catch (error) {
-      if (transaction && !transaction.finished) {
-        await transaction.rollback();
-      }
-
       res.status(400).json({
         success: false,
         data: null,
@@ -140,4 +121,4 @@ class PenjualanGudangController {
   }  
 }  
   
-module.exports = PenjualanGudangController;  
+module.exports = PenjualanGudangController;

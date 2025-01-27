@@ -1,11 +1,8 @@
-
 const CustomIdGenerateService = require("../services/customIdGenerateService");
 const PembelianGudangService = require("../services/pembelianGudangService");
-const ProdukPembelianGudangService = require("../services/produkPembelianGudangService");
 
 class PembelianGudangController {
   static async create(req, res) {
-    let transaction;
   
     try {
       const newId = await CustomIdGenerateService.generatePembelianGudangId();

@@ -6,6 +6,7 @@ const BarangNonHandmadeGudang = require("../models/barangNonHandmadeGudang");
 const PackagingGudang = require("../models/packagingGudang");
 const BarangMentah = require("../models/barangMentah");
 const PembelianGudang = require("../models/pembelianGudang");
+const PenjualanGudang = require("../models/penjualanGudang");
 
 class CustomIdGenerateService {
     static async generatePackagingId() {
@@ -158,6 +159,22 @@ class CustomIdGenerateService {
         const newId = `PMB${String(newNumericPart).padStart(4, '0')}`;
         return newId;
     }
+
+    static async generatePenjualanGudangId() {
+        const lastPenjualan = await PenjualanGudang.findOne({
+            order: [['penjualan_id', 'DESC']]
+        });
+
+        if (!lastPenjualan) {
+            return 'PNJ0001';
+        }
+        const lastId = lastPenjualan.lastPenjualan;
+        const numericPart = parseInt(lastId.slice(3), 10);
+        const newNumericPart = numericPart + 1;
+        const newId = `PNJ${String(newNumericPart).padStart(4, '0')}`;
+        return newId;
+    }
+
 }
 
 module.exports = CustomIdGenerateService;

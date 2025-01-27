@@ -92,10 +92,11 @@ class ProdukPenjualanGudangService {
 
   static async createMany(dataArray, options = {}) {
     const transaction = options.transaction;
+    const createdProdukList = [];
 
     try {
       for (const data of dataArray) {
-        const { packaging_id, barang_mentah_id, barang_id, kuantitas } = data;
+        const { packaging_id, barang_mentah_id, barang_handmade_id, barang_nonhandmade_id, kuantitas } = data;
 
         let fieldName, fieldValue;
         if (packaging_id) {
@@ -104,13 +105,17 @@ class ProdukPenjualanGudangService {
         } else if (barang_mentah_id) {
           fieldName = 'barang_mentah_id';
           fieldValue = barang_mentah_id;
-        } else if (barang_id) {
-          fieldName = 'barang_id';
-          fieldValue = barang_id;
+        } else if (barang_handmade_id) {
+          fieldName = 'barang_handmade_id';
+          fieldValue = barang_handmade_id;
+        } else if (barang_nonhandmade_id) {
+          fieldName = 'barang_nonhandmade_id';
+          fieldValue = barang_nonhandmade_id;
         } else {
           continue;
         }
 
+        // Check stock and get stock record
         const stockRecord = await StokBarangGudang.findOne({
           where: {
             [fieldName]: fieldValue,
@@ -123,42 +128,18 @@ class ProdukPenjualanGudangService {
           const availableStock = stockRecord ? stockRecord.jumlah_stok : 0;
           throw new Error(`Stok barang ${fieldName}: ${fieldValue}. Tersedia: ${availableStock}, Stok: ${kuantitas}`);
         }
-      }
 
-      const createdProdukList = await ProdukPenjualanGudang.bulkCreate(dataArray, {
-        transaction,
-        returning: true,
-      });
-
-      for (const produk of createdProdukList) {
-        const { packaging_id, barang_mentah_id, barang_id, kuantitas } = produk;
-
-        let fieldName, fieldValue;
-        if (packaging_id) {
-          fieldName = 'packaging_id';
-          fieldValue = packaging_id;
-        } else if (barang_mentah_id) {
-          fieldName = 'barang_mentah_id';
-          fieldValue = barang_mentah_id;
-        } else if (barang_id) {
-          fieldName = 'barang_id';
-          fieldValue = barang_id;
-        } else {
-          continue;
-        }
-
-        const stokEntry = await StokBarangGudang.findOne({
-          where: {
-            [fieldName]: fieldValue,
-            is_deleted: false,
-          },
+        // Create product and update stock in sequence
+        const createdProduct = await ProdukPenjualanGudang.create(data, {
           transaction,
         });
 
-        await stokEntry.decrement('jumlah_stok', {
+        await stockRecord.decrement('jumlah_stok', {
           by: kuantitas,
           transaction,
         });
+
+        createdProdukList.push(createdProduct);
       }
 
       return createdProdukList;

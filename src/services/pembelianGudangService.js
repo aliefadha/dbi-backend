@@ -59,7 +59,7 @@ class PembelianGudangService {
           model: ProdukPembelianGudang,
           as: "produk",
           attributes: {
-            exclude: ["is_deleted", "barang_mentah_id", "barang_nonhandmade_id", "packaging_id", "produk_pembelian_id", "pembelian_id"]
+            exclude: ["is_deleted", "barang_mentah_id", "barang_nonhandmade_id", "barang_handmade_id", "packaging_id", "produk_pembelian_id", "pembelian_id"]
           },
           include: [
             {
@@ -82,7 +82,7 @@ class PembelianGudangService {
             {
               model: BarangHandmadeGudang,
               as: "barang_handmade",
-              attributes: ["image", "nama_barang", "kategori_barang_id", "jenis_barang_id", "harga_jual", "is_deleted"],
+              attributes: ["image", "nama_barang", "kategori_barang_id", "harga_jual", "is_deleted"],
               include: [
                 {
                   model: KategoriBarangGudang,
@@ -132,7 +132,12 @@ class PembelianGudangService {
             delete transformedProduk.barang_nonhandmade;
             delete transformedProduk.barang_mentah;
             delete transformedProduk.barang_handmade;
-          } else {
+          } else if (produk.barang_handmade) {
+            delete transformedProduk.barang_nonhandmade;
+            delete transformedProduk.barang_mentah;
+            delete transformedProduk.packaging;
+          } 
+          else {
             delete transformedProduk.barang_nonhandmade;
             delete transformedProduk.barang_mentah;
             delete transformedProduk.packaging;
@@ -198,13 +203,46 @@ class PembelianGudangService {
   }
 
   static async update(id, data) {
-    const pembelianGudang = await PembelianGudang.findByPk(id);
-    if (!pembelianGudang) return null;
+    const transaction = await sequelize.transaction();
+    
+    try {
+      const { produk, ...pembelianData } = data;
 
-    Object.assign(pembelianGudang, data);
-    await pembelianGudang.save();
+      const pembelianGudang = await PembelianGudang.findOne({
+        where: {
+          pembelian_id: id,
+          is_deleted: false
+        }
+      });
 
-    return pembelianGudang;
+      if (!pembelianGudang) return null;
+
+      await pembelianGudang.update(pembelianData, { transaction });
+
+      if (produk && Array.isArray(produk)) {
+        // Delete existing produk
+        await ProdukPembelianGudang.destroy({
+          where: { pembelian_id: id },
+          transaction
+        });
+
+        // Create new produk
+        const produkData = produk.map(item => ({
+          ...item,
+          pembelian_id: id
+        }));
+
+        await ProdukPembelianGudangService.createMany(produkData, { transaction });
+      }
+
+      await transaction.commit();
+
+      const updatedPembelianGudang = await this.getById(id);
+      return updatedPembelianGudang;
+    } catch (error) {
+      await transaction.rollback();
+      throw new Error(`Failed to update purchase: ${error.message}`);
+    }
   }
 
   static async delete(id) {

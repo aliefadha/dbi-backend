@@ -251,6 +251,11 @@ ProdukPenjualanGudang.belongsTo(BarangNonHandmadeGudang, {
     as: "barang_nonhandmade"
 })
 
+ProdukPenjualanGudang.belongsTo(BarangHandmadeGudang, {
+    foreignKey: "barang_handmade_id",
+    as: "barang_handmade"
+})
+
 ProdukPenjualanGudang.belongsTo(BarangMentah, {
     foreignKey: "barang_mentah_id",
     as: "barang_mentah"
@@ -290,6 +295,16 @@ BarangNonHandmadeGudang.hasOne(StokBarangGudang, {
 StokBarangGudang.belongsTo(BarangNonHandmadeGudang, {
     foreignKey: "barang_nonhandmade_id",
     as: "barang_nonhandmade"
+})
+
+StokBarangGudang.belongsTo(BarangHandmadeGudang, {
+    foreignKey: "barang_handmade_id",
+    as: "barang_handmade"
+})
+
+BarangHandmadeGudang.hasOne(StokBarangGudang, {
+    foreignKey: "barang_handmade_id",
+    as: "stok_barang"
 })
 
 StokBarangGudang.belongsTo(BarangMentah, {
