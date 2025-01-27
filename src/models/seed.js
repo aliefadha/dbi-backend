@@ -84,16 +84,16 @@ const seedDatabase = async () => {
 
 
         // Seed data for Penjualan
-        await Penjualan.create({
-            tanggal_waktu: new Date(),
-            nama_pembeli: "John Doe",
-            cash_or_non: true,
-            metode_pembayaran_id: 1,
-            sub_total: 100000,
-            diskon: 5000,
-            pajak: 10000,
-            total_penjualan: 105000
-        });
+        // await Penjualan.create({
+        //     tanggal_waktu: new Date(),
+        //     nama_pembeli: "John Doe",
+        //     cash_or_non: true,
+        //     metode_pembayaran_id: 1,
+        //     sub_total: 100000,
+        //     diskon: 5000,
+        //     pajak: 10000,
+        //     total_penjualan: 105000
+        // });
 
 
         // Seed data for DivisiKaryawan  

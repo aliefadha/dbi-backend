@@ -12,6 +12,8 @@ const storage = multer.diskStorage({
         cb(null, Date.now() + path.extname(file.originalname));
     },
 });
+
+const upload = multer({ storage: storage });
   
 class BarangNonHandmadeController {  
   static async create(req, res) {  
@@ -23,6 +25,7 @@ class BarangNonHandmadeController {
         barang_non_handmade_id: newId,
         jenis_barang_id: 2
       }
+      console.log(req.body);
       const barangNonHandmade = await BarangNonHandmadeService.create(barangNonHandmadeData);  
       res.status(201).json({  
         success: true,  
@@ -98,7 +101,7 @@ class BarangNonHandmadeController {
         });
         updatedData.image = req.file.filename;
       }
-      const barangNonHandmade = await BarangNonHandmadeService.update(req.params.id, ypdatedData);  
+      const barangNonHandmade = await BarangNonHandmadeService.update(req.params.id, updatedData);  
       if (!barangNonHandmade) {  
         return res.status(404).json({  
           success: false,  
@@ -145,4 +148,4 @@ class BarangNonHandmadeController {
   }  
 }  
   
-module.exports = BarangNonHandmadeController;  
+module.exports = {BarangNonHandmadeController, upload};  

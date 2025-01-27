@@ -165,7 +165,8 @@ class DataKaryawanService {
             }      
     
             // Push the record into the kpiKaryawanList      
-            groupedKpi[kpiKey].kpiKaryawanList.push({       
+            groupedKpi[kpiKey].kpiKaryawanList.push({    
+                kpi_karyawan_id: record.kpi_karyawan_id,       
                 point_ke: record.point_ke,    
             });    
     

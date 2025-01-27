@@ -1,6 +1,7 @@
 const Packaging = require("../models/packaging");
 const BarangCustom = require("../models/barangCustom");
 const BarangHandmade = require("../models/barangHandmade");
+const BarangNonHandmade = require("../models/barangNonHandmade");
 const BarangHandmadeGudang = require("../models/barangHandmadeGudang");
 const BarangNonHandmadeGudang = require("../models/barangNonHandmadeGudang");
 const PackagingGudang = require("../models/packagingGudang");
