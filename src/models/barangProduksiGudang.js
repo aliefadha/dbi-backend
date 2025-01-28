@@ -9,13 +9,6 @@ const BarangProduksiGudang = sequelize.define("barang_produksi_gudang", {
     primaryKey: true,
     autoIncrement: true,
   },
-  barang_id: {
-    type: DataTypes.INTEGER,
-    references: {
-      model: BarangNonHandmadeGudang,
-      key: 'barang_id'
-    }
-  },
   jumlah: {
     type: DataTypes.INTEGER,
     defaultValue: 0

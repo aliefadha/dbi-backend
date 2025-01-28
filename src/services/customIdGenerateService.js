@@ -4,10 +4,31 @@ const BarangHandmade = require("../models/barangHandmade");
 const BarangNonHandmade = require("../models/barangNonHandmade");
 const BarangHandmadeGudang = require("../models/barangHandmadeGudang");
 const BarangNonHandmadeGudang = require("../models/barangNonHandmadeGudang");
+const PackagingGudang = require("../models/packagingGudang");
+const BarangMentah = require("../models/barangMentah");
+const PembelianGudang = require("../models/pembelianGudang");
+const PenjualanGudang = require("../models/penjualanGudang");
 
 class CustomIdGenerateService {
     static async generatePackagingId() {
         const lastPackaging = await Packaging.findOne({  
+            order: [['packaging_id', 'DESC']]  
+        });  
+    
+        if (!lastPackaging) {  
+            return 'PCK0001';  
+        }  
+    
+        const lastId = lastPackaging.packaging_id;  
+        const numericPart = parseInt(lastId.slice(3), 10);  
+        const newNumericPart = numericPart + 1;  
+        const newId = `PCK${String(newNumericPart).padStart(4, '0')}`;  
+    
+        return newId;  
+    }
+
+    static async generatePackagingGudangId() {
+        const lastPackaging = await PackagingGudang.findOne({  
             order: [['packaging_id', 'DESC']]  
         });  
     
@@ -36,6 +57,23 @@ class CustomIdGenerateService {
         const numericPart = parseInt(lastId.slice(3), 10);  
         const newNumericPart = numericPart + 1;  
         const newId = `CSM${String(newNumericPart).padStart(4, '0')}`;  
+    
+        return newId;  
+    }
+
+    static async generateBarangMentahId() {
+        const lastBarangMentah = await BarangMentah.findOne({  
+            order: [['barang_mentah_id', 'DESC']]  
+        });  
+    
+        if (!lastBarangMentah) {  
+            return 'MTH0001';  
+        }  
+    
+        const lastId = lastBarangMentah.barang_mentah_id;  
+        const numericPart = parseInt(lastId.slice(3), 10);  
+        const newNumericPart = numericPart + 1;  
+        const newId = `MTH${String(newNumericPart).padStart(4, '0')}`;  
     
         return newId;  
     }
@@ -74,6 +112,23 @@ class CustomIdGenerateService {
         return newId;  
     }
 
+    static async generateBarangNonHandmadeId() {
+        const lastBarangNonHandmade = await BarangNonHandmade.findOne({  
+            order: [['barang_non_handmade_id', 'DESC']]  
+        });  
+    
+        if (!lastBarangNonHandmade) {  
+            return 'BNH0001';  
+        }  
+    
+        const lastId = lastBarangNonHandmade.barang_non_handmade_id;  
+        const numericPart = parseInt(lastId.slice(3), 10);  
+        const newNumericPart = numericPart + 1;  
+        const newId = `BNH${String(newNumericPart).padStart(4, '0')}`;  
+    
+        return newId;
+    }
+
     static async generateBarangNonHandmadeGudangId() {
         const lastBarangNonHandmade = await BarangNonHandmadeGudang.findOne({  
             order: [['barang_nonhandmade_id', 'DESC']]  
@@ -91,37 +146,36 @@ class CustomIdGenerateService {
         return newId;  
     }
 
-    static async generateRincianBiayaGudangId() {
-        const lastRincianBiaya = await RincianBiayaGudang.findOne({
-            order: [['rincian_biaya_id', 'DESC']]
+    static async generatePembelianGudangId() {
+        const lastPembelian = await PembelianGudang.findOne({
+            order: [['pembelian_id', 'DESC']]
         });
 
-        if (!lastRincianBiaya) {
-            return 'RBG0001';
+        if (!lastPembelian) {
+            return 'PMB0001';
         }
-        const lastId = lastRincianBiaya.rincian_biaya_id;
+        const lastId = lastPembelian.pembelian_id;
         const numericPart = parseInt(lastId.slice(3), 10);
         const newNumericPart = numericPart + 1;
-        const newId = `RBG${String(newNumericPart).padStart(4, '0')}`;
+        const newId = `PMB${String(newNumericPart).padStart(4, '0')}`;
         return newId;
     }
 
-    static async generateBarangNonHandmadeId() {
-        const lastBarangNonHandmade = await BarangNonHandmade.findOne({  
-            order: [['barang_non_handmade_id', 'DESC']]  
-        });  
-    
-        if (!lastBarangNonHandmade) {  
-            return 'BNH0001';  
-        }  
-    
-        const lastId = lastBarangNonHandmade.barang_non_handmade_id;  
-        const numericPart = parseInt(lastId.slice(3), 10);  
-        const newNumericPart = numericPart + 1;  
-        const newId = `BNH${String(newNumericPart).padStart(4, '0')}`;  
-    
+    static async generatePenjualanGudangId() {
+        const lastPenjualan = await PenjualanGudang.findOne({
+            order: [['penjualan_id', 'DESC']]
+        });
+
+        if (!lastPenjualan) {
+            return 'PNJ0001';
+        }
+        const lastId = lastPenjualan.lastPenjualan;
+        const numericPart = parseInt(lastId.slice(3), 10);
+        const newNumericPart = numericPart + 1;
+        const newId = `PNJ${String(newNumericPart).padStart(4, '0')}`;
         return newId;
     }
+
 }
 
 module.exports = CustomIdGenerateService;

@@ -1,8 +1,5 @@
-const BarangMentah = require("../models/barangMentah");
 const BarangNonHandmadeGudang = require("../models/barangNonHandmadeGudang");  
-const JenisBarangGudang = require("../models/jenisBarangGudang");
 const KategoriBarangGudang = require("../models/kategoriBarangGudang");
-const RincianBahanGudang = require("../models/rincianBahanGudang");
 const RincianBiayaGudang = require("../models/rincianBiayaGudang");
 const sequelize = require("../config/database");
 const CustomIdGenerateService = require("./customIdGenerateService");
@@ -10,14 +7,91 @@ const RincianBiayaGudangService = require("./rincianBiayaGudangService");
 const BiayaGudang = require("../models/biayaGudang");
   
 class BarangNonHandmadeGudangService {  
-  static async create(data) {  
-    return await BarangNonHandmadeGudang.create(data);  
-  }  
+  static async create(data) {
+    const transaction = await sequelize.transaction();
+    
+    try {
+      const { 
+        image, 
+        barang_nonhandmade_id, 
+        kategori_barang_id, 
+        nama_barang, 
+        jumlah_minimum_stok,
+        total_hpp,
+        keuntungan,
+        harga_jual,
+        rincian_biaya
+      } = data;
+
+      const barangNonHandmadeGudang = await BarangNonHandmadeGudang.create({
+        image,
+        barang_nonhandmade_id,
+        kategori_barang_id,
+        nama_barang,
+        jumlah_minimum_stok,
+        total_hpp,
+        keuntungan,
+        harga_jual
+      }, { transaction });
+
+      const biayaGudang = await BiayaGudang.findByPk(1, {
+        attributes: ['total_biaya', 'total_modal'],
+        where: { is_deleted: false },
+      });
+
+      if (!biayaGudang) {
+        throw new Error('Biaya Gudang data not found');
+      }
+
+      const defaultRincianBiaya = [
+        {
+          barang_nonhandmade_id: barangNonHandmadeGudang.barang_nonhandmade_id,
+          nama_biaya: "Biaya Operasional dan Staff",
+          jumlah_biaya: biayaGudang.total_biaya
+        },
+        {
+          barang_nonhandmade_id: barangNonHandmadeGudang.barang_nonhandmade_id,
+          nama_biaya: "Biaya Operasional Produksi",
+          jumlah_biaya: biayaGudang.total_modal
+        }
+      ];
+
+      const allRincianBiaya = [
+        ...defaultRincianBiaya,
+        ...rincian_biaya.map(biaya => ({
+          ...biaya,
+          barang_nonhandmade_id: barangNonHandmadeGudang.barang_nonhandmade_id
+        }))
+      ];
+
+      const createdRincianBiaya = await RincianBiayaGudangService.createMany(
+        allRincianBiaya,
+        { transaction }
+      );
+
+      if (!createdRincianBiaya) {
+        throw new Error('Failed to create rincian biaya');
+      }
+
+      await transaction.commit();
+
+      return {
+        barang_nonhandmade: barangNonHandmadeGudang,
+        rincian_biaya: createdRincianBiaya
+      };
+    } catch (error) {
+      await transaction.rollback();
+      throw error;
+    }
+  } 
   
   static async getAll() {  
     return await BarangNonHandmadeGudang.findAll({
       where: {
         is_deleted: false
+      },
+      attributes: {
+        exclude: ["kategori_barang_id", "jenis_barang_id"]
       },
       include: [
         {
@@ -46,6 +120,9 @@ class BarangNonHandmadeGudangService {
         barang_nonhandmade_id: id,
         is_deleted: false,
       },
+      attributes: {
+        exclude: ["kategori_barang_id", "jenis_barang_id"]
+      },
       include: [
         {
           model: KategoriBarangGudang,
@@ -67,27 +144,79 @@ class BarangNonHandmadeGudangService {
     });  
   }  
   
-  static async update(id, data, options = {}) {  
-    const { image, kategori_barang_gudang_id, nama_barang, jumlah_minimum_stok } = data;
-
-    const barangNonHandmadeGudang = await BarangNonHandmadeGudang.findOne({
-      where: {
-        barang_nonhandmade_id: id,
-        is_deleted: false
+  static async update(id, data) {
+      const transaction = await sequelize.transaction();
+      
+      try {
+        const { 
+          image, 
+          kategori_barang_id, 
+          nama_barang, 
+          jumlah_minimum_stok,
+          rincian_biaya,
+          ...otherData 
+        } = data;
+  
+        const barangNonHandmadeGudang = await BarangNonHandmadeGudang.findOne({
+          where: {
+            barang_nonhandmade_id: id,
+            is_deleted: false
+          }
+        });
+  
+        if (!barangNonHandmadeGudang) return null;
+  
+        await barangNonHandmadeGudang.update({
+          image,
+          kategori_barang_id,
+          nama_barang,
+          jumlah_minimum_stok,
+          ...otherData
+        }, { transaction });
+  
+        const biayaGudang = await BiayaGudang.findByPk(1, {
+          attributes: ['total_biaya', 'total_modal'],
+          where: { is_deleted: false },
+        });
+  
+        if (!biayaGudang) {
+          throw new Error('Biaya Gudang data not found');
+        }
+  
+        await RincianBiayaGudangService.deleteByBarangNonhandmadeId(id, { transaction });
+  
+        const defaultRincianBiaya = [
+          {
+            barang_nonhandmade_id: id,
+            nama_biaya: "Biaya Operasional dan Staff",
+            jumlah_biaya: biayaGudang.total_biaya
+          },
+          {
+            barang_nonhandmade_id: id,
+            nama_biaya: "Biaya Operasional Produksi",
+            jumlah_biaya: biayaGudang.total_modal
+          }
+        ];
+  
+        const allRincianBiaya = [
+          ...defaultRincianBiaya,
+          ...(rincian_biaya || []).map(biaya => ({
+            ...biaya,
+            barang_nonhandmade_id: id
+          }))
+        ];
+  
+        await RincianBiayaGudangService.createMany(allRincianBiaya, { transaction });
+  
+        await transaction.commit();
+  
+        const updatedBarangNonHandmadeGudang = await this.getById(id);
+        return updatedBarangNonHandmadeGudang;
+      } catch (error) {
+        await transaction.rollback();
+        throw error;
       }
-    });
-
-    if (!barangNonHandmadeGudang) return null;
-
-    await barangNonHandmadeGudang.update({
-      image,
-      kategori_barang_gudang_id,
-      nama_barang,
-      jumlah_minimum_stok
-    }, options);
-
-    return barangNonHandmadeGudang;
-  }
+    }
   
   static async delete(id) {  
     const barangNonHandmadeGudang = await BarangNonHandmadeGudang.findByPk(id);  

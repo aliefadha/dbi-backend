@@ -2,7 +2,6 @@
 const KategoriBarang = require('./kategoriBarang');
 const JenisBarang = require('./jenisBarang');
 const Packaging = require('./packaging');
-const BarangNonHandmade = require('./barangNonHandmade');
 const DivisiKaryawan = require('./divisiKaryawan');
 const Karyawan = require('./karyawan');
 const Kpi = require('./kpi');
@@ -11,16 +10,10 @@ const Cabang = require('./cabang');
 const JenisBarangGudang = require('./jenisBarangGudang');
 const KategoriBarangGudang = require('./kategoriBarangGudang');
 const BarangMentah = require('./barangMentah');
-const BarangNonHandmadeGudang = require('./barangNonHandmadeGudang');
-const RincianBiayaGudang = require('./rincianBiayaGudang');
 const MetodePembayaranGudang = require('./metodePembayaranGudang');
-const PackagingGudang = require('./packagingGudang');
-const PenjualanGudang = require('./penjualanGudang');
-const PembelianGudang = require('./pembelianGudang');
 const BiayaOperasionalStaffGudang = require('./biayaOperasionalStaffGudang');
 const BiayaOperasionalProduksiGudang = require('./biayaOperasionalProduksiGudang');
-const OperasionalProduksiGudang = require('./operasionalProduksiGudang');
-const OperasionalStaffGudang = require('./operasionalStaffGudang');
+const BiayaGudang = require('./biayaGudang');
 
 const seedDatabase = async () => {
     try {
@@ -47,9 +40,6 @@ const seedDatabase = async () => {
         await Packaging.create({ packaging_id: 'PCK0001', nama_packaging: "Zipper", ukuran: "XL", jumlah_minimum_stok: 10, harga: 10, isi: 10, harga_satuan: 100, jenis_barang_id: 4, kategori_barang_id: 1 });
         await Packaging.create({ packaging_id: 'PCK0002', nama_packaging: "Kantong Kain", ukuran: "XL", jumlah_minimum_stok: 100, harga: 100, isi: 50, harga_satuan: 125, jenis_barang_id: 4, kategori_barang_id: 2 });
 
-    // Seed data for BarangMentah
-        await BarangMentah.create({ barang_mentah_id: 1, nama_barang: "Manik-Manik Huruf", jumlah_minimum_stok: 100, harga: 10, isi: 10, harga_satuan: 10 })
-
 
         //Seed data for MetodePembayaran
         await MetodePembayaran.create({ nama_metode: "BCA" })
@@ -57,14 +47,40 @@ const seedDatabase = async () => {
         //Seed data for MetodePembayaran
         await MetodePembayaranGudang.create({ nama_metode: "BCA" })
 
-        //Seed data for PackagingGudang
-        await PackagingGudang.create({nama_packaging: "Zipper", ukuran: "Besar", jumlah_minimum_stok: 10, harga: 10, isi: 10, harga_satuan: 100})
+        //Seed data for biaya gudang
+        await BiayaGudang.create({
+            total: 5000000,
+            rata_rata: 2500000,
+            total_biaya: 3000000,
+            waktu_kerja: 160,
+            total_modal: 10000000
+        })
 
-        //Seed data for PenjualanGudang
-        await PenjualanGudang.create({cash_or_non: true, metode_id: 1, nama_pembeli: "Pembueli", sub_total: 100, diskon: 20, pajak: 5, total_penjualan: 10})
+        await BiayaOperasionalProduksiGudang.create({
+            biaya_gudang_id: 1,
+            nama_biaya: "Operasional",
+            total_biaya: 2000000,
+            biaya_gudang_id: 1
+        })
 
-        //Seed data for PembelianGudang
-        await PembelianGudang.create({cash_or_non: true, metode_id: 1, sub_total: 100, diskon: 20, pajak: 5, total_penjualan: 10})
+        await BiayaOperasionalStaffGudang.create({
+            biaya_gudang_id: 1,
+            nama_biaya: "Staff",
+            total_biaya: 1000000,
+            biaya_gudang_id: 1
+        })
+
+        //Seed data for barang mentah
+        await BarangMentah.create({
+            barang_mentah_id: "MTH0001",
+            nama_barang: "Manik-Manik Angka",
+            harga: 10000,
+            jumlah_minimum_stok: 10,
+            harga_satuan: 1000,
+            isi: 10,
+            is_deleted: false
+        })
+
 
         // Seed data for Penjualan
         // await Penjualan.create({

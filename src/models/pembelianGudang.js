@@ -4,10 +4,9 @@ const MetodePembayaranGudang = require("./metodePembayaranGudang");
   
 const PembelianGudang = sequelize.define("pembelian_gudang", {  
   pembelian_id: {  
-    type: DataTypes.INTEGER,  
+    type: DataTypes.STRING,  
     allowNull: false,
     primaryKey: true,
-    autoIncrement: true,
   }, 
   tanggal: {
     type: DataTypes.DATE,

@@ -1,8 +1,9 @@
 const PackagingGudang = require("../models/packagingGudang");  
+const CustomIdGenerateService = require("./customIdGenerateService");
   
 class PackagingGudangService {  
   static async create(data) {  
-    return await PackagingGudang.create(data);  
+    return await PackagingGudang.create(data);
   }  
   
   static async getAll() {  

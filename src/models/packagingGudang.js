@@ -3,10 +3,9 @@ const sequelize = require("../config/database");
 
 const PackagingGudang = sequelize.define("packaging_gudang", {
   packaging_id: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
     allowNull: false,
     primaryKey: true,
-    autoIncrement: true,
   },
   image: {
     type: DataTypes.STRING

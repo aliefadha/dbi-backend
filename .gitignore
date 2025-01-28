@@ -9,3 +9,5 @@ database.sqlite
 .sqlite
 .png
 *.jpg
+*.jpeg
+.DS_Store

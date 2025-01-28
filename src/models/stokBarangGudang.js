@@ -3,6 +3,7 @@ const sequelize = require("../config/database");
 const BarangNonHandmadeGudang = require("./barangNonHandmadeGudang");
 const BarangMentah = require("./barangMentah");
 const PackagingGudang = require("./packagingGudang");
+const BarangHandmadeGudang = require("./barangHandmadeGudang");
   
 const StokBarangGudang = sequelize.define("stok_barang_gudang", {  
   stok_barang_gudang_id: {  
@@ -11,13 +12,6 @@ const StokBarangGudang = sequelize.define("stok_barang_gudang", {
     primaryKey: true,
     autoIncrement: true,
   },
-  barang_id: {
-    type: DataTypes.INTEGER,
-    references: {
-      model: BarangNonHandmadeGudang,
-      key: 'barang_id'
-    }
-  },
   barang_mentah_id: {
     type: DataTypes.INTEGER,
     references: {
@@ -25,8 +19,22 @@ const StokBarangGudang = sequelize.define("stok_barang_gudang", {
       key: 'barang_mentah_id'
     }
   },
+  barang_nonhandmade_id: {
+    type: DataTypes.STRING,
+    references: {
+      model: BarangNonHandmadeGudang,
+      key: 'barang_nonhandmade_id'
+    }
+  },
+  barang_handmade_id: {
+    type: DataTypes.STRING,
+    references: {
+      model: BarangHandmadeGudang,
+      key: 'barang_handmade_id'
+    }
+  },
   packaging_id: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
     references: {
       model: PackagingGudang,
       key: 'packaging_id'
