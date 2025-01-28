@@ -20,6 +20,11 @@ app.use('/images-packaging', express.static(path.join(__dirname, 'public/packagi
 app.use('/images-barang-custom', express.static(path.join(__dirname, 'public/barangCustom')));
 app.use('/images-barang-handmade', express.static(path.join(__dirname, 'public/barangHandmade')));
 app.use('/images-barang-non-handmade', express.static(path.join(__dirname, 'public/barangNonHandmade')));
+app.use('/images-barang-handmade-gudang', express.static(path.join(__dirname, 'public/barangHandmadeGudang')));
+app.use('/images-barang-non-handmade-gudang', express.static(path.join(__dirname, 'public/barangNonHandmadeGudang')));
+app.use('/images-packaging-gudang', express.static(path.join(__dirname, 'public/packagingGudang')));
+app.use('/images-barang-handmade', express.static(path.join(__dirname, 'public/barangHandmade')));
+app.use('/images-barang-mentah', express.static(path.join(__dirname, 'public/barangMentah')));
 app.use('/images-toko', express.static(path.join(__dirname, 'public/toko')));
 
 const corsOptions = {
