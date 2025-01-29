@@ -1,9 +1,15 @@
 const PembelianService = require("../services/pembelianService");  
+const CustomIdGenerateService = require("../services/customIdGenerateService");
   
 class PembelianController {  
   static async create(req, res) {  
     try {  
-      const pembelian = await PembelianService.create(req.body);  
+      const newId = await CustomIdGenerateService.generatePembelianId();
+      const pembelianData = {
+        ...req.body,
+        pembelian_id: newId
+      }
+      const pembelian = await PembelianService.create(pembelianData);  
       res.status(201).json({  
         success: true,  
         data: pembelian,  

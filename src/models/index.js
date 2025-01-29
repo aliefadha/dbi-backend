@@ -42,6 +42,8 @@ const BiayaOperasionalStaffGudang = require('./biayaOperasionalStaffGudang');
 const OperasionalStaffGudang = require('./operasionalStaffGudang');
 const BarangHandmadeGudang = require('./barangHandmadeGudang');
 const BiayaGudang = require('./biayaGudang');
+const Pembelian = require('./pembelian');
+const ProdukPembelian = require('./produkPembelian');
 
 
 JenisBarang.hasMany(BarangNonHandmade, {
@@ -364,10 +366,15 @@ BarangCustom.belongsTo(JenisBarang, {
 //     as: 'penjualan'
 // });
 
-// MetodePembayaran.hasMany(Pembelian, {
-//     foreignKey: "metode_pembayaran_id",
-//     as: "pembelian"
-// })
+MetodePembayaran.hasMany(Pembelian, {
+    foreignKey: "metode_pembayaran_id",
+    as: "pembelian"
+})
+
+Pembelian.belongsTo(MetodePembayaran, {
+    foreignKey: "metode_pembayaran_id",
+    as: "metode_pembayaran"
+})
 
 DivisiKaryawan.hasMany(Karyawan, {
     foreignKey: "divisi_karyawan_id",
@@ -558,6 +565,57 @@ RincianBiaya.belongsTo(Cabang, {
     foreignKey: "cabang_id",
     as: "cabang",
 })
+
+Pembelian.hasMany(ProdukPembelian, {
+    foreignKey: "pembelian_id",
+    as: "produk_pembelian",
+})
+
+ProdukPembelian.belongsTo(Pembelian, {
+    foreignKey: "pembelian_id",
+    as: "pembelian",
+})
+
+BarangHandmade.hasMany(ProdukPembelian, {
+    foreignKey: "barang_handmade_id",
+    as: "produk_pembelian",
+})
+
+ProdukPembelian.belongsTo(BarangHandmade, {
+    foreignKey: "barang_handmade_id",
+    as: "barang_handmade",
+})
+
+BarangCustom.hasMany(ProdukPembelian, {
+    foreignKey: "barang_custom_id",
+    as: "produk_pembelian",
+})
+
+ProdukPembelian.belongsTo(BarangCustom, {
+    foreignKey: "barang_custom_id",
+    as: "barang_custom",
+})
+
+Packaging.hasMany(ProdukPembelian, {
+    foreignKey: "packaging_id",
+    as: "produk_pembelian",
+})
+
+ProdukPembelian.belongsTo(Packaging, {
+    foreignKey: "packaging_id",
+    as: "packaging",
+})
+
+BarangNonHandmade.hasMany(ProdukPembelian, {
+    foreignKey: "barang_non_handmade_id",
+    as: "produk_pembelian",
+})
+
+ProdukPembelian.belongsTo(BarangNonHandmade, {
+    foreignKey: "barang_non_handmade_id",
+    as: "barang_non_handmade",
+})
+
 
 
 // Sync models with the database  

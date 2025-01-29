@@ -80,7 +80,7 @@ const seedDatabase = async () => {
             isi: 10,
             is_deleted: false
         })
-
+        
 
         // Seed data for Penjualan
         // await Penjualan.create({
