@@ -9,6 +9,7 @@ const BarangMentah = require("../models/barangMentah");
 const PembelianGudang = require("../models/pembelianGudang");
 const PenjualanGudang = require("../models/penjualanGudang");
 const Pembelian = require("../models/pembelian");
+const Penjualan = require("../models/penjualan");
 
 class CustomIdGenerateService {
     static async generatePackagingId() {
@@ -206,6 +207,7 @@ class CustomIdGenerateService {
         const newId = `PNJ${String(newNumericPart).padStart(4, '0')}`;
         return newId;
     }
+
 
 }
 

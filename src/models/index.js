@@ -44,6 +44,8 @@ const BarangHandmadeGudang = require('./barangHandmadeGudang');
 const BiayaGudang = require('./biayaGudang');
 const Pembelian = require('./pembelian');
 const ProdukPembelian = require('./produkPembelian');
+const StokBarang = require('./stokBarang');
+const Penjualan = require('./penjualan');
 
 
 JenisBarang.hasMany(BarangNonHandmade, {
@@ -361,18 +363,23 @@ BarangCustom.belongsTo(JenisBarang, {
 })
 
 
-// MetodePembayaran.hasMany(Penjualan, {
-//     foreignKey: "metode_pembayaran_id",
-//     as: 'penjualan'
-// });
+MetodePembayaran.hasMany(Penjualan, {
+    foreignKey: "metode_id",
+    as: 'penjualan'
+});
+
+Penjualan.belongsTo(MetodePembayaran, {
+    foreignKey: "metode_id",
+    as: "metode_pembayaran"
+})
 
 MetodePembayaran.hasMany(Pembelian, {
-    foreignKey: "metode_pembayaran_id",
+    foreignKey: "metode_id",
     as: "pembelian"
 })
 
 Pembelian.belongsTo(MetodePembayaran, {
-    foreignKey: "metode_pembayaran_id",
+    foreignKey: "metode_id",
     as: "metode_pembayaran"
 })
 
@@ -616,6 +623,55 @@ ProdukPembelian.belongsTo(BarangNonHandmade, {
     as: "barang_non_handmade",
 })
 
+Cabang.hasMany(StokBarang, {
+    foreignKey: "cabang_id",
+    as: "stok_barang",
+})
+
+StokBarang.belongsTo(Cabang, {
+    foreignKey: "cabang_id",
+    as: "cabang",
+})
+
+BarangHandmade.hasOne(StokBarang, {
+    foreignKey: "barang_handmade_id",
+    as: "stok_barang",
+})
+
+StokBarang.belongsTo(BarangHandmade, {
+    foreignKey: "barang_handmade_id",
+    as: "barang_handmade",
+})
+
+BarangNonHandmade.hasOne(StokBarang, {
+    foreignKey: "barang_non_handmade_id",
+    as: "stok_barang",
+})
+
+StokBarang.belongsTo(BarangNonHandmade, {
+    foreignKey: "barang_non_handmade_id",
+    as: "barang_non_handmade",
+})
+
+BarangCustom.hasOne(StokBarang, {
+    foreignKey: "barang_custom_id",
+    as: "stok_barang",
+})
+
+StokBarang.belongsTo(BarangCustom, {
+    foreignKey: "barang_custom_id",
+    as: "barang_custom",
+})
+
+Packaging.hasOne(StokBarang, {
+    foreignKey: "packaging_id",
+    as: "stok_barang",
+})
+
+StokBarang.belongsTo(Packaging, {
+    foreignKey: "packaging_id",
+    as: "packaging",
+})
 
 
 // Sync models with the database  

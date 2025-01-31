@@ -14,6 +14,7 @@ const MetodePembayaranGudang = require('./metodePembayaranGudang');
 const BiayaOperasionalStaffGudang = require('./biayaOperasionalStaffGudang');
 const BiayaOperasionalProduksiGudang = require('./biayaOperasionalProduksiGudang');
 const BiayaGudang = require('./biayaGudang');
+const BarangHandmade = require('./barangHandmade');
 
 const seedDatabase = async () => {
     try {
@@ -39,7 +40,6 @@ const seedDatabase = async () => {
         // Seed data for Packaging  
         await Packaging.create({ packaging_id: 'PCK0001', nama_packaging: "Zipper", ukuran: "XL", jumlah_minimum_stok: 10, harga: 10, isi: 10, harga_satuan: 100, jenis_barang_id: 4, kategori_barang_id: 1 });
         await Packaging.create({ packaging_id: 'PCK0002', nama_packaging: "Kantong Kain", ukuran: "XL", jumlah_minimum_stok: 100, harga: 100, isi: 50, harga_satuan: 125, jenis_barang_id: 4, kategori_barang_id: 2 });
-
 
         //Seed data for MetodePembayaran
         await MetodePembayaran.create({ nama_metode: "BCA" })

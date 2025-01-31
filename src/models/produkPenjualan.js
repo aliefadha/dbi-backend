@@ -1,24 +1,25 @@
 const { DataTypes } = require("sequelize");  
 const sequelize = require("../config/database");  
-const Pembelian = require("./pembelian");
+const Penjualan = require("./penjualan");
 const BarangHandmade = require("./barangHandmade");
 const BarangNonHandmade = require("./barangNonHandmade");
 const BarangCustom = require("./barangCustom");
 const Packaging = require("./packaging");
 const Cabang = require("./cabang");
   
-const ProdukPembelian = sequelize.define("produk_pembelian", {  
-  produk_pembelian_id: {  
+const ProdukPenjualan = sequelize.define("produk_penjualan", {  
+  produk_penjualan_id: {  
     type: DataTypes.INTEGER,  
     allowNull: false,
     primaryKey: true,
     autoIncrement: true,
   }, 
-  pembelian_id: {
+  penjualan_id: {
     type: DataTypes.STRING,
+    allowNull: false,
     references: {
-      model: Pembelian,
-      key: 'pembelian_id'
+      model: Penjualan,
+      key: 'penjualan_id'
     }
   },
   cabang_id: {
@@ -26,9 +27,9 @@ const ProdukPembelian = sequelize.define("produk_pembelian", {
     allowNull: false,
     references: {
       model: Cabang,
-      key: 'cabang_id'
-    }                                   
-  },                                        
+      key: "cabang_id"
+    }
+  },
   barang_handmade_id: {
     type: DataTypes.STRING,
     references: {
@@ -77,4 +78,4 @@ const ProdukPembelian = sequelize.define("produk_pembelian", {
   timestamps: false
 });  
   
-module.exports = ProdukPembelian;  
+module.exports = ProdukPenjualan;  

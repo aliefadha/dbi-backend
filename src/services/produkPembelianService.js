@@ -92,62 +92,87 @@ class ProdukPembelianService {
   }  
 
   static async updateMany(data, options = {}) {
-    const transaction = options.transaction;
+      const transaction = options.transaction;
 
-    try {
-      const updatedProdukList = await ProdukPembelian.bulkUpdate(data, {
-        transaction,
-        returning: true,
-      });
+      try {
+          const updatedProdukList = [];
 
-      for (const produk of updatedProdukList) {
-        const { cabang_id, packaging_id, barang_custom_id, barang_non_handmade_id, barang_handmade_id, kuantitas } = produk;
+          for (const produk of data) {
+              const { produk_pembelian_id, cabang_id, packaging_id, barang_custom_id, barang_non_handmade_id, barang_handmade_id, kuantitas } = produk;
 
-        let fieldName, fieldValue;
-        if (packaging_id) {
-          fieldName = 'packaging_id';
-          fieldValue = packaging_id;
-        } else if (barang_custom_id) {
-          fieldName = 'barang_custom_id';
-          fieldValue = barang_custom_id;  
-        } else if (barang_non_handmade_id) {
-          fieldName = 'barang_non_handmade_id';
-          fieldValue = barang_non_handmade_id;
-        } else if (barang_handmade_id) {
-          fieldName = 'barang_handmade_id';
-          fieldValue = barang_handmade_id;
-        } else {
-          continue;
-        }
+              let fieldName, fieldValue;
+              if (packaging_id) {
+                  fieldName = 'packaging_id';
+                  fieldValue = packaging_id;
+              } else if (barang_custom_id) {
+                  fieldName = 'barang_custom_id';
+                  fieldValue = barang_custom_id;
+              } else if (barang_non_handmade_id) {
+                  fieldName = 'barang_non_handmade_id';
+                  fieldValue = barang_non_handmade_id;
+              } else if (barang_handmade_id) {
+                  fieldName = 'barang_handmade_id';
+                  fieldValue = barang_handmade_id;
+              } else {
+                  continue;
+              }
 
-        let stokEntry = await StokBarang.findOne({
-          where: {
-            [fieldName]: fieldValue,
-            cabang_id: cabang_id,  
-            is_deleted: false
-          },
-          transaction,
-        });
-  
-        if (stokEntry) {
-          await stokEntry.increment('jumlah_stok', {
-            by: kuantitas,
-            transaction,
-          });
-        } else {
-          await StokBarang.create({
-            cabang_id: cabang_id,  
-            [fieldName]: fieldValue,
-            jumlah_stok: kuantitas
-          }, { transaction });
-        }
+              let difference = 0;
+              if (produk_pembelian_id) {
+                  // 🔹 Update existing record
+                  const existingProduk = await ProdukPembelian.findOne({
+                      where: { produk_pembelian_id },
+                      transaction,
+                  });
+
+                  if (existingProduk) {
+                      const oldKuantitas = existingProduk.kuantitas;
+                      const newKuantitas = kuantitas;
+                      difference = newKuantitas - oldKuantitas; // Calculate the difference
+
+                      await existingProduk.update(produk, { transaction });
+                      updatedProdukList.push(existingProduk);
+                  } else {
+                      throw new Error(`ProdukPembelian with ID ${produk_pembelian_id} not found`);
+                  }
+              } else {
+                  // 🔹 Create new record if ID does not exist
+                  const newProduk = await ProdukPembelian.create(produk, { transaction });
+                  updatedProdukList.push(newProduk);
+                  difference = kuantitas; // Since it's a new record, stock increases by full kuantitas
+              }
+
+              // 🔹 Update stock
+              let stokEntry = await StokBarang.findOne({
+                  where: {
+                      [fieldName]: fieldValue,
+                      cabang_id: cabang_id,
+                      is_deleted: false
+                  },
+                  transaction,
+              });
+
+              if (stokEntry) {
+                  await stokEntry.increment('jumlah_stok', {
+                      by: difference,
+                      transaction,
+                  });
+              } else {
+                  await StokBarang.create({
+                      cabang_id: cabang_id,
+                      [fieldName]: fieldValue,
+                      jumlah_stok: kuantitas // New record, so use full kuantitas
+                  }, { transaction });
+              }
+          }
+
+          return updatedProdukList;
+      } catch (error) {
+          throw new Error(`updateMany failed: ${error.message}`);
       }
-
-      return updatedProdukList;
-    } catch (error) {
-      throw new Error(`updateMany failed: ${error.message}`);
-        }
   }
+
+
   
   static async delete(id) {  
     const produkPembelian = await ProdukPembelian.findByPk(id);  
