@@ -131,6 +131,22 @@ class PembelianService {
           as: "produk_pembelian",
           include: [
             {
+              model: BarangHandmade,
+              as: "barang_handmade",
+              include: [
+                {
+                  model: JenisBarang,
+                  as: "jenis_barang",
+                  attributes: ["nama_jenis_barang"]
+                },
+                {
+                  model: KategoriBarang,
+                  as: "kategori_barang",
+                  attributes: ["nama_kategori_barang"]
+                }
+              ]
+            },
+            {
               model: BarangNonHandmade,
               as: "barang_non_handmade",
               include: [
@@ -150,22 +166,6 @@ class PembelianService {
               model: Packaging,
               as: "packaging",
               attributes: ["image", "nama_packaging", "ukuran", "harga_satuan"],
-              include: [
-                {
-                  model: JenisBarang,
-                  as: "jenis_barang",
-                  attributes: ["nama_jenis_barang"]
-                },
-                {
-                  model: KategoriBarang,
-                  as: "kategori_barang",
-                  attributes: ["nama_kategori_barang"]
-                }
-              ]
-            },
-            {
-              model: BarangHandmade,
-              as: "barang_handmade",
               include: [
                 {
                   model: JenisBarang,

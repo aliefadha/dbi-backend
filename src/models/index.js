@@ -46,6 +46,7 @@ const Pembelian = require('./pembelian');
 const ProdukPembelian = require('./produkPembelian');
 const StokBarang = require('./stokBarang');
 const Penjualan = require('./penjualan');
+const ProdukPenjualan = require('./produkPenjualan');
 
 
 JenisBarang.hasMany(BarangNonHandmade, {
@@ -673,7 +674,55 @@ StokBarang.belongsTo(Packaging, {
     as: "packaging",
 })
 
+Penjualan.hasMany(ProdukPenjualan, {
+    foreignKey: "penjualan_id",
+    as: "produk_penjualan",
+})
 
+ProdukPenjualan.belongsTo(Penjualan, {
+    foreignKey: "penjualan_id",
+    as: "penjualan",
+})
+
+BarangHandmade.hasMany(ProdukPenjualan, {
+    foreignKey: "barang_handmade_id",
+    as: "produk_penjualan",
+})
+
+ProdukPenjualan.belongsTo(BarangHandmade, {
+    foreignKey: "barang_handmade_id",
+    as: "barang_handmade",
+})
+
+BarangNonHandmade.hasMany(ProdukPenjualan, {
+    foreignKey: "barang_non_handmade_id",
+    as: "produk_penjualan",
+})
+
+ProdukPenjualan.belongsTo(BarangNonHandmade, {
+    foreignKey: "barang_non_handmade_id",
+    as: "barang_non_handmade",
+})
+
+BarangCustom.hasMany(ProdukPenjualan, {
+    foreignKey: "barang_custom_id",
+    as: "produk_penjualan",
+})
+
+ProdukPenjualan.belongsTo(BarangCustom, {
+    foreignKey: "barang_custom_id",
+    as: "barang_custom",
+})
+
+Packaging.hasMany(ProdukPenjualan, {
+    foreignKey: "packaging_id",
+    as: "produk_penjualan",
+})
+
+ProdukPenjualan.belongsTo(Packaging, {
+    foreignKey: "packaging_id",
+    as: "packaging",
+})
 // Sync models with the database  
 const syncDatabase = async () => {
     try {
