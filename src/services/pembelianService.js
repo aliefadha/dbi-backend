@@ -36,78 +36,29 @@ class PembelianService {
         is_deleted: false
       },include: [
         {
-          model: MetodePembayaran,
-          as: "metode_pembayaran",
-          attributes: ["metode_id", "nama_metode"]
-        },
-        {
           model: ProdukPembelian,
           as: "produk_pembelian",
           include: [
             {
+              model: BarangHandmade,
+              as: "barang_handmade",
+              attributes: ['nama_barang']
+            },
+            {
               model: BarangNonHandmade,
               as: "barang_non_handmade",
-              include: [
-                {
-                  model: KategoriBarang,
-                  as: "kategori",
-                  attributes: ["nama_kategori_barang"]
-                },
-                {
-                  model: JenisBarang,
-                  as: "jenis",
-                  attributes: ["nama_jenis_barang"]
-                }
-              ]
+              attributes: ['nama_barang']
             },
             {
               model: Packaging,
               as: "packaging",
               attributes: ["image", "nama_packaging", "ukuran", "harga_satuan"],
-              include: [
-                {
-                  model: JenisBarang,
-                  as: "jenis_barang",
-                  attributes: ["nama_jenis_barang"]
-                },
-                {
-                  model: KategoriBarang,
-                  as: "kategori_barang",
-                  attributes: ["nama_kategori_barang"]
-                }
-              ]
-            },
-            {
-              model: BarangHandmade,
-              as: "barang_handmade",
-              include: [
-                {
-                  model: JenisBarang,
-                  as: "jenis_barang",
-                  attributes: ["nama_jenis_barang"]
-                },
-                {
-                  model: KategoriBarang,
-                  as: "kategori_barang",
-                  attributes: ["nama_kategori_barang"]
-                }
-              ]
+              attributes: ['nama_packaging']
             },
             {
               model: BarangCustom,
               as: "barang_custom",
-              include: [
-                {
-                  model: JenisBarang,
-                  as: "jenis_barang",
-                  attributes: ["nama_jenis_barang"]
-                },
-                {
-                  model: KategoriBarang,
-                  as: "kategori",
-                  attributes: ["nama_kategori_barang"]
-                }
-              ]
+              attributes: ['nama_barang']
             }
           ]
         }
