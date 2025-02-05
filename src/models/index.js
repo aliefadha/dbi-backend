@@ -382,8 +382,6 @@ MetodePembayaran.hasMany(Pembelian, {
     as: "pembelian"
 })
 
-
-
 ProduksiGudang.hasMany(BarangProduksiGudang, {
     foreignKey: "produksi_gudang_id",
     as: "produk"
