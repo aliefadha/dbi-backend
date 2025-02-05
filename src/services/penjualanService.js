@@ -25,12 +25,15 @@ class PenjualanService {
 
       await ProdukPenjualanService.createMany(produkPenjualan, { transaction });
 
-      const rincianBiayaCustom = data.rincian_biaya_custom.map(item => ({
-        ...item,
-        penjualan_id: penjualan.penjualan_id
-      }));
-
-      await RincianBiayaCustomService.create(rincianBiayaCustom, { transaction });
+      if (data.rincian_biaya_custom && Array.isArray(data.rincian_biaya_custom)) {
+        const rincianBiayaCustom = data.rincian_biaya_custom.map(item => ({
+          ...item,
+          penjualan_id: penjualan.penjualan_id
+        }));
+  
+        await RincianBiayaCustomService.create(rincianBiayaCustom, { transaction });  
+      }
+      
 
       await transaction.commit();
       return penjualan;
