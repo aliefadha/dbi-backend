@@ -31,6 +31,7 @@ const Penjualan = sequelize.define("penjualan", {
   },
   metode_id: {
     type: DataTypes.INTEGER,
+    allowNull: true,
     references: {
       model: MetodePembayaran,
       key: 'metode_id'

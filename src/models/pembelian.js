@@ -18,6 +18,7 @@ const Pembelian = sequelize.define("pembelian", {
   },
   metode_id: {
     type: DataTypes.INTEGER,
+    allowNull: true,
     references: {
       model: MetodePembayaran,
       key: 'metode_id'
