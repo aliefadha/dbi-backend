@@ -3,10 +3,35 @@ const DivisiKaryawan = require("../models/divisiKaryawan");
 const { sequelize } = require('../models');
   
 class KpiService {  
-  static async create(data) {  
-    return await Kpi.bulkCreate(data);  
-  }  
-  
+  static async create(data) {
+    try {
+        // Group by divisi_karyawan_id and check total persentase
+        const groupedPersentase = data.reduce((acc, kpi) => {
+            acc[kpi.divisi_karyawan_id] = (acc[kpi.divisi_karyawan_id] || 0) + kpi.persentase;
+            return acc;
+        }, {});
+
+        // Validate persentase does not exceed 100
+        for (const divisiId in groupedPersentase) {
+            if (groupedPersentase[divisiId] > 100) {
+                throw new Error(`Total persentase for divisi_karyawan_id ${divisiId} cannot exceed 100`);
+            }
+        }
+
+        // Ensure UUID is assigned if required
+        const dataWithUuid = data.map(kpi => ({
+            ...kpi,
+            uuid: kpi.uuid || crypto.randomUUID()
+        }));
+
+        return await Kpi.bulkCreate(dataWithUuid);
+    } catch (error) {
+        throw new Error(`Failed to create KPI: ${error.message}`);
+    }
+}
+
+
+
   static async getAll() {  
     return await Kpi.findAll();  
   }  

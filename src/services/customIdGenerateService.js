@@ -8,6 +8,8 @@ const PackagingGudang = require("../models/packagingGudang");
 const BarangMentah = require("../models/barangMentah");
 const PembelianGudang = require("../models/pembelianGudang");
 const PenjualanGudang = require("../models/penjualanGudang");
+const Pembelian = require("../models/pembelian");
+const Penjualan = require("../models/penjualan");
 
 class CustomIdGenerateService {
     static async generatePackagingId() {
@@ -175,6 +177,37 @@ class CustomIdGenerateService {
         const newId = `PNJ${String(newNumericPart).padStart(4, '0')}`;
         return newId;
     }
+
+    static async generatePembelianId() {
+        const lastPembelian = await Pembelian.findOne({
+            order: [['pembelian_id', 'DESC']]
+        });
+
+        if (!lastPembelian) {
+            return 'PMB0001';
+        }
+        const lastId = lastPembelian.pembelian_id;
+        const numericPart = parseInt(lastId.slice(3), 10);
+        const newNumericPart = numericPart + 1;
+        const newId = `PMB${String(newNumericPart).padStart(4, '0')}`;
+        return newId;
+    }
+
+    static async generatePenjualanId() {
+        const lastPenjualan = await Penjualan.findOne({
+            order: [['penjualan_id', 'DESC']]
+        });
+
+        if (!lastPenjualan) {
+            return 'PNJ0001';
+        }
+        const lastId = lastPenjualan.penjualan_id;
+        const numericPart = parseInt(lastId.slice(3), 10);
+        const newNumericPart = numericPart + 1;
+        const newId = `PNJ${String(newNumericPart).padStart(4, '0')}`;
+        return newId;
+    }
+
 
 }
 
