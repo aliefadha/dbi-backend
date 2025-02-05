@@ -49,6 +49,7 @@ const ProduksiGudang = require('./produksiGudang');
 const StokBarang = require('./stokBarang');
 const Penjualan = require('./penjualan');
 const ProdukPenjualan = require('./produkPenjualan');
+const RincianBiayaCustom = require('./rincianBiayaCustom');
 
 
 
@@ -755,6 +756,16 @@ Packaging.hasMany(ProdukPenjualan, {
 ProdukPenjualan.belongsTo(Packaging, {
     foreignKey: "packaging_id",
     as: "packaging",
+})
+
+Penjualan.hasMany(RincianBiayaCustom, {
+    foreignKey: "penjualan_id",
+    as: "rincian_biaya_custom",
+})
+
+RincianBiayaCustom.belongsTo(Penjualan, {
+    foreignKey: "penjualan_id",
+    as: "penjualan",
 })
 // Sync models with the database  
 const syncDatabase = async () => {

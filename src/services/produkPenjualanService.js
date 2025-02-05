@@ -45,7 +45,7 @@ class ProdukPenjualanService {
         });
        
         if (!stokEntry || stokEntry.jumlah_stok < kuantitas) {
-          throw new Error(`Not enough stock for product: ${fieldName} at cabang ${cabang_id}`);
+          throw new Error(`Not enough stock for this product`);
         }
 
         // Decrease stock if there is enough
@@ -54,7 +54,7 @@ class ProdukPenjualanService {
 
       return createdProdukList;
     } catch (error) {
-      throw new Error(`createMany failed: ${error.message}`);
+      throw new Error(`Produk Penjualan failed`);
     }
   }
   
@@ -89,7 +89,19 @@ class ProdukPenjualanService {
     const transaction = options.transaction;
 
     try {
-      const updatedProdukList = [];
+      const penjualanId = data[0]?.penjualan_id;
+      if (!penjualanId) throw new Error("Missing pembelian_id");
+
+      const existingProduks = await ProdukPenjualan.findAll({
+        where: { penjualan_id: penjualanId },
+        transaction
+      });
+
+      const existingProduksMap = new Map(
+        existingProduks.map(produk => [produk.produk_penjualan_id, produk])
+      );
+      const updatedProdukList = new Set();
+      const receivedIds = new Set();
 
       for (const produk of data) {
         const { produk_penjualan_id, cabang_id, packaging_id, barang_custom_id, barang_non_handmade_id, barang_handmade_id, kuantitas } = produk;
@@ -112,6 +124,17 @@ class ProdukPenjualanService {
         } 
 
         let difference = 0; 
+
+        if (produk_penjualan_id && existingProduksMap.has(produk_penjualan_id)) {
+          const existingProduk = existingProduksMap.get(produk_penjualan_id);
+          difference = kuantitas - existingProduk.kuantitas;
+
+          await existingProduk.update( produk, { transaction });
+          updatedProdukList.add(existingProduk);
+          receivedIds.add(produk_penjualan_id);
+        } else {
+          
+        }
 
         if (produk_penjualan_id) {
           // 🔹 Update existing recor
@@ -147,7 +170,7 @@ class ProdukPenjualanService {
         });
 
         if (stokEntry && stokEntry.jumlah_stok < difference) {
-          throw new Error(`Not enough stock for product: ${fieldName} at cabang ${cabang_id}`);
+          throw new Error(`Not enough stock for this product`);
         }
 
         if (stokEntry) {
@@ -162,7 +185,7 @@ class ProdukPenjualanService {
       }
       return updatedProdukList;
     } catch (error) {
-      throw new Error(`updateMany failed: ${error.message}`);
+      throw new Error(`Update Produk Penjualan failed`);
     }
   }
   

@@ -8,7 +8,9 @@ const MetodePembayaran = require("../models/metodePembayaran");
 const Packaging = require("../models/packaging");
 const Penjualan = require("../models/penjualan");  
 const ProdukPenjualan = require("../models/produkPenjualan");
+const RincianBiayaCustom = require("../models/rincianBiayaCustom");
 const ProdukPenjualanService = require("./produkPenjualanService");
+const RincianBiayaCustomService = require("./rincianBiayaCustomService");
   
 class PenjualanService {  
   static async create(data) {  
@@ -22,6 +24,13 @@ class PenjualanService {
       }));
 
       await ProdukPenjualanService.createMany(produkPenjualan, { transaction });
+
+      const rincianBiayaCustom = data.rincian_biaya_custom.map(item => ({
+        ...item,
+        penjualan_id: penjualan.penjualan_id
+      }));
+
+      await RincianBiayaCustomService.create(rincianBiayaCustom, { transaction });
 
       await transaction.commit();
       return penjualan;
@@ -51,6 +60,10 @@ class PenjualanService {
           as: "metode_pembayaran",
           attributes: ["metode_id", "nama_metode"]
         }, 
+        {
+          model: RincianBiayaCustom,
+          as: "rincian_biaya_custom"
+        },  
         {
           model: ProdukPenjualan,
           as: "produk_penjualan",
@@ -147,6 +160,16 @@ class PenjualanService {
           }
         ));
         await ProdukPenjualanService.updateMany(produkData, { transaction });
+      }
+
+      if (data.rincian_biaya_custom && Array.isArray(data.rincian_biaya_custom)) {
+        const rincianBiayaCustom = data.rincian_biaya_custom.map(item => (
+          {
+            ...item,
+            penjualan_id: id
+          }
+        ));
+        await RincianBiayaCustomService.update(rincianBiayaCustom, { transaction });
       }
       await transaction.commit();
 
