@@ -320,6 +320,7 @@ class BarangHandmadeGudangService {
       throw error;
     }
   }
+  
 }
 
 module.exports = BarangHandmadeGudangService;
