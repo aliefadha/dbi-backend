@@ -584,6 +584,16 @@ ProdukPembelian.belongsTo(Pembelian, {
     as: "pembelian",
 })
 
+Cabang.hasMany(ProdukPembelian, {
+    foreignKey: "cabang_id",
+    as: "produk_pembelian",
+})
+
+ProdukPembelian.belongsTo(Cabang, {
+    foreignKey: "cabang_id",
+    as: "cabang",
+})
+
 BarangHandmade.hasMany(ProdukPembelian, {
     foreignKey: "barang_handmade_id",
     as: "produk_pembelian",

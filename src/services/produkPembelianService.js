@@ -92,85 +92,95 @@ class ProdukPembelianService {
   }  
 
   static async updateMany(data, options = {}) {
-      const transaction = options.transaction;
+    const transaction = options.transaction;
 
-      try {
-          const updatedProdukList = [];
+    try {
+        const pembelianId = data[0]?.pembelian_id;
+        if (!pembelianId) throw new Error("Missing pembelian_id");
 
-          for (const produk of data) {
-              const { produk_pembelian_id, cabang_id, packaging_id, barang_custom_id, barang_non_handmade_id, barang_handmade_id, kuantitas } = produk;
+        // Fetch existing products for the given pembelian_id
+        const existingProduks = await ProdukPembelian.findAll({
+            where: { pembelian_id: pembelianId },
+            transaction
+        });
 
-              let fieldName, fieldValue;
-              if (packaging_id) {
-                  fieldName = 'packaging_id';
-                  fieldValue = packaging_id;
-              } else if (barang_custom_id) {
-                  fieldName = 'barang_custom_id';
-                  fieldValue = barang_custom_id;
-              } else if (barang_non_handmade_id) {
-                  fieldName = 'barang_non_handmade_id';
-                  fieldValue = barang_non_handmade_id;
-              } else if (barang_handmade_id) {
-                  fieldName = 'barang_handmade_id';
-                  fieldValue = barang_handmade_id;
-              } else {
-                  continue;
-              }
+        // Create a map for quick lookup
+        const existingProduksMap = new Map(
+            existingProduks.map(produk => [produk.produk_pembelian_id, produk])
+        );
 
-              let difference = 0;
-              if (produk_pembelian_id) {
-                  // 🔹 Update existing record
-                  const existingProduk = await ProdukPembelian.findOne({
-                      where: { produk_pembelian_id },
-                      transaction,
-                  });
+        const updatedProdukList = new Set();
+        const receivedIds = new Set(); // Store IDs from the incoming data
 
-                  if (existingProduk) {
-                      const oldKuantitas = existingProduk.kuantitas;
-                      const newKuantitas = kuantitas;
-                      difference = newKuantitas - oldKuantitas; // Calculate the difference
+        for (const produk of data) {
+            const { produk_pembelian_id, cabang_id, kuantitas } = produk;
 
-                      await existingProduk.update(produk, { transaction });
-                      updatedProdukList.push(existingProduk);
-                  } else {
-                      throw new Error(`ProdukPembelian with ID ${produk_pembelian_id} not found`);
-                  }
-              } else {
-                  // 🔹 Create new record if ID does not exist
-                  const newProduk = await ProdukPembelian.create(produk, { transaction });
-                  updatedProdukList.push(newProduk);
-                  difference = kuantitas; // Since it's a new record, stock increases by full kuantitas
-              }
+            const { fieldName, fieldValue } = getFieldAndValue(produk);
+            if (!fieldName) continue; // Skip if no valid field is found
 
-              // 🔹 Update stock
-              let stokEntry = await StokBarang.findOne({
-                  where: {
-                      [fieldName]: fieldValue,
-                      cabang_id: cabang_id,
-                      is_deleted: false
-                  },
-                  transaction,
-              });
+            let difference = 0;
 
-              if (stokEntry) {
-                  await stokEntry.increment('jumlah_stok', {
-                      by: difference,
-                      transaction,
-                  });
-              } else {
-                  await StokBarang.create({
-                      cabang_id: cabang_id,
-                      [fieldName]: fieldValue,
-                      jumlah_stok: kuantitas // New record, so use full kuantitas
-                  }, { transaction });
-              }
-          }
+            if (produk_pembelian_id && existingProduksMap.has(produk_pembelian_id)) {
+                // 🔹 Update existing record
+                const existingProduk = existingProduksMap.get(produk_pembelian_id);
+                difference = kuantitas - existingProduk.kuantitas;
 
-          return updatedProdukList;
-      } catch (error) {
-          throw new Error(`updateMany failed: ${error.message}`);
-      }
-  }
+                await existingProduk.update(produk, { transaction });
+                updatedProdukList.add(produk_pembelian_id);
+                receivedIds.add(produk_pembelian_id);
+            } else {
+                // 🔹 Create new record
+                const newProduk = await ProdukPembelian.create(produk, { transaction });
+                updatedProdukList.add(newProduk.produk_pembelian_id);
+                difference = kuantitas;
+            }
+
+            // 🔹 Update stock
+            let stokEntry = await StokBarang.findOne({
+                where: { [fieldName]: fieldValue, cabang_id, is_deleted: false },
+                transaction
+            });
+
+            if (stokEntry) {
+                await stokEntry.increment("jumlah_stok", { by: difference, transaction });
+            } else {
+                await StokBarang.create(
+                    { cabang_id, [fieldName]: fieldValue, jumlah_stok: kuantitas },
+                    { transaction }
+                );
+            }
+        }
+
+        // 🔹 Delete old records that are NOT in the received data
+        for (const existingProduk of existingProduks) {
+            if (!receivedIds.has(existingProduk.produk_pembelian_id)) {
+                const { fieldName, fieldValue } = getFieldAndValue(existingProduk);
+                if (!fieldName) continue;
+
+                let stokEntry = await StokBarang.findOne({
+                    where: { [fieldName]: fieldValue, cabang_id: existingProduk.cabang_id, is_deleted: false },
+                    transaction
+                });
+
+                if (stokEntry) {
+                    await stokEntry.decrement("jumlah_stok", {
+                        by: existingProduk.kuantitas,
+                        transaction
+                    });
+                }
+
+                await existingProduk.destroy({ transaction });
+            }
+        }
+
+        return Array.from(updatedProdukList);
+    } catch (error) {
+        throw new Error(`updateMany failed: ${error.message}`);
+    }
+}
+
+
+
 
 
   
@@ -181,5 +191,14 @@ class ProdukPembelianService {
     return true;  
   }  
 }  
+
+// Helper function to determine field name and value dynamically
+function getFieldAndValue(produk) {
+  if (produk.packaging_id) return { fieldName: "packaging_id", fieldValue: produk.packaging_id };
+  if (produk.barang_custom_id) return { fieldName: "barang_custom_id", fieldValue: produk.barang_custom_id };
+  if (produk.barang_non_handmade_id) return { fieldName: "barang_non_handmade_id", fieldValue: produk.barang_non_handmade_id };
+  if (produk.barang_handmade_id) return { fieldName: "barang_handmade_id", fieldValue: produk.barang_handmade_id };
+  return { fieldName: null, fieldValue: null };
+}
   
 module.exports = ProdukPembelianService;  

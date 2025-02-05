@@ -9,6 +9,7 @@ const KategoriBarang = require("../models/kategoriBarang");
 const BarangHandmade = require("../models/barangHandmade");
 const JenisBarang = require("../models/jenisBarang");
 const Packaging = require("../models/packaging");
+const Cabang = require("../models/cabang");
   
 class PembelianService {  
   static async create(data) {  
@@ -81,6 +82,11 @@ class PembelianService {
           model: ProdukPembelian,
           as: "produk_pembelian",
           include: [
+            {
+              model: Cabang,
+              as: "cabang",
+              attributes: ["nama_cabang"]
+            },
             {
               model: BarangHandmade,
               as: "barang_handmade",
@@ -175,7 +181,7 @@ class PembelianService {
         await ProdukPembelianService.updateMany(produkData, { transaction });  
       }
       await transaction.commit();  
-
+      
       const updatedPembelian = await this.getById(id);
       return updatedPembelian;  
     } catch (error) {  
