@@ -44,9 +44,12 @@ const BarangHandmadeGudang = require('./barangHandmadeGudang');
 const BiayaGudang = require('./biayaGudang');
 const Pembelian = require('./pembelian');
 const ProdukPembelian = require('./produkPembelian');
+
+const ProduksiGudang = require('./produksiGudang');
 const StokBarang = require('./stokBarang');
 const Penjualan = require('./penjualan');
 const ProdukPenjualan = require('./produkPenjualan');
+
 
 
 JenisBarang.hasMany(BarangNonHandmade, {
@@ -381,6 +384,31 @@ MetodePembayaran.hasMany(Pembelian, {
 
 Pembelian.belongsTo(MetodePembayaran, {
     foreignKey: "metode_id",
+    as: "metode_pembayaran"
+})
+
+ProduksiGudang.hasMany(BarangProduksiGudang, {
+    foreignKey: "produksi_gudang_id",
+    as: "produk"
+})
+
+BarangProduksiGudang.belongsTo(ProduksiGudang, {
+    foreignKey: "produksi_gudang_id",
+    as: "produksi"
+})
+
+BarangProduksiGudang.belongsTo(BarangHandmadeGudang, {
+    foreignKey: "barang_handmade_id",
+    as: "barang"
+})
+
+BarangHandmadeGudang.hasMany(BarangProduksiGudang, {
+    foreignKey: "barang_handmade_id",
+    as: "barang_produksi"
+})
+
+Pembelian.belongsTo(MetodePembayaran, {
+    foreignKey: "metode_pembayaran_id",
     as: "metode_pembayaran"
 })
 
