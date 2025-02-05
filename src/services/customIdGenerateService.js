@@ -171,7 +171,7 @@ class CustomIdGenerateService {
         if (!lastPenjualan) {
             return 'PNJ0001';
         }
-        const lastId = lastPenjualan.lastPenjualan;
+        const lastId = lastPenjualan.penjualan_id;
         const numericPart = parseInt(lastId.slice(3), 10);
         const newNumericPart = numericPart + 1;
         const newId = `PNJ${String(newNumericPart).padStart(4, '0')}`;

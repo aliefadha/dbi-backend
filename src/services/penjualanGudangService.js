@@ -293,6 +293,7 @@ class PenjualanGudangService {
     const penjualanGudang = await PenjualanGudang.findByPk(id);
     if (!penjualanGudang) return null;
     await penjualanGudang.update({ is_deleted: true });
+    await penjualanGudang.save();
     return true;
   }
 }
