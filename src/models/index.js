@@ -382,10 +382,7 @@ MetodePembayaran.hasMany(Pembelian, {
     as: "pembelian"
 })
 
-Pembelian.belongsTo(MetodePembayaran, {
-    foreignKey: "metode_id",
-    as: "metode_pembayaran"
-})
+
 
 ProduksiGudang.hasMany(BarangProduksiGudang, {
     foreignKey: "produksi_gudang_id",
