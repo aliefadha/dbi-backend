@@ -2,6 +2,8 @@ const { sequelize } = require("../models");
 const BarangHandmadeGudang = require("../models/barangHandmadeGudang");
 const BarangProduksiGudang = require("../models/barangProduksiGudang");
 const ProduksiGudang = require("../models/produksiGudang");
+const RincianBahanGudang = require("../models/rincianBahanGudang");
+const StokBarangGudang = require("../models/stokBarangGudang");
 const BarangProduksiGudangService = require("./barangProduksiGudangService");
 
 class ProduksiGudangService {
@@ -9,7 +11,7 @@ class ProduksiGudangService {
     const transaction = await sequelize.transaction();
     try {
       const { jumlah_produksi, total_menit, image, tanggal, produk } = data;
-      
+
       const produksi = await ProduksiGudang.create({
         jumlah_produksi,
         total_menit,
@@ -86,32 +88,74 @@ class ProduksiGudangService {
   }
 
   static async update(id, data) {
-
     const transaction = await sequelize.transaction();
     try {
+      const { jumlah_produksi, total_menit, image, tanggal, status } = data;
+
       const produksiGudang = await ProduksiGudang.findOne({
         where: {
           produksi_gudang_id: id,
           is_deleted: false
-      }}, 
-      { transaction });
+        },
+        include: [
+          {
+            model: BarangProduksiGudang,
+            as: "produk",
+            attributes: ["jumlah"],
+            include: [
+              {
+                model: BarangHandmadeGudang,
+                as: "barang",
+                attributes: ["barang_handmade_id"],
+                include: [
+                  {
+                    model: RincianBahanGudang,
+                    as: "rincian_bahan",
+                    attributes: ["barang_mentah_id", "kuantitas"],
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        transaction
+      });
       if (!produksiGudang) return null;
-  
-      Object.assign(produksiGudang, data);
 
-      await produksiGudang.save({ transaction });
-      
-      await BarangProduksiGudangService.deleteByProduksi(id);
+      await produksiGudang.update({
+        jumlah_produksi,
+        total_menit,
+        image,
+        tanggal,
+        status
+      }, { transaction });
 
-      const produkData = data.produk.map(item => ({
-        ...item,
-        produksi_gudang_id: produksiGudang.produksi_gudang_id
-      }));
+      const bahanProduction = produksiGudang.produk.flatMap(item =>
+        item.barang.rincian_bahan
+      );
 
-      await BarangProduksiGudangService.createMany(produkData, { transaction });
-  
+
+      if (status === "terima") {
+        for (const bahan of bahanProduction) {
+          const stockRecord = await StokBarangGudang.findOne({
+            where: {
+              barang_mentah_id: bahan.barang_mentah_id,
+              is_deleted: false
+            },
+            transaction
+          });
+          if (!stockRecord) {
+            throw new Error(`Stok tidak ditemukan`);
+          }
+          await stockRecord.decrement('jumlah_stok', {
+            by: (bahan.kuantitas * produksiGudang.jumlah_produksi),
+            transaction
+          });
+        }
+      }
+
       await transaction.commit();
-      return produksiGudang;
+      return produksiGudang.produk;
     } catch (error) {
       await transaction.rollback();
       throw error;

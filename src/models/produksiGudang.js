@@ -24,7 +24,9 @@ const ProduksiGudang = sequelize.define("produksi_gudang", {
     type: DataTypes.INTEGER,
   },
   status: {
-    type: DataTypes.BOOLEAN,
+    type: DataTypes.ENUM('terima', 'tolak', 'proses'),
+    defaultValue: 'proses',
+    allowNull: false
   },
   is_deleted: {
     type: DataTypes.BOOLEAN,

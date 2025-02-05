@@ -80,6 +80,16 @@ const seedDatabase = async () => {
             isi: 10,
             is_deleted: false
         })
+
+        await BarangMentah.create({
+            barang_mentah_id: "MTH0002",
+            nama_barang: "Manik-Manik Huruf",
+            harga: 10000,
+            jumlah_minimum_stok: 10,
+            harga_satuan: 1000,
+            isi: 10,
+            is_deleted: false
+        })
         
 
         // Seed data for Penjualan

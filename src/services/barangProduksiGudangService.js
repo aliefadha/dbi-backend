@@ -72,7 +72,7 @@ class BarangProduksiGudangService {
     return true;
   }
 
-  static async createMany(dataArray, options = {}, status) {
+  static async createMany(dataArray, options = {}) {
     const transaction = options.transaction;
     const createdProdukList = [];
 
@@ -98,25 +98,21 @@ class BarangProduksiGudangService {
           throw new Error(`Barang handmade tidak ditemukan`);
         }
 
+        const bahanStockRecords = [];
         for (const bahan of barangHandmade.rincian_bahan) {
-          const stockRecord = await StokBarangGudang.findOne({
+          const bahanStockRecord = await StokBarangGudang.findOne({
             where: {
               barang_mentah_id: bahan.barang_mentah_id,
               is_deleted: false
             },
             transaction
           });
-          if (!stockRecord || stockRecord.jumlah_stok < (bahan.kuantitas * data.jumlah)) {
+
+          if (!bahanStockRecord || bahanStockRecord.jumlah_stok < (bahan.kuantitas * data.jumlah)) {
             throw new Error(`Stok barang mentah tidak cukup.`);
           }
-          if (status) {
-            await stockRecord.update(
-              { jumlah_stok: stockRecord.jumlah_stok - (bahan.kuantitas * data.jumlah)},
-              { transaction }
-            );
-          }
+          bahanStockRecords.push({ record: bahanStockRecord, kuantitas: bahan.kuantitas });
         }
-        // Create product
         const createdProduct = await BarangProduksiGudang.create(data, {
           transaction,
         });
@@ -128,12 +124,16 @@ class BarangProduksiGudangService {
     }
   }
 
-  static async deleteByProduksi(id) {
-    return await BarangProduksiGudang.destroy({
-      where: {
-        produksi_gudang_id: id
+  static async deleteByProduksi(id, options = {}) {
+    return await BarangProduksiGudang.update(
+      { is_deleted: true },
+      {
+        where: {
+          produksi_gudang_id: id
+        },
+        ...options
       }
-    })
+    );
   }
 }
 

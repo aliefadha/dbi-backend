@@ -79,26 +79,51 @@ class ProduksiGudangController {
   
   static async update(req, res) {  
     try {  
-      const produksiGudang = await ProduksiGudangService.update(req.params.id, req.body);  
-      if (!produksiGudang) {  
-        return res.status(404).json({  
-          success: false,  
-          data: null,  
-          message: "not found",  
-        });  
-      }  
-      res.status(200).json({  
-        success: true,  
-        data: produksiGudang,  
-        message: "updated successfully",  
-      });  
-    } catch (error) {  
-      res.status(400).json({  
-        success: false,  
-        data: null,  
-        message: error.message,  
-      });  
-    }  
+      const existingProduksiGudang = await ProduksiGudangService.getById(req.params.id);
+      if (!existingProduksiGudang) {
+        return res.status(404).json({
+          success: false,
+          data: null,
+          message: "not found",
+        });
+      }
+
+      const updatedData = { ...req.body };
+
+      // Check if a new file is uploaded
+      if (req.file) {
+        // Delete the old image file
+        const oldImagePath = path.join(__dirname, "../public/produksiGudang", existingProduksiGudang.image);
+        fs.unlink(oldImagePath, (err) => {
+          if (err) {
+            console.error("Failed to delete old image:", err);
+          }
+        });
+
+        updatedData.image = req.file.filename;
+      }
+
+      const produksiGudang = await ProduksiGudangService.update(req.params.id, updatedData);
+      if (!produksiGudang) {
+        return res.status(404).json({
+          success: false,
+          data: null,
+          message: "not found",
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        data: produksiGudang,
+        message: "updated successfully",
+      });
+    } catch (error) {
+      res.status(400).json({
+        success: false,
+        data: null,
+        message: error.message,
+      });
+    }
   }  
   
   static async delete(req, res) {  
@@ -126,4 +151,4 @@ class ProduksiGudangController {
   }  
 }  
   
-module.exports = {ProduksiGudangController, upload};  
+module.exports = {ProduksiGudangController, upload};
