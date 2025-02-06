@@ -130,6 +130,30 @@ class KpiController {
       });
     }
   }
+
+  static async getDivisiKpi(req, res) {
+    try {
+      const kpi = await KpiService.getDivisiKpi();
+      if (!kpi) {
+        return res.status(404).json({
+          success: false,
+          data: null,
+          message: "not found",
+        });
+      }
+      res.status(200).json({
+        success: true,
+        data: kpi,
+        message: "retrieved successfully",
+      });
+    } catch (error) {  
+      res.status(500).json({    
+        success: false,  
+        data: null,  
+        message: error.message,  
+      });  
+    }  
+  }
 }  
   
 module.exports = KpiController;  

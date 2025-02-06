@@ -78,6 +78,9 @@ class KpiService {
 
   static async getKpiByDivisi() {
     const divisiKaryawanList = await DivisiKaryawan.findAll({
+      where: {
+        is_deleted: false 
+      },
       include: [
         {
           model: Kpi,
@@ -97,6 +100,30 @@ class KpiService {
 
     return result;
   }
+
+  static async getDivisiKpi() {
+    const divisiKpi = await DivisiKaryawan.findAll({
+        where: {
+            is_deleted: false 
+        },
+        include: [
+            {
+                model: Kpi,
+                as: "kpi",
+                // Exclude Kpi associations with through: null (if applicable)
+                through: null
+            },
+        ]
+    });
+    
+    // Filter out entries with any Kpi data
+    const result = divisiKpi.filter(entry => 
+        entry.kpi === undefined || entry.kpi.length === 0
+    );
+    return result;
+}
+
+
 }  
   
 module.exports = KpiService;  

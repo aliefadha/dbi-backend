@@ -8,5 +8,6 @@ router.get('/kpi/:id', KpiController.getById);
 router.put('/kpi/:id', KpiController.update);  
 router.delete('/kpi/:id', KpiController.delete);
 router.get('/kpi-divisi', KpiController.getKpiByDivisi);  
+router.get('/get-divisi-kpi', KpiController.getDivisiKpi);  
   
 module.exports = router;  
