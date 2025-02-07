@@ -14,19 +14,19 @@ class KpiService {
         // Validate persentase does not exceed 100
         for (const divisiId in groupedPersentase) {
             if (groupedPersentase[divisiId] > 100) {
-                throw new Error(`Total persentase for divisi_karyawan_id ${divisiId} cannot exceed 100`);
+                throw new Error("Total persentase cannot exceed 100");
             }
         }
 
         // Ensure UUID is assigned if required
         const dataWithUuid = data.map(kpi => ({
             ...kpi,
-            uuid: kpi.uuid || crypto.randomUUID()
+            uuid: kpi.uuid
         }));
 
         return await Kpi.bulkCreate(dataWithUuid);
     } catch (error) {
-        throw new Error(`Failed to create KPI: ${error.message}`);
+        throw new Error("Failed to create KPI");
     }
 }
 
@@ -78,6 +78,9 @@ class KpiService {
 
   static async getKpiByDivisi() {
     const divisiKaryawanList = await DivisiKaryawan.findAll({
+      where: {
+        is_deleted: false 
+      },
       include: [
         {
           model: Kpi,
@@ -97,6 +100,30 @@ class KpiService {
 
     return result;
   }
+
+  static async getDivisiKpi() {
+    const divisiKpi = await DivisiKaryawan.findAll({
+        where: {
+            is_deleted: false 
+        },
+        include: [
+            {
+                model: Kpi,
+                as: "kpi",
+                // Exclude Kpi associations with through: null (if applicable)
+                through: null
+            },
+        ]
+    });
+    
+    // Filter out entries with any Kpi data
+    const result = divisiKpi.filter(entry => 
+        entry.kpi === undefined || entry.kpi.length === 0
+    );
+    return result;
+}
+
+
 }  
   
 module.exports = KpiService;  

@@ -1,12 +1,12 @@
-const KpiService = require("../services/kpiService");  
+const RincianBiayaCustomService = require("../services/rincianBiayaCustomService");  
   
-class KpiController {  
+class RincianBiayaCustomController {  
   static async create(req, res) {  
     try {  
-      const kpi = await KpiService.create(req.body);  
+      const rincianBiayaCustom = await RincianBiayaCustomService.create(req.body);  
       res.status(201).json({  
         success: true,  
-        data: kpi,  
+        data: rincianBiayaCustom,  
         message: "created successfully",  
       });  
     } catch (error) {  
@@ -20,10 +20,10 @@ class KpiController {
   
   static async getAll(req, res) {  
     try {  
-      const kpis = await KpiService.getAll();  
+      const rincianBiayaCustoms = await RincianBiayaCustomService.getAll();  
       res.status(200).json({  
         success: true,  
-        data: kpis,  
+        data: rincianBiayaCustoms,  
         message: "retrieved successfully",  
       });  
     } catch (error) {  
@@ -37,8 +37,8 @@ class KpiController {
   
   static async getById(req, res) {  
     try {  
-      const kpi = await KpiService.getById(req.params.id);  
-      if (!kpi) {  
+      const rincianBiayaCustom = await RincianBiayaCustomService.getById(req.params.id);  
+      if (!rincianBiayaCustom) {  
         return res.status(404).json({  
           success: false,  
           data: null,  
@@ -47,7 +47,7 @@ class KpiController {
       }  
       res.status(200).json({  
         success: true,  
-        data: kpi,  
+        data: rincianBiayaCustom,  
         message: "retrieved successfully",  
       });  
     } catch (error) {  
@@ -61,8 +61,8 @@ class KpiController {
   
   static async update(req, res) {  
     try {  
-      const kpi = await KpiService.update(req.params.id, req.body);  
-      if (!kpi) {  
+      const rincianBiayaCustom = await RincianBiayaCustomService.update(req.params.id, req.body);  
+      if (!rincianBiayaCustom) {  
         return res.status(404).json({  
           success: false,  
           data: null,  
@@ -71,7 +71,7 @@ class KpiController {
       }  
       res.status(200).json({  
         success: true,  
-        data: kpi,  
+        data: rincianBiayaCustom,  
         message: "updated successfully",  
       });  
     } catch (error) {  
@@ -85,7 +85,7 @@ class KpiController {
   
   static async delete(req, res) {  
     try {  
-      const deleted = await KpiService.delete(req.params.id);  
+      const deleted = await RincianBiayaCustomService.delete(req.params.id);  
       if (!deleted) {  
         return res.status(404).json({  
           success: false,  
@@ -106,54 +106,6 @@ class KpiController {
       });  
     }  
   }  
-
-  static async getKpiByDivisi(req, res) {
-    try {
-      const kpi = await KpiService.getKpiByDivisi(req.params.id);
-      if (!kpi) {
-        return res.status(404).json({
-          success: false,
-          data: null,
-          message: "not found",
-        });
-      }
-      res.status(200).json({
-        success: true,
-        data: kpi,
-        message: "retrieved successfully",
-      });
-    } catch (error) {
-      res.status(500).json({
-        success: false,
-        data: null,
-        message: error.message,
-      });
-    }
-  }
-
-  static async getDivisiKpi(req, res) {
-    try {
-      const kpi = await KpiService.getDivisiKpi();
-      if (!kpi) {
-        return res.status(404).json({
-          success: false,
-          data: null,
-          message: "not found",
-        });
-      }
-      res.status(200).json({
-        success: true,
-        data: kpi,
-        message: "retrieved successfully",
-      });
-    } catch (error) {  
-      res.status(500).json({    
-        success: false,  
-        data: null,  
-        message: error.message,  
-      });  
-    }  
-  }
 }  
   
-module.exports = KpiController;  
+module.exports = RincianBiayaCustomController;  

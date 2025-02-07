@@ -45,7 +45,7 @@ class ProdukPenjualanService {
         });
        
         if (!stokEntry || stokEntry.jumlah_stok < kuantitas) {
-          throw new Error(`Not enough stock for product: ${fieldName} at cabang ${cabang_id}`);
+          throw new Error(`Not enough stock for this product`);
         }
 
         // Decrease stock if there is enough
@@ -54,7 +54,7 @@ class ProdukPenjualanService {
 
       return createdProdukList;
     } catch (error) {
-      throw new Error(`createMany failed: ${error.message}`);
+      throw new Error(`Produk Penjualan failed`);
     }
   }
   
@@ -89,51 +89,39 @@ class ProdukPenjualanService {
     const transaction = options.transaction;
 
     try {
-      const updatedProdukList = [];
+      const penjualanId = data[0]?.penjualan_id;
+      if (!penjualanId) throw new Error("Missing pembelian_id");
+
+      const existingProduks = await ProdukPenjualan.findAll({
+        where: { penjualan_id: penjualanId },
+        transaction
+      });
+
+      const existingProduksMap = new Map(
+        existingProduks.map(produk => [produk.produk_penjualan_id, produk])
+      );
+      const updatedProdukList = new Set();
+      const receivedIds = new Set();
 
       for (const produk of data) {
-        const { produk_penjualan_id, cabang_id, packaging_id, barang_custom_id, barang_non_handmade_id, barang_handmade_id, kuantitas } = produk;
+        const { produk_penjualan_id, cabang_id, kuantitas } = produk;
 
-        let fieldName, fieldValue;
-        if (packaging_id) {
-          fieldName = 'packaging_id';
-          fieldValue = packaging_id;
-        } else if (barang_custom_id) {
-          fieldName = 'barang_custom_id';
-          fieldValue = barang_custom_id;
-        } else if (barang_non_handmade_id) {
-          fieldName = 'barang_non_handmade_id';
-          fieldValue = barang_non_handmade_id;
-        } else if (barang_handmade_id) {
-          fieldName = 'barang_handmade_id';
-          fieldValue = barang_handmade_id;
-        } else {
-          continue;
-        } 
+        const { fieldName, fieldValue } = getFieldAndValue(produk);
+        if (!fieldName) continue;
 
         let difference = 0; 
 
-        if (produk_penjualan_id) {
-          // 🔹 Update existing recor
-          const existingProduk = await ProdukPenjualan.findOne({
-            where: { produk_penjualan_id },
-            transaction
-          });
+        if (produk_penjualan_id && existingProduksMap.has(produk_penjualan_id)) {
+          const existingProduk = existingProduksMap.get(produk_penjualan_id);
+          difference = kuantitas - existingProduk.kuantitas;
 
-          if (existingProduk) {
-            const oldKuantitas = existingProduk.kuantitas;
-            const newKuantitas = kuantitas;
-            difference = newKuantitas - oldKuantitas;
-
-            await existingProduk.update( produk, { transaction });
-            updatedProdukList.push(existingProduk);  
-          } else {
-            throw new Error(`Produk with ID ${produk_penjualan_id} not found.`);
-          }
+          await existingProduk.update( produk, { transaction });
+          updatedProdukList.add(existingProduk);
+          receivedIds.add(produk_penjualan_id);
         } else {
           const newProduk = await ProdukPenjualan.create(produk, { transaction});
-          updatedProdukList.push(newProduk);
-          difference = kuantitas; 
+          updatedProdukList.add(newProduk.produk_penjualan_id);
+          difference = kuantitas;
         }
 
         // Update stock 
@@ -147,7 +135,7 @@ class ProdukPenjualanService {
         });
 
         if (stokEntry && stokEntry.jumlah_stok < difference) {
-          throw new Error(`Not enough stock for product: ${fieldName} at cabang ${cabang_id}`);
+          throw new Error(`Not enough stock for this product`);
         }
 
         if (stokEntry) {
@@ -160,9 +148,27 @@ class ProdukPenjualanService {
           }, { transaction });
         }
       }
-      return updatedProdukList;
+
+      for (const existingProduk of existingProduks) {
+        if (!receivedIds.has(existingProduk.produk_penjualan_id)) {
+          const { fieldName, fieldValue } = getFieldAndValue(existingProduk);
+          if (!fieldName) continue;
+
+          let stokEntry = await StokBarang.findOne({
+            where: { [fieldName]: fieldValue, cabang_id: existingProduk.cabang_id, is_deleted: false },
+            transaction
+          });
+
+          if (stokEntry) {
+            await stokEntry.increment('jumlah_stok', { by: existingProduk.kuantitas, transaction });
+          }
+
+          await existingProduk.destroy({ transaction });
+        }
+      }
+      return Array.from(updatedProdukList);
     } catch (error) {
-      throw new Error(`updateMany failed: ${error.message}`);
+      throw new Error(`Update Produk Penjualan failed`);
     }
   }
   
@@ -173,5 +179,13 @@ class ProdukPenjualanService {
     return true;  
   }  
 }  
-  
+
+// Helper function to determine field name and value dynamically
+function getFieldAndValue(produk) {
+  if (produk.packaging_id) return { fieldName: "packaging_id", fieldValue: produk.packaging_id };
+  if (produk.barang_custom_id) return { fieldName: "barang_custom_id", fieldValue: produk.barang_custom_id };
+  if (produk.barang_non_handmade_id) return { fieldName: "barang_non_handmade_id", fieldValue: produk.barang_non_handmade_id };
+  if (produk.barang_handmade_id) return { fieldName: "barang_handmade_id", fieldValue: produk.barang_handmade_id };
+  return { fieldName: null, fieldValue: null };
+}
 module.exports = ProdukPenjualanService;  
