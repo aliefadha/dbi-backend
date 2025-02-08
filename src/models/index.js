@@ -342,11 +342,6 @@ BiayaGudang.hasMany(BiayaOperasionalStaffGudang, {
     as: "biaya_staff"
 })
 
-BarangNonHandmadeGudang.hasMany(BarangProduksiGudang, {
-    foreignKey: "barang_id",
-    as: "barang_produksi"
-})
-
 KategoriBarang.hasMany(BarangCustom, {
     foreignKey: 'kategori_barang_id',
     as: "barang_custom"

@@ -80,6 +80,16 @@ const seedDatabase = async () => {
             isi: 10,
             is_deleted: false
         })
+
+        await BarangMentah.create({
+            barang_mentah_id: "MTH0002",
+            nama_barang: "Manik-Manik Huruf",
+            harga: 10000,
+            jumlah_minimum_stok: 10,
+            harga_satuan: 1000,
+            isi: 10,
+            is_deleted: false
+        })
         
 
         // Seed data for Penjualan
@@ -117,9 +127,6 @@ const seedDatabase = async () => {
 
         // // Penjualan
         // await Penjualan.create({ nama_pembeli: "Pembeli", metode_pembayaran_id: 1, sub_total: 10, diskon: 10, pajak: 10, total_penjualan: 10 })
-
-        // // Seed data for ProdukPenjualan  
-        // await ProdukPenjualan.create({ produk_penjualan_id: 1, penjualan_id: 1, barang_id: 1, kuantitas: 10, total_biaya: 100, cabang_id: 1 });
 
         console.log("Seed data created!");
     } catch (error) {

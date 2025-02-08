@@ -58,7 +58,7 @@ class BarangNonHandmadeGudangService {
 
       const allRincianBiaya = [
         ...defaultRincianBiaya,
-        ...rincian_biaya.map(biaya => ({
+        ...(Array.isArray(rincian_biaya) ? rincian_biaya : []).map(biaya => ({
           ...biaya,
           barang_nonhandmade_id: barangNonHandmadeGudang.barang_nonhandmade_id
         }))
