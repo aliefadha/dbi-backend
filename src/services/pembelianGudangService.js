@@ -16,7 +16,7 @@ class PembelianGudangService {
 
     try {
       const { produk, ...pembelianData } = data;
-      
+
       // Create the purchase record
       const pembelian = await PembelianGudang.create(pembelianData, {
         transaction
@@ -54,110 +54,35 @@ class PembelianGudangService {
           model: MetodePembayaranGudang,
           as: "metode_pembelian",
           attributes: ["nama_metode"]
-        },
-        {
-          model: ProdukPembelianGudang,
-          as: "produk",
-          attributes: {
-            exclude: ["is_deleted", "barang_mentah_id", "barang_nonhandmade_id", "barang_handmade_id", "packaging_id", "produk_pembelian_id", "pembelian_id"]
-          },
-          include: [
-            {
-              model: BarangNonHandmadeGudang,
-              as: "barang_nonhandmade",
-              attributes: ["image", "nama_barang", "harga_jual", "is_deleted"],
-              include: [
-                {
-                  model: KategoriBarangGudang,
-                  as: "kategori",
-                  attributes: ["nama_kategori_barang", "is_deleted"]
-                },
-                {
-                  model: JenisBarangGudang,
-                  as: "jenis",
-                  attributes: ["nama_jenis_barang", "is_deleted"]
-                }
-              ]
-            },
-            {
-              model: BarangHandmadeGudang,
-              as: "barang_handmade",
-              attributes: ["image", "nama_barang", "kategori_barang_id", "harga_jual", "is_deleted"],
-              include: [
-                {
-                  model: KategoriBarangGudang,
-                  as: "kategori",
-                  attributes: ["nama_kategori_barang", "is_deleted"]
-                },
-                {
-                  model: JenisBarangGudang,
-                  as: "jenis",
-                  attributes: ["nama_jenis_barang", "is_deleted"]
-                }
-              ]
-            },
-            {
-              model: BarangMentah,
-              as: "barang_mentah",
-              attributes: ["image", "nama_barang", "harga_satuan", "is_deleted"],
-            },
-            {
-              model: PackagingGudang,
-              as: "packaging",
-              attributes: ["image", "nama_packaging", "ukuran", "harga_satuan"]
-            },
-          ]
         }
       ]
     });
 
-    // Transform the data to include only the relevant product type
-    const transformedData = data.map(pembelian => {
+    const transformedData = await Promise.all(data.map(async (pembelian) => {
       const plainPembelian = pembelian.get({ plain: true });
       
-      if (plainPembelian.produk) {
-        plainPembelian.produk = plainPembelian.produk.map(produk => {
-          const transformedProduk = { ...produk };
-          
-          // Keep only the non-null product type
-          if (produk.barang_nonhandmade) {
-            delete transformedProduk.barang_mentah;
-            delete transformedProduk.packaging;
-            delete transformedProduk.barang_handmade;
-          } else if (produk.barang_mentah) {
-            delete transformedProduk.barang_nonhandmade;
-            delete transformedProduk.packaging;
-            delete transformedProduk.barang_handmade;
-          } else if (produk.packaging) {
-            delete transformedProduk.barang_nonhandmade;
-            delete transformedProduk.barang_mentah;
-            delete transformedProduk.barang_handmade;
-          } else if (produk.barang_handmade) {
-            delete transformedProduk.barang_nonhandmade;
-            delete transformedProduk.barang_mentah;
-            delete transformedProduk.packaging;
-          } 
-          else {
-            delete transformedProduk.barang_nonhandmade;
-            delete transformedProduk.barang_mentah;
-            delete transformedProduk.packaging;
-          }
-          
-          return transformedProduk;
-        });
-      }
-      
+      // Transform metode_pembelian to metode
+      plainPembelian.metode = plainPembelian.metode_pembelian.nama_metode;
+      delete plainPembelian.metode_pembelian;
+
+      // Get products using ProdukPembelianGudangService
+      const produk = await ProdukPembelianGudangService.getAllByPembelianId(pembelian.pembelian_id);
+      plainPembelian.produk = produk;
+
       return plainPembelian;
-    });
+    }));
 
     return transformedData;
   }
 
   static async getById(id) {
-    return await PembelianGudang.findOne({
+    const pembelianData = await PembelianGudang.findOne({
       where: {
         pembelian_id: id,
         is_deleted: false
+      },
+      attributes: {
+        exclude: ["is_deleted", "metode_id"]
       },
       include: [
         {
@@ -165,46 +90,99 @@ class PembelianGudangService {
           as: "metode_pembelian",
           attributes: ["nama_metode"]
         },
-        {
-          model: ProdukPembelianGudang,
-          as: "produk",
-          include: [
-            {
-              model: BarangNonHandmadeGudang,
-              as: "barang_nonhandmade",
-              attributes: ["image", "nama_barang", "kategori_barang_id", "jenis_barang_id", "harga_jual", "is_deleted"],
-              include: [
-                {
-                  model: KategoriBarangGudang,
-                  as: "kategori",
-                  attributes: ["nama_kategori_barang", "is_deleted"]
-                },
-                {
-                  model: JenisBarangGudang,
-                  as: "jenis",
-                  attributes: ["nama_jenis_barang", "is_deleted"]
-                }
-              ]
-            },
-            {
-              model: BarangMentah,
-              as: "barang_mentah",
-              attributes: ["image", "nama_barang", "harga_satuan", "is_deleted"],
-            },
-            {
-              model: PackagingGudang,
-              as: "packaging",
-              attributes: ["image", "nama_packaging", "ukuran", "harga_satuan"]
-            },
-          ]
-        }
       ]
-    });
+    })
+
+    if (pembelianData) {
+      const pembelian = pembelianData.get({ plain: true });
+      pembelian.metode_pembelian = pembelian.metode_pembelian.nama_metode;
+      delete pembelian.metode_pembelian;
+      
+      const produk = await ProdukPembelianGudangService.getAllByPembelianId(id);
+      pembelian.produk = produk;
+      return pembelian;
+    }
+    // return await PembelianGudang.findOne({
+    //   where: {
+    //     pembelian_id: id,
+    //     is_deleted: false
+    //   },
+    //   include: [
+    //     {
+    //       model: MetodePembayaranGudang,
+    //       as: "metode_pembelian",
+    //       attributes: ["nama_metode"]
+    //     },
+    //     {
+    //       model: ProdukPembelianGudang,
+    //       as: "produk",
+    //       include: [
+    //         {
+    //           model: BarangNonHandmadeGudang,
+    //           as: "barang_nonhandmade",
+    //           attributes: ["image", "nama_barang", "kategori_barang_id", "jenis_barang_id", "harga_jual", "is_deleted"],
+    //           include: [
+    //             {
+    //               model: KategoriBarangGudang,
+    //               as: "kategori",
+    //               attributes: ["nama_kategori_barang", "is_deleted"]
+    //             },
+    //             {
+    //               model: JenisBarangGudang,
+    //               as: "jenis",
+    //               attributes: ["nama_jenis_barang", "is_deleted"]
+    //             }
+    //           ]
+    //         },
+    //         {
+    //           model: BarangHandmadeGudang,
+    //           as: "barang_handmade",
+    //           attributes: ["image", "nama_barang", "kategori_barang_id", "jenis_barang_id", "harga_jual", "is_deleted"],
+    //           include: [
+    //             {
+    //               model: KategoriBarangGudang,
+    //               as: "kategori",
+    //               attributes: ["nama_kategori_barang", "is_deleted"]
+    //             },
+    //             {
+    //               model: JenisBarangGudang,
+    //               as: "jenis",
+    //               attributes: ["nama_jenis_barang", "is_deleted"]
+    //             }
+    //           ]
+    //         },
+    //         {
+    //           model: BarangMentah,
+    //           as: "barang_mentah",
+    //           attributes: ["image", "nama_barang", "harga_satuan", "is_deleted"],
+    //         },
+    //         {
+    //           model: PackagingGudang,
+    //           as: "packaging",
+    //           attributes: ["image", "nama_packaging", "ukuran", "harga_satuan"]
+    //         },
+    //       ]
+    //     }
+    //   ]
+    // });
+  }
+
+  static async getByIdProper(id) {
+    const pembelianData = await PembelianGudang.findOne({
+      where: {
+        pembelian_id: id,
+        is_deleted: false
+      }
+    })
+
+    if (pembelianData) {
+      const pembelian = pembelianData.get({ plain: true });
+    }
   }
 
   static async update(id, data) {
     const transaction = await sequelize.transaction();
-    
+
     try {
       const { produk, ...pembelianData } = data;
 
