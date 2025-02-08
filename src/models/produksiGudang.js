@@ -1,5 +1,6 @@
 const { DataTypes } = require("sequelize");  
 const sequelize = require("../config/database");  
+const Karyawan = require("./karyawan");
   
 const ProduksiGudang = sequelize.define("produksi_gudang", {  
   produksi_gudang_id: {  
@@ -7,6 +8,14 @@ const ProduksiGudang = sequelize.define("produksi_gudang", {
     allowNull: false,
     primaryKey: true,
     autoIncrement: true,
+  },
+  karyawan_id : {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: Karyawan,
+      key: "karyawan_id"
+    }
   },
   image: {
     type: DataTypes.STRING,
@@ -24,12 +33,15 @@ const ProduksiGudang = sequelize.define("produksi_gudang", {
     type: DataTypes.INTEGER,
   },
   status: {
-    type: DataTypes.BOOLEAN,
+    type: DataTypes.ENUM('terima', 'tolak', 'proses'),
+    defaultValue: 'proses',
+    allowNull: false
   },
   is_deleted: {
     type: DataTypes.BOOLEAN,
     defaultValue: false
   },
+
 },{
   timestamps: false
 });  
