@@ -10,13 +10,14 @@ class ProduksiGudangService {
   static async create(data) {
     const transaction = await sequelize.transaction();
     try {
-      const { jumlah_produksi, total_menit, image, tanggal, produk } = data;
+      const { jumlah_produksi, total_menit, image, tanggal, karyawan_id, produk } = data;
 
       const produksi = await ProduksiGudang.create({
         jumlah_produksi,
         total_menit,
         image,
         tanggal,
+        karyawan_id
       }, { transaction });
 
       if (produk && produk.length > 0) {
@@ -90,7 +91,7 @@ class ProduksiGudangService {
   static async update(id, data) {
     const transaction = await sequelize.transaction();
     try {
-      const { jumlah_produksi, total_menit, image, tanggal, status } = data;
+      const { jumlah_produksi, total_menit, image, tanggal, karyawan_id, status } = data;
 
       const produksiGudang = await ProduksiGudang.findOne({
         where: {
@@ -127,7 +128,8 @@ class ProduksiGudangService {
         total_menit,
         image,
         tanggal,
-        status
+        status,
+        karyawan_id
       }, { transaction });
 
       const bahanProduction = produksiGudang.produk.flatMap(item =>

@@ -82,27 +82,54 @@ class BarangNonHandmadeGudangController {
   
   static async update(req, res) {  
     try {  
-      const barangNonHandmadeGudang = await BarangNonHandmadeGudangService.update(req.params.id, req.body);  
-      if (!barangNonHandmadeGudang) {  
-        return res.status(404).json({  
-          success: false,  
-          data: null,  
-          message: "not found",  
-        });  
-      }  
-      res.status(200).json({  
-        success: true,  
-        data: barangNonHandmadeGudang,  
-        message: "updated successfully",  
-      });  
-    } catch (error) {  
-      res.status(400).json({  
-        success: false,  
-        data: null,  
-        message: error.message,  
-      });  
-    }  
-  }  
+      const existingBarangNonHandmadeGudang = await BarangNonHandmadeGudangService.getById(req.params.id);
+      if (!existingBarangNonHandmadeGudang) {
+        return res.status(404).json({
+          success: false,
+          data: null,
+          message: "not found",
+        });
+      }
+
+      const updatedData = { ...req.body };
+
+      // Check if a new file is uploaded
+      if (req.file) {
+        // Delete the old image file if it exists
+        if (existingBarangNonHandmadeGudang.image) {
+          const oldImagePath = path.join(__dirname, "../public/barangNonHandmadeGudang", existingBarangNonHandmadeGudang.image);
+          fs.unlink(oldImagePath, (err) => {
+            if (err) {
+              console.error("Failed to delete old image:", err);
+            }
+          });
+        }
+
+        updatedData.image = req.file.filename;
+      }
+
+      const barangNonHandmadeGudang = await BarangNonHandmadeGudangService.update(req.params.id, updatedData);
+      if (!barangNonHandmadeGudang) {
+        return res.status(404).json({
+          success: false,
+          data: null,
+          message: "not found",
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        data: barangNonHandmadeGudang,
+        message: "updated successfully",
+      });
+    } catch (error) {
+      res.status(400).json({
+        success: false,
+        data: null,
+        message: error.message,
+      });
+    }
+  }
   
   static async delete(req, res) {  
     try {  
