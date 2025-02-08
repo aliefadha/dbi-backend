@@ -53,7 +53,6 @@ class PembelianService {
             {
               model: Packaging,
               as: "packaging",
-              attributes: ["image", "nama_packaging", "ukuran", "harga_satuan"],
               attributes: ['nama_packaging']
             },
             {
@@ -66,6 +65,7 @@ class PembelianService {
       ]
     });  
   }  
+  
   
   static async getById(id) {  
     return await Pembelian.findOne({
