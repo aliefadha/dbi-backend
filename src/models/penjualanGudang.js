@@ -21,7 +21,7 @@ const PenjualanGudang = sequelize.define("penjualan_gudang", {
     references: {
       model: MetodePembayaranGudang,
       key: 'metode_id'
-    }
+    },
   },
   nama_pembeli: {
     type: DataTypes.STRING,

@@ -64,8 +64,6 @@ const ProdukPenjualanGudang = sequelize.define("produk_penjualan_gudang", {
     type: DataTypes.BOOLEAN,
     defaultValue: false
   }
-},{
-  timestamps: false
-});  
+},);  
   
 module.exports = ProdukPenjualanGudang;  
