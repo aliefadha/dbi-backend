@@ -76,7 +76,32 @@ class ProduksiGudangController {
       });  
     }  
   }  
+
+  static async getByKaryawanId(req, res) {  
+    try {  
+      const produksiGudang = await ProduksiGudangService.getByKaryawanId(req.params.id);  
+      if (!produksiGudang) {  
+        return res.status(404).json({  
+          success: false,  
+          data: null,  
+          message: "not found",  
+        });  
+      }  
+      res.status(200).json({  
+        success: true,  
+        data: produksiGudang,  
+        message: "retrieved successfully",  
+      });  
+    } catch (error) {  
+      res.status(500).json({  
+        success: false,  
+        data: null,  
+        message: error.message,  
+      });  
+    }  
+  }  
   
+
   static async update(req, res) {  
     try {  
       const existingProduksiGudang = await ProduksiGudangService.getById(req.params.id);

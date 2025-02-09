@@ -1,3 +1,4 @@
+const { Op } = require("sequelize");
 const { sequelize } = require("../models");
 const BarangHandmadeGudang = require("../models/barangHandmadeGudang");
 const BarangMentah = require("../models/barangMentah");
@@ -46,107 +47,68 @@ class PenjualanGudangService {
           model: MetodePembayaranGudang,
           as: "metode_pembayaran",
           attributes: ["nama_metode"]
-        },
-        {
-          model: ProdukPenjualanGudang,
-          as: "produk",
-          attributes: {
-            exclude: ["is_deleted", "barang_mentah_id", "barang_nonhandmade_id", "packaging_id", "barang_handmade_id", "produk_penjualan_id", "penjualan_id"]
-          },
-          include: [
-            {
-              model: BarangNonHandmadeGudang,
-              as: "barang_nonhandmade",
-              attributes: ["image", "nama_barang", "harga_jual", "is_deleted"],
-              include: [
-                {
-                  model: KategoriBarangGudang,
-                  as: "kategori",
-                  attributes: ["nama_kategori_barang", "is_deleted"]
-                },
-                {
-                  model: JenisBarangGudang,
-                  as: "jenis",
-                  attributes: ["nama_jenis_barang", "is_deleted"]
-                }
-              ]
-            },
-            {
-              model: BarangHandmadeGudang,
-              as: "barang_handmade",
-              attributes: ["image", "nama_barang", "kategori_barang_id", "harga_jual", "is_deleted"],
-              include: [
-                {
-                  model: KategoriBarangGudang,
-                  as: "kategori",
-                  attributes: ["nama_kategori_barang", "is_deleted"]
-                },
-                {
-                  model: JenisBarangGudang,
-                  as: "jenis",
-                  attributes: ["nama_jenis_barang", "is_deleted"]
-                }
-              ]
-            },
-            {
-              model: BarangMentah,
-              as: "barang_mentah",
-              attributes: ["image", "nama_barang", "harga_satuan", "is_deleted"],
-            },
-            {
-              model: PackagingGudang,
-              as: "packaging",
-              attributes: ["image", "nama_packaging", "ukuran", "harga_satuan"]
-            },
-          ]
         }
       ]
     });
 
-    // Transform the data to include only the relevant product type
-    const transformedData = data.map(penjualan => {
+    const transformedData = await Promise.all(data.map(async (penjualan) => {
       const plainPenjualan = penjualan.get({ plain: true });
       
-      if (plainPenjualan.produk) {
-        plainPenjualan.produk = plainPenjualan.produk.map(produk => {
-          const transformedProduk = { ...produk };
-          
-          // Keep only the non-null product type
-          if (produk.barang_nonhandmade) {
-            delete transformedProduk.barang_mentah;
-            delete transformedProduk.packaging;
-            delete transformedProduk.barang_handmade;
-          } else if (produk.barang_mentah) {
-            delete transformedProduk.barang_nonhandmade;
-            delete transformedProduk.packaging;
-            delete transformedProduk.barang_handmade;
-          } else if (produk.packaging) {
-            delete transformedProduk.barang_nonhandmade;
-            delete transformedProduk.barang_mentah;
-            delete transformedProduk.barang_handmade;
-          } else if (produk.barang_handmade) {
-            delete transformedProduk.barang_nonhandmade;
-            delete transformedProduk.barang_mentah;
-            delete transformedProduk.packaging;
-          } 
-          else {
-            delete transformedProduk.barang_nonhandmade;
-            delete transformedProduk.barang_mentah;
-            delete transformedProduk.packaging;
-          }
-          
-          return transformedProduk;
-        });
-      }
-      
+      // Transform metode_pembayaran to metode
+      plainPenjualan.metode = plainPenjualan.metode_pembayaran?.nama_metode || 'cash';
+      delete plainPenjualan.metode_pembayaran;
+
+      // Get products using ProdukPenjualanGudangService
+      const produk = await ProdukPenjualanGudangService.getAllByPenjualanId(penjualan.penjualan_id);
+      plainPenjualan.produk = produk;
+
       return plainPenjualan;
-    });
+    }));
 
     return transformedData;
   }
 
+  static async getAllByDate(startDate, endDate) {
+      const whereClause = {
+        is_deleted: false
+      };
+  
+      // Only add date filter if both dates are provided
+      if (startDate && endDate) {
+        whereClause.tanggal = {
+          [Op.between]: [startDate, endDate]
+        };
+      }
+  
+      const data = await PenjualanGudang.findAll({
+        where: whereClause,
+        attributes: {
+          exclude: ["is_deleted", "metode_id"]
+        },
+        include: [
+          {
+            model: MetodePembayaranGudang,
+            as: "metode_pembayaran",
+            attributes: ["nama_metode"]
+          }
+        ]
+      });
+  
+      const transformedData = await Promise.all(data.map(async (penjualan) => {
+        const plainPenjualan = penjualan.get({ plain: true });
+        // Transform metode_pembayaran to metode
+        plainPenjualan.metode = plainPenjualan.metode_pembayaran?.nama_metode || 'cash';
+        delete plainPenjualan.metode_pembayaran;
+        // Get products using ProdukPenjualanGudangService
+        const produk = await ProdukPenjualanGudangService.getAllByPenjualanId(penjualan.penjualan_id);
+        plainPenjualan.produk = produk;
+        return plainPenjualan;
+      }));
+      return transformedData;
+    }
+
   static async getById(id) {
-    const data = await PenjualanGudang.findOne({
+    const penjualanData = await PenjualanGudang.findOne({
       where: {
         penjualan_id: id,
         is_deleted: false
@@ -160,97 +122,18 @@ class PenjualanGudangService {
           as: "metode_pembayaran",
           attributes: ["nama_metode"]
         },
-        {
-          model: ProdukPenjualanGudang,
-          as: "produk",
-          attributes: {
-            exclude: ["is_deleted", "barang_mentah_id", "barang_nonhandmade_id", "packaging_id", "barang_handmade_id", "produk_penjualan_id", "penjualan_id"]
-          },
-          include: [
-            {
-              model: BarangNonHandmadeGudang,
-              as: "barang_nonhandmade",
-              attributes: ["image", "nama_barang", "harga_jual", "is_deleted"],
-              include: [
-                {
-                  model: KategoriBarangGudang,
-                  as: "kategori",
-                  attributes: ["nama_kategori_barang", "is_deleted"]
-                },
-                {
-                  model: JenisBarangGudang,
-                  as: "jenis",
-                  attributes: ["nama_jenis_barang", "is_deleted"]
-                }
-              ]
-            },
-            {
-              model: BarangHandmadeGudang,
-              as: "barang_handmade",
-              attributes: ["image", "nama_barang", "kategori_barang_id", "harga_jual", "is_deleted"],
-              include: [
-                {
-                  model: KategoriBarangGudang,
-                  as: "kategori",
-                  attributes: ["nama_kategori_barang", "is_deleted"]
-                },
-                {
-                  model: JenisBarangGudang,
-                  as: "jenis",
-                  attributes: ["nama_jenis_barang", "is_deleted"]
-                }
-              ]
-            },
-            {
-              model: BarangMentah,
-              as: "barang_mentah",
-              attributes: ["image", "nama_barang", "harga_satuan", "is_deleted"],
-            },
-            {
-              model: PackagingGudang,
-              as: "packaging",
-              attributes: ["image", "nama_packaging", "ukuran", "harga_satuan"]
-            },
-          ]
-        }
       ]
     });
 
-    if (!data) return null;
-
-    const plainData = data.get({ plain: true });
-    
-    if (plainData.produk) {
-      plainData.produk = plainData.produk.map(produk => {
-        const transformedProduk = { ...produk };
-        
-        if (produk.barang_nonhandmade) {
-          delete transformedProduk.barang_mentah;
-          delete transformedProduk.packaging;
-          delete transformedProduk.barang_handmade;
-        } else if (produk.barang_mentah) {
-          delete transformedProduk.barang_nonhandmade;
-          delete transformedProduk.packaging;
-          delete transformedProduk.barang_handmade;
-        } else if (produk.packaging) {
-          delete transformedProduk.barang_nonhandmade;
-          delete transformedProduk.barang_mentah;
-          delete transformedProduk.barang_handmade;
-        } else if (produk.barang_handmade) {
-          delete transformedProduk.barang_nonhandmade;
-          delete transformedProduk.barang_mentah;
-          delete transformedProduk.packaging;
-        } else {
-          delete transformedProduk.barang_nonhandmade;
-          delete transformedProduk.barang_mentah;
-          delete transformedProduk.packaging;
-        }
-        
-        return transformedProduk;
-      });
+    if (penjualanData) {
+      const penjualan = penjualanData.get({ plain: true });
+      penjualan.metode = penjualan.metode_pembayaran?.nama_metode || 'cash';
+      delete penjualan.metode_pembayaran;
+      
+      const produk = await ProdukPenjualanGudangService.getAllByPenjualanId(id);
+      penjualan.produk = produk;
+      return penjualan;
     }
-
-    return plainData;
   }
 
   static async update(id, data) {
@@ -271,13 +154,16 @@ class PenjualanGudangService {
       await penjualanGudang.update(penjualanData, { transaction });
 
       if (produk && Array.isArray(produk)) {
-        // Update or create new produk
-        const produkData = produk.map(item => ({
-          ...item,
-          penjualan_id: id
-        }));
+        // Update or create new produk with all transaction details
+        const produkWithDetails = {
+          penjualan_id: id,  // Pass the penjualan_id
+          produk: produk.map(item => ({
+            ...item,
+            penjualan_id: id  // Add penjualan_id to each product
+          }))
+        };
 
-        await ProdukPenjualanGudangService.updateMany(produkData, { transaction });
+        await ProdukPenjualanGudangService.updateMany(produkWithDetails, { transaction });
       }
 
       await transaction.commit();
@@ -296,6 +182,7 @@ class PenjualanGudangService {
     await penjualanGudang.save();
     return true;
   }
+
 }
 
 module.exports = PenjualanGudangService;

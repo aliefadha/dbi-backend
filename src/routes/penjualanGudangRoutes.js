@@ -4,6 +4,7 @@ const PenjualanGudangController = require('../controllers/penjualanGudangControl
 
 router.post('/penjualan-gudang', PenjualanGudangController.create);  
 router.get('/penjualan-gudang', PenjualanGudangController.getAll);  
+router.get('/penjualan-gudang/date', PenjualanGudangController.getAllByDate);
 router.get('/penjualan-gudang/:id', PenjualanGudangController.getById);  
 router.put('/penjualan-gudang/:id', PenjualanGudangController.update);  
 router.delete('/penjualan-gudang/:id', PenjualanGudangController.delete);  

@@ -43,6 +43,24 @@ class PembelianGudangController {
       });
     }
   }
+  
+  static async getAllByDate(req, res) {
+    const { startDate, endDate } = req.query;
+    try {
+      const pembelianGudangs = await PembelianGudangService.getAllByDate(startDate, endDate);
+      res.status(200).json({
+        success: true,
+        data: pembelianGudangs,
+        message: "retrieved successfully",
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        data: null,
+        message: error.message,
+      });
+    }
+  }
 
   static async getById(req, res) {
     try {

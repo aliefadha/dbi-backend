@@ -1,14 +1,8 @@
-const BarangHandmadeGudang = require("../models/barangHandmadeGudang");
-const BarangMentah = require("../models/barangMentah");
-const BarangNonHandmadeGudang = require("../models/barangNonHandmadeGudang");
-const JenisBarangGudang = require("../models/jenisBarangGudang");
-const KategoriBarangGudang = require("../models/kategoriBarangGudang");
 const MetodePembayaranGudang = require("../models/metodePembayaranGudang");
-const PackagingGudang = require("../models/packagingGudang");
 const PembelianGudang = require("../models/pembelianGudang");
-const ProdukPembelianGudang = require("../models/produkPembelianGudang");
 const { sequelize } = require("../models");
 const ProdukPembelianGudangService = require("./produkPembelianGudangService");
+const { Op } = require("sequelize");
 
 class PembelianGudangService {
   static async create(data) {
@@ -62,7 +56,7 @@ class PembelianGudangService {
       const plainPembelian = pembelian.get({ plain: true });
       
       // Transform metode_pembelian to metode
-      plainPembelian.metode = plainPembelian.metode_pembelian.nama_metode;
+      plainPembelian.metode = plainPembelian.metode_pembelian?.nama_metode || 'cash';
       delete plainPembelian.metode_pembelian;
 
       // Get products using ProdukPembelianGudangService
@@ -95,89 +89,14 @@ class PembelianGudangService {
 
     if (pembelianData) {
       const pembelian = pembelianData.get({ plain: true });
-      pembelian.metode_pembelian = pembelian.metode_pembelian.nama_metode;
+      pembelian.metode = pembelian.metode_pembelian?.nama_metode || 'cash';
       delete pembelian.metode_pembelian;
       
       const produk = await ProdukPembelianGudangService.getAllByPembelianId(id);
       pembelian.produk = produk;
       return pembelian;
     }
-    // return await PembelianGudang.findOne({
-    //   where: {
-    //     pembelian_id: id,
-    //     is_deleted: false
-    //   },
-    //   include: [
-    //     {
-    //       model: MetodePembayaranGudang,
-    //       as: "metode_pembelian",
-    //       attributes: ["nama_metode"]
-    //     },
-    //     {
-    //       model: ProdukPembelianGudang,
-    //       as: "produk",
-    //       include: [
-    //         {
-    //           model: BarangNonHandmadeGudang,
-    //           as: "barang_nonhandmade",
-    //           attributes: ["image", "nama_barang", "kategori_barang_id", "jenis_barang_id", "harga_jual", "is_deleted"],
-    //           include: [
-    //             {
-    //               model: KategoriBarangGudang,
-    //               as: "kategori",
-    //               attributes: ["nama_kategori_barang", "is_deleted"]
-    //             },
-    //             {
-    //               model: JenisBarangGudang,
-    //               as: "jenis",
-    //               attributes: ["nama_jenis_barang", "is_deleted"]
-    //             }
-    //           ]
-    //         },
-    //         {
-    //           model: BarangHandmadeGudang,
-    //           as: "barang_handmade",
-    //           attributes: ["image", "nama_barang", "kategori_barang_id", "jenis_barang_id", "harga_jual", "is_deleted"],
-    //           include: [
-    //             {
-    //               model: KategoriBarangGudang,
-    //               as: "kategori",
-    //               attributes: ["nama_kategori_barang", "is_deleted"]
-    //             },
-    //             {
-    //               model: JenisBarangGudang,
-    //               as: "jenis",
-    //               attributes: ["nama_jenis_barang", "is_deleted"]
-    //             }
-    //           ]
-    //         },
-    //         {
-    //           model: BarangMentah,
-    //           as: "barang_mentah",
-    //           attributes: ["image", "nama_barang", "harga_satuan", "is_deleted"],
-    //         },
-    //         {
-    //           model: PackagingGudang,
-    //           as: "packaging",
-    //           attributes: ["image", "nama_packaging", "ukuran", "harga_satuan"]
-    //         },
-    //       ]
-    //     }
-    //   ]
-    // });
-  }
-
-  static async getByIdProper(id) {
-    const pembelianData = await PembelianGudang.findOne({
-      where: {
-        pembelian_id: id,
-        is_deleted: false
-      }
-    })
-
-    if (pembelianData) {
-      const pembelian = pembelianData.get({ plain: true });
-    }
+    
   }
 
   static async update(id, data) {
@@ -222,6 +141,45 @@ class PembelianGudangService {
     if (!pembelianGudang) return null;
     await pembelianGudang.update({ is_deleted: true });
     return true;
+  }
+
+  static async getAllByDate(startDate, endDate) {
+    const whereClause = {
+      is_deleted: false
+    };
+
+    // Only add date filter if both dates are provided
+    if (startDate && endDate) {
+      whereClause.tanggal = {
+        [Op.between]: [startDate, endDate]
+      };
+    }
+
+    const data = await PembelianGudang.findAll({
+      where: whereClause,
+      attributes: {
+        exclude: ["is_deleted", "metode_id"]
+      },
+      include: [
+        {
+          model: MetodePembayaranGudang,
+          as: "metode_pembelian",
+          attributes: ["nama_metode"]
+        }
+      ]
+    });
+
+    const transformedData = await Promise.all(data.map(async (pembelian) => {
+      const plainPembelian = pembelian.get({ plain: true });
+      // Transform metode_pembelian to metode
+      plainPembelian.metode = plainPembelian.metode_pembelian?.nama_metode || 'cash';
+      delete plainPembelian.metode_pembelian;
+      // Get products using ProdukPembelianGudangService
+      const produk = await ProdukPembelianGudangService.getAllByPembelianId(pembelian.pembelian_id);
+      plainPembelian.produk = produk;
+      return plainPembelian;
+    }));
+    return transformedData;
   }
 }
 

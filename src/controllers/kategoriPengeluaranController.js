@@ -1,12 +1,12 @@
-const ProdukPenjualanGudangService = require("../services/produkPenjualanGudangService");  
+const KategoriPengeluaranService = require("../services/kategoriPengeluaranService");  
   
-class ProdukPenjualanGudangController {  
+class KategoriPengeluaranController {  
   static async create(req, res) {  
     try {  
-      const produkPenjualanGudang = await ProdukPenjualanGudangService.create(req.body);  
+      const kategoriPengeluaran = await KategoriPengeluaranService.create(req.body);  
       res.status(201).json({  
         success: true,  
-        data: produkPenjualanGudang,  
+        data: kategoriPengeluaran,  
         message: "created successfully",  
       });  
     } catch (error) {  
@@ -20,10 +20,10 @@ class ProdukPenjualanGudangController {
   
   static async getAll(req, res) {  
     try {  
-      const produkPenjualanGudangs = await ProdukPenjualanGudangService.getAll();  
+      const kategoriPengeluarans = await KategoriPengeluaranService.getAll();  
       res.status(200).json({  
         success: true,  
-        data: produkPenjualanGudangs,  
+        data: kategoriPengeluarans,  
         message: "retrieved successfully",  
       });  
     } catch (error) {  
@@ -37,8 +37,8 @@ class ProdukPenjualanGudangController {
   
   static async getById(req, res) {  
     try {  
-      const produkPenjualanGudang = await ProdukPenjualanGudangService.getById(req.params.id);  
-      if (!produkPenjualanGudang) {  
+      const kategoriPengeluaran = await KategoriPengeluaranService.getById(req.params.id);  
+      if (!kategoriPengeluaran) {  
         return res.status(404).json({  
           success: false,  
           data: null,  
@@ -47,7 +47,7 @@ class ProdukPenjualanGudangController {
       }  
       res.status(200).json({  
         success: true,  
-        data: produkPenjualanGudang,  
+        data: kategoriPengeluaran,  
         message: "retrieved successfully",  
       });  
     } catch (error) {  
@@ -61,8 +61,8 @@ class ProdukPenjualanGudangController {
   
   static async update(req, res) {  
     try {  
-      const produkPenjualanGudang = await ProdukPenjualanGudangService.update(req.params.id, req.body);  
-      if (!produkPenjualanGudang) {  
+      const kategoriPengeluaran = await KategoriPengeluaranService.update(req.params.id, req.body);  
+      if (!kategoriPengeluaran) {  
         return res.status(404).json({  
           success: false,  
           data: null,  
@@ -71,7 +71,7 @@ class ProdukPenjualanGudangController {
       }  
       res.status(200).json({  
         success: true,  
-        data: produkPenjualanGudang,  
+        data: kategoriPengeluaran,  
         message: "updated successfully",  
       });  
     } catch (error) {  
@@ -85,7 +85,7 @@ class ProdukPenjualanGudangController {
   
   static async delete(req, res) {  
     try {  
-      const deleted = await ProdukPenjualanGudangService.delete(req.params.id);  
+      const deleted = await KategoriPengeluaranService.delete(req.params.id);  
       if (!deleted) {  
         return res.status(404).json({  
           success: false,  
@@ -105,49 +105,7 @@ class ProdukPenjualanGudangController {
         message: error.message,  
       });  
     }  
-  } 
-
-  static async getAllTerlaris(req, res) {
-    try {
-      const { startDate, endDate } = req.query;
-      const produkTerlaris = await ProdukPenjualanGudangService.getAllTerlaris(
-        startDate? new Date(startDate) : null,
-        endDate? new Date(endDate) : null
-      );
-      res.status(200).json({
-        success: true,
-        data: produkTerlaris,
-        message: "retrieved successfully",
-      });
-    } catch (error) {
-      res.status(500).json({
-        success: false,
-        data: null,
-        message: error.message,
-      });
-    }
-  }
-
-  static async getTopten(req, res) {
-    try {
-      const { startDate, endDate } = req.query;
-      const produkTopten = await ProdukPenjualanGudangService.getTopTenTerlaris(
-        startDate? new Date(startDate) : null,
-        endDate? new Date(endDate) : null
-      );
-      res.status(200).json({
-        success: true,
-        data: produkTopten,
-        message: "retrieved successfully",
-      });
-    } catch (error) {
-      res.status(500).json({
-        success: false,
-        data: null,
-        message: error.message,
-      });
-    }
-  }
+  }  
 }  
   
-module.exports = ProdukPenjualanGudangController;
+module.exports = KategoriPengeluaranController;  

@@ -88,6 +88,32 @@ class ProduksiGudangService {
     });
   }
 
+  static async getByKaryawanId(karyawan_id) {
+    return await ProduksiGudang.findAll({
+      where: {
+        karyawan_id: karyawan_id,
+        is_deleted: false
+      },
+      include: [
+        {
+          model: BarangProduksiGudang,
+          as: "produk",
+          attributes: ["jumlah"],
+          include: [
+            {
+              model: BarangHandmadeGudang,
+              as: "barang",
+              where: {
+                is_deleted: false
+              },
+              attributes: ["barang_handmade_id", "nama_barang"]
+            }
+          ]
+        }
+      ]
+    });
+  }
+
   static async update(id, data) {
     const transaction = await sequelize.transaction();
     try {

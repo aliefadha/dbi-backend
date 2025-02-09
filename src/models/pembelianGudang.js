@@ -21,7 +21,8 @@ const PembelianGudang = sequelize.define("pembelian_gudang", {
     references: {
       model: MetodePembayaranGudang,
       key: 'metode_id'
-    }
+    },
+    allowNull: true,
   },
   catatan: {
     type: DataTypes.TEXT,
