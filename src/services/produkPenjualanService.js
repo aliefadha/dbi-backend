@@ -54,7 +54,7 @@ class ProdukPenjualanService {
 
       return createdProdukList;
     } catch (error) {
-      throw new Error(`Produk Penjualan failed`);
+      throw new Error(`Produk Penjualan failed: ${error.message}`);
     }
   }
   
@@ -168,7 +168,7 @@ class ProdukPenjualanService {
       }
       return Array.from(updatedProdukList);
     } catch (error) {
-      throw new Error(`Update Produk Penjualan failed`);
+      throw new Error(`Update Produk Penjualan failed: ${error.message}`);
     }
   }
   

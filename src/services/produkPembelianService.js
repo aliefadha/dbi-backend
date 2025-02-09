@@ -60,7 +60,7 @@ class ProdukPembelianService {
   
       return createdProdukList;
     } catch (error) {
-      throw new Error(`Failed to create produk Pembelian`);
+      throw new Error(`Failed to create produk Pembelian: ${error.message}`);
     }
   }
   
@@ -175,7 +175,7 @@ class ProdukPembelianService {
 
         return Array.from(updatedProdukList);
     } catch (error) {
-        throw new Error(`Failed to Updated produk Pembelian`);
+        throw new Error(`Failed to Updated produk Pembelian: ${error.message}`);
     }
 }
 
