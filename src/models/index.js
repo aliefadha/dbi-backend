@@ -762,6 +762,16 @@ RincianBiayaCustom.belongsTo(Penjualan, {
     foreignKey: "penjualan_id",
     as: "penjualan",
 })
+
+Cabang.hasMany(Penjualan, {
+    foreignKey: "cabang_id",
+    as: "penjualan"
+})
+
+Penjualan.belongsTo(Cabang, {
+    foreignKey: "cabang_id",
+    as: "cabang"
+})
 // Sync models with the database  
 const syncDatabase = async () => {
     try {

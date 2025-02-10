@@ -26,7 +26,8 @@ class PenjualanController {
   
   static async getAll(req, res) {  
     try {  
-      const penjualans = await PenjualanService.getAll();  
+      const {bulan, tahun, cabang} = req.query;
+      const penjualans = await PenjualanService.getAll(bulan, tahun, cabang);  
       res.status(200).json({  
         success: true,  
         data: penjualans,  
