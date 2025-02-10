@@ -45,7 +45,8 @@ class ProdukPenjualanService {
         });
        
         if (!stokEntry || stokEntry.jumlah_stok < kuantitas) {
-          throw new Error(`Not enough stock for this product`);
+          const availableStock = stokEntry ? stokEntry.jumlah_stok : 0;
+          throw new Error(`Not enough stock for this product: ${fieldValue}. Available: ${availableStock}`);
         }
 
         // Decrease stock if there is enough
@@ -135,6 +136,7 @@ class ProdukPenjualanService {
         });
 
         if (stokEntry && stokEntry.jumlah_stok < difference) {
+          const availableStock = stokEntry.jumlah_stok ? stokEntry.jumlah_stok : 0;
           throw new Error(`Not enough stock for this product`);
         }
 

@@ -399,7 +399,7 @@ BarangHandmadeGudang.hasMany(BarangProduksiGudang, {
 })
 
 Pembelian.belongsTo(MetodePembayaran, {
-    foreignKey: "metode_pembayaran_id",
+    foreignKey: "metode_id",
     as: "metode_pembayaran"
 })
 

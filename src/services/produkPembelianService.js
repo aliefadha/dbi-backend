@@ -1,3 +1,10 @@
+const BarangCustom = require("../models/barangCustom");
+const BarangHandmade = require("../models/barangHandmade");
+const BarangNonHandmade = require("../models/barangNonHandmade");
+const Cabang = require("../models/cabang");
+const JenisBarang = require("../models/jenisBarang");
+const KategoriBarang = require("../models/kategoriBarang");
+const Packaging = require("../models/packaging");
 const ProdukPembelian = require("../models/produkPembelian");  
 const StokBarang = require("../models/stokBarang");
 
@@ -80,6 +87,95 @@ class ProdukPembelianService {
       }
     });  
   }  
+
+  static async getAllByPembelianId(pembelianId) {  
+    const produk = await ProdukPembelian.findAll({
+      where: {
+        pembelian_id: pembelianId,
+        is_deleted: false
+      },
+      attributes: {
+        exclude: ["is_deleted","pembelian_id","cabang_id","barang_handmade_id","barang_non_handmade_id","packaging_id","barang_custom_id","produk_pembelian_id"]
+      },
+      include: [
+        {
+          model: Cabang,
+          as: "cabang",
+          attributes: ["nama_cabang"]
+        },
+        {
+          model: BarangHandmade,
+          as: "barang_handmade",
+          attributes: ["image", "barang_handmade_id", "nama_barang", "jumlah_minimum_stok"],
+          include: [
+            {
+              model: JenisBarang,
+              as: "jenis_barang",
+              attributes: ["nama_jenis_barang"]
+            },
+            {
+              model: KategoriBarang,
+              as: "kategori_barang",
+              attributes: ["nama_kategori_barang"]
+            }
+          ]
+        },
+        {
+          model: BarangNonHandmade,
+          as: "barang_non_handmade",
+          attributes: ["image", "barang_non_handmade_id", "nama_barang", "jumlah_minimum_stok"],
+          include: [
+            {
+              model: JenisBarang,
+              as: "jenis",
+              attributes: ["nama_jenis_barang"]
+            },
+            {
+              model: KategoriBarang,
+              as: "kategori",
+              attributes: ["nama_kategori_barang"]
+            }
+          ]
+        },
+        {
+          model: Packaging,
+          as: "packaging",
+          attributes: ["image", "nama_packaging", "ukuran", "harga_satuan"],
+          include: [
+            {
+              model: JenisBarang,
+              as: "jenis_barang",
+              attributes: ["nama_jenis_barang"]
+            },
+            {
+              model: KategoriBarang,
+              as: "kategori_barang",
+              attributes: ["nama_kategori_barang"]
+            }
+          ]
+        },
+        {
+          model: BarangCustom,
+          as: "barang_custom",
+          attributes: ["image", "barang_custom_id", "nama_barang", "harga_satuan", "jumlah_minimum_stok"],
+          include: [
+            {
+              model: JenisBarang,
+              as: "jenis_barang",
+              attributes: ["nama_jenis_barang"]
+            },
+            {
+              model: KategoriBarang,
+              as: "kategori",
+              attributes: ["nama_kategori_barang"]
+            }
+          ]
+        }
+      ]
+    });
+
+    return produk;
+  }
   
   static async update(id, data) {  
     const produkPembelian = await ProdukPembelian.findByPk(id);  
