@@ -1,3 +1,9 @@
+const BarangCustom = require("../models/barangCustom");
+const BarangHandmade = require("../models/barangHandmade");
+const BarangNonHandmade = require("../models/barangNonHandmade");
+const JenisBarang = require("../models/jenisBarang");
+const KategoriBarang = require("../models/kategoriBarang");
+const Packaging = require("../models/packaging");
 const ProdukPenjualan = require("../models/produkPenjualan");  
 const StokBarang = require("../models/stokBarang");
   
@@ -45,7 +51,8 @@ class ProdukPenjualanService {
         });
        
         if (!stokEntry || stokEntry.jumlah_stok < kuantitas) {
-          throw new Error(`Not enough stock for this product`);
+          const availableStock = stokEntry ? stokEntry.jumlah_stok : 0;
+          throw new Error(`Not enough stock for this product: ${fieldValue}. Available: ${availableStock}`);
         }
 
         // Decrease stock if there is enough
@@ -54,7 +61,7 @@ class ProdukPenjualanService {
 
       return createdProdukList;
     } catch (error) {
-      throw new Error(`Produk Penjualan failed`);
+      throw new Error(`Produk Penjualan failed: ${error.message}`);
     }
   }
   
@@ -135,6 +142,7 @@ class ProdukPenjualanService {
         });
 
         if (stokEntry && stokEntry.jumlah_stok < difference) {
+          const availableStock = stokEntry.jumlah_stok ? stokEntry.jumlah_stok : 0;
           throw new Error(`Not enough stock for this product`);
         }
 
@@ -168,7 +176,7 @@ class ProdukPenjualanService {
       }
       return Array.from(updatedProdukList);
     } catch (error) {
-      throw new Error(`Update Produk Penjualan failed`);
+      throw new Error(`Update Produk Penjualan failed: ${error.message}`);
     }
   }
   
@@ -178,6 +186,83 @@ class ProdukPenjualanService {
     await produkPenjualan.update({ is_deleted: true });  
     return true;  
   }  
+
+  static async getAllByPenjualanId(penjualanId) {
+    const produk = await ProdukPenjualan.findAll({
+      where: {
+        penjualan_id: penjualanId,
+        is_deleted: false
+      },
+      attributes: {
+        exclude: ["is_deleted","penjualan_id","cabang_id","barang_handmade_id","barang_non_handmade_id","packaging_id","barang_custom_id","produk_penjualan_id"]
+      },
+      include: [
+        {
+          model: BarangHandmade,
+          as: "barang_handmade",
+          include: [
+            {
+              model: KategoriBarang,
+              as: "kategori_barang",
+              attributes: ["nama_kategori_barang"]
+            },
+            {
+              model: JenisBarang,
+              as: "jenis_barang",
+              attributes: ["nama_jenis_barang"]
+            }
+          ]
+        },
+        {
+          model: BarangNonHandmade,
+          as: "barang_non_handmade",
+          include: [
+            {
+              model: KategoriBarang,
+              as: "kategori",
+              attributes: ["nama_kategori_barang"]
+            },
+            {
+              model: JenisBarang,
+              as: "jenis",
+              attributes: ["nama_jenis_barang"]
+            }
+          ]
+        },
+        {
+          model: Packaging,
+          as: "packaging",
+          include: [
+            {
+              model: JenisBarang,
+              as: "jenis_barang",
+              attributes: ["nama_jenis_barang"]
+            },
+            {
+              model: KategoriBarang,
+              as: "kategori_barang",
+              attributes: ["nama_kategori_barang"]  
+            }
+          ]
+        },
+        {
+          model: BarangCustom,
+          as: "barang_custom",
+          include: [
+            {
+              model: JenisBarang,
+              as: "jenis_barang"
+            },
+            {
+              model: KategoriBarang,
+              as: "kategori"
+            }
+          ]
+        }
+      ]
+    });
+    return produk;
+  }
 }  
 
 // Helper function to determine field name and value dynamically

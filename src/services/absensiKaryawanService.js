@@ -28,6 +28,17 @@ class AbsensiKaryawanService {
   
     return await AbsensiKaryawan.create(data); 
   }  
+
+  static async getAllByKaryawan(karyawanId) {
+    return await AbsensiKaryawan.findAll({
+      where: {
+        karyawan_id: karyawanId
+      },
+      attributes: {
+        exclude: ['createdAt', 'updatedAt', 'gaji_pokok_perhari']
+      }
+    });
+  }
   
   static async getAll(bulan, tahun) {  
       const karyawanList = await Karyawan.findAll();  

@@ -53,6 +53,24 @@ class AbsensiKaryawanController {
       });  
     }  
   }  
+
+  static async getAllByKaryawan(req, res) {  
+    try {  
+      const { karyawanId } = req.query;
+      const absensiKaryawans = await AbsensiKaryawanService.getAllByKaryawan(karyawanId);  
+      res.status(200).json({  
+        success: true,  
+        data: absensiKaryawans,  
+        message: "retrieved successfully",  
+      });  
+    } catch (error) {  
+      res.status(500).json({  
+        success: false,  
+        data: null,  
+        message: error.message,  
+      });  
+    }  
+  }
   
   static async getById(req, res) {  
     try {  

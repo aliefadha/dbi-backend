@@ -15,6 +15,7 @@ const BiayaOperasionalStaffGudang = require('./biayaOperasionalStaffGudang');
 const BiayaOperasionalProduksiGudang = require('./biayaOperasionalProduksiGudang');
 const BiayaGudang = require('./biayaGudang');
 const BarangHandmade = require('./barangHandmade');
+const Authentication = require('./authentication');
 
 const seedDatabase = async () => {
     try {
@@ -127,6 +128,13 @@ const seedDatabase = async () => {
 
         // // Penjualan
         // await Penjualan.create({ nama_pembeli: "Pembeli", metode_pembayaran_id: 1, sub_total: 10, diskon: 10, pajak: 10, total_penjualan: 10 })
+
+        // Authentication
+        await Authentication.create({ email: "owner@gmail.com", password: 12345678 });
+        await Authentication.create({ email: "finance@gmail.com", password: 12345678 });
+        await Authentication.create({ email: "manager@gmail.com", password: 12345678 });
+        await Authentication.create({ email: "headgudang@gmail.com", password: 12345678 });
+        await Authentication.create({ email: "admingudang@gmail.com", password: 12345678 });
 
         console.log("Seed data created!");
     } catch (error) {

@@ -399,7 +399,7 @@ BarangHandmadeGudang.hasMany(BarangProduksiGudang, {
 })
 
 Pembelian.belongsTo(MetodePembayaran, {
-    foreignKey: "metode_pembayaran_id",
+    foreignKey: "metode_id",
     as: "metode_pembayaran"
 })
 
@@ -761,6 +761,16 @@ Penjualan.hasMany(RincianBiayaCustom, {
 RincianBiayaCustom.belongsTo(Penjualan, {
     foreignKey: "penjualan_id",
     as: "penjualan",
+})
+
+Cabang.hasMany(Penjualan, {
+    foreignKey: "cabang_id",
+    as: "penjualan"
+})
+
+Penjualan.belongsTo(Cabang, {
+    foreignKey: "cabang_id",
+    as: "cabang"
 })
 // Sync models with the database  
 const syncDatabase = async () => {

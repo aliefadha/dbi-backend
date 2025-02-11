@@ -1,16 +1,11 @@
+const { Op } = require("sequelize");
 const { sequelize } = require("../models");
-const BarangCustom = require("../models/barangCustom");
-const BarangHandmade = require("../models/barangHandmade");
-const BarangNonHandmade = require("../models/barangNonHandmade");
-const JenisBarang = require("../models/jenisBarang");
-const KategoriBarang = require("../models/kategoriBarang");
 const MetodePembayaran = require("../models/metodePembayaran");
-const Packaging = require("../models/packaging");
 const Penjualan = require("../models/penjualan");  
-const ProdukPenjualan = require("../models/produkPenjualan");
 const RincianBiayaCustom = require("../models/rincianBiayaCustom");
 const ProdukPenjualanService = require("./produkPenjualanService");
 const RincianBiayaCustomService = require("./rincianBiayaCustomService");
+const Cabang = require("../models/cabang");
   
 class PenjualanService {  
   static async create(data) {  
@@ -43,100 +38,95 @@ class PenjualanService {
     }    
   }  
   
-  static async getAll() {  
-    return await Penjualan.findAll({
-      where: {
-        is_deleted: false
+  static async getAll(bulan, tahun, cabang) {  
+    const startDate = new Date(tahun, bulan-1, 1);
+    const endDate = new Date(tahun, bulan, 0);
+
+    const whereConditions = {
+      is_deleted: false,
+      tanggal: {
+        [Op.between]: [startDate, endDate]
       }
+    };
+
+    if (cabang) {
+      whereConditions.cabang_id = cabang;
+    }
+
+    const data = await Penjualan.findAll({
+      where: whereConditions,
+      attributes: {
+        exclude: ["is_deleted", "createdAt", "updatedAt"]
+      },
+      include: [
+        {
+          model: Cabang,
+          as: "cabang",
+          attributes: ["nama_cabang"]
+        },
+        {
+          model: MetodePembayaran,
+          as: "metode_pembayaran",
+          attributes: ["nama_metode"]
+        },
+        {
+          model: RincianBiayaCustom,
+          as: "rincian_biaya_custom",
+          attributes: ["nama_biaya","jumlah_biaya"]
+        }
+      ],
+      order: [
+        ['tanggal', 'DESC']
+      ]
     });  
+
+    const transformedData = await Promise.all(data.map(async (penjualan) => {
+        const plainPenjualan = penjualan.get({ plain:true });
+
+        const produk = await ProdukPenjualanService.getAllByPenjualanId(penjualan.penjualan_id);
+        plainPenjualan.produk = produk;
+
+        return plainPenjualan;
+    }));
+
+    return transformedData;
   }  
   
   static async getById(id) {  
-    return await Penjualan.findOne({
+    const penjualanData = await Penjualan.findOne({
       where: {
         penjualan_id: id,
         is_deleted: false
       },
+      attributes: {
+        exclude: ["is_deleted", "createdAt", "updatedAt"]
+      },
       include: [
+        {
+          model: Cabang,
+          as: "cabang",
+          attributes: ["nama_cabang"]
+        },
         {
           model: MetodePembayaran,
           as: "metode_pembayaran",
-          attributes: ["metode_id", "nama_metode"]
-        }, 
+          attributes: ["nama_metode"]
+        },
         {
           model: RincianBiayaCustom,
-          as: "rincian_biaya_custom"
-        },  
-        {
-          model: ProdukPenjualan,
-          as: "produk_penjualan",
-          include: [
-            {
-              model: BarangHandmade,
-              as: "barang_handmade",
-              include: [
-                {
-                  model: KategoriBarang,
-                  as: "kategori_barang",
-                  attributes: ["nama_kategori_barang"]
-                },
-                {
-                  model: JenisBarang,
-                  as: "jenis_barang",
-                  attributes: ["nama_jenis_barang"]
-                }
-              ]
-            },
-            {
-              model: BarangNonHandmade,
-              as: "barang_non_handmade",
-              include: [
-                {
-                  model: KategoriBarang,
-                  as: "kategori",
-                  attributes: ["nama_kategori_barang"]
-                },
-                {
-                  model: JenisBarang,
-                  as: "jenis",
-                  attributes: ["nama_jenis_barang"]
-                }
-              ]
-            },
-            {
-              model: Packaging,
-              as: "packaging",
-              include: [
-                {
-                  model: JenisBarang,
-                  as: "jenis_barang",
-                  attributes: ["nama_jenis_barang"]
-                },
-                {
-                  model: KategoriBarang,
-                  as: "kategori_barang",
-                  attributes: ["nama_kategori_barang"]  
-                }
-              ]
-            },
-            {
-              model: BarangCustom,
-              as: "barang_custom",
-              include: [
-                {
-                  model: JenisBarang,
-                  as: "jenis_barang"
-                },
-                {
-                  model: KategoriBarang,
-                  as: "kategori"
-                }
-              ]
-            }
-          ]
+          as: "rincian_biaya_custom",
+          attributes: ["rincian_biaya_custom_id","nama_biaya","jumlah_biaya"]
         }
       ]
-    });  
+    });
+
+    if (penjualanData) {
+      const penjualan = penjualanData.get({ plain:true });
+
+      const produk = await ProdukPenjualanService.getAllByPenjualanId(id);
+      penjualan.produk = produk;
+      return penjualan;
+    }
   }  
   
   static async update(id, data) {  
