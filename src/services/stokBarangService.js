@@ -12,11 +12,17 @@ class StokBarangService {
     return await StokBarang.create(data);  
   }  
   
-  static async getAll() {  
-    return await StokBarang.findAll({
-      where: {
-        is_deleted: false
-      },
+  static async getAll(cabang) {  
+    const whereConditions = {
+      is_deleted: false,
+    };
+
+    if (cabang) {
+      whereConditions.cabang_id = cabang;
+    }
+
+    const data = await StokBarang.findAll({
+      where: whereConditions,
       include: [
         { model: Cabang, as: "cabang", attributes: ["nama_cabang"] },
         { model: BarangHandmade, as: "barang_handmade", attributes: ["nama_barang"],
@@ -77,6 +83,8 @@ class StokBarangService {
          },
       ]
     });  
+
+    return data;
   }  
   
   static async getById(id) {  
