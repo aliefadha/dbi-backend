@@ -1,14 +1,7 @@
 const { Op } = require("sequelize");
 const { sequelize } = require("../models");
-const BarangCustom = require("../models/barangCustom");
-const BarangHandmade = require("../models/barangHandmade");
-const BarangNonHandmade = require("../models/barangNonHandmade");
-const JenisBarang = require("../models/jenisBarang");
-const KategoriBarang = require("../models/kategoriBarang");
 const MetodePembayaran = require("../models/metodePembayaran");
-const Packaging = require("../models/packaging");
 const Penjualan = require("../models/penjualan");  
-const ProdukPenjualan = require("../models/produkPenjualan");
 const RincianBiayaCustom = require("../models/rincianBiayaCustom");
 const ProdukPenjualanService = require("./produkPenjualanService");
 const RincianBiayaCustomService = require("./rincianBiayaCustomService");

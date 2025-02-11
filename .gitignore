@@ -11,3 +11,4 @@ database.sqlite
 *.jpg
 *.jpeg
 .DS_Store
+.env
