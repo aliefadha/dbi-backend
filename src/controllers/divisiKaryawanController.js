@@ -20,7 +20,8 @@ class DivisiKaryawanController {
   
   static async getAll(req, res) {  
     try {  
-      const divisiKaryawans = await DivisiKaryawanService.getAll();  
+      const { toko_id } = req.query;
+      const divisiKaryawans = await DivisiKaryawanService.getAll(toko_id);  
       res.status(200).json({  
         success: true,  
         data: divisiKaryawans,  

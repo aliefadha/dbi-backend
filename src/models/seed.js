@@ -94,24 +94,16 @@ const seedDatabase = async () => {
         })
         
 
-        // Seed data for Penjualan
-        // await Penjualan.create({
-        //     tanggal_waktu: new Date(),
-        //     nama_pembeli: "John Doe",
-        //     cash_or_non: true,
-        //     metode_pembayaran_id: 1,
-        //     sub_total: 100000,
-        //     diskon: 5000,
-        //     pajak: 10000,
-        //     total_penjualan: 105000
-        // });
         // Seed data fot toko
         await Toko.create({ toko_id: 1, nama_toko: "Rumah Produksi", email: "headgudang@gmail.com", password: 12345678 });
         await Toko.create({ toko_id: 2, nama_toko: "Tatitatu", email: "tatitatu@gmail.com", password: 12345678 });
 
-        // Seed data for DivisiKaryawan  
-        await DivisiKaryawan.create({ divisi_karyawan_id: 1, nama_divisi: "Produksi" });
-        await DivisiKaryawan.create({ divisi_karyawan_id: 2, nama_divisi: "Pemasaran" });
+        // Seed data for Divisi Karyawan
+        await DivisiKaryawan.create({ toko_id: null, nama_divisi: "Finance" });
+        await DivisiKaryawan.create({ toko_id: null, nama_divisi: "Manager" });
+        await DivisiKaryawan.create({ toko_id: 1, nama_divisi: "Head Gudang" });
+        await DivisiKaryawan.create({ toko_id: 1, nama_divisi: "Admin Gudang" });
+        await DivisiKaryawan.create({ toko_id: 2, nama_divisi: "SPV" });
 
         // Seed data for Cabang  
         await Cabang.create({ cabang_id: 1, toko_id: 1, nama_cabang: "Gudang", email: "admingudang@gmail.com", password: 12345678 });
