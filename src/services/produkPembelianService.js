@@ -140,7 +140,7 @@ class ProdukPembelianService {
         {
           model: Packaging,
           as: "packaging",
-          attributes: ["image", "nama_packaging", "ukuran", "harga_satuan"],
+          attributes: ["image", "packaging_id", "nama_packaging", "ukuran", "harga_satuan"],
           include: [
             {
               model: JenisBarang,
