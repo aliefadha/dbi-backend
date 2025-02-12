@@ -9,6 +9,9 @@ class KategoriPengeluaranService {
     return await KategoriPengeluaran.findAll({
       where: {
         is_deleted: false
+      },
+      attributes: {
+        exclude: ["is_deleted"]
       }
     });  
   }  
