@@ -50,6 +50,9 @@ const StokBarang = require('./stokBarang');
 const Penjualan = require('./penjualan');
 const ProdukPenjualan = require('./produkPenjualan');
 const RincianBiayaCustom = require('./rincianBiayaCustom');
+const KategoriPengeluaran = require('./kategoriPengeluaran');
+const Pengeluaran = require('./pengeluaran');
+const Toko = require('./toko');
 
 
 
@@ -771,6 +774,36 @@ Cabang.hasMany(Penjualan, {
 Penjualan.belongsTo(Cabang, {
     foreignKey: "cabang_id",
     as: "cabang"
+})
+
+KategoriPengeluaran.hasMany(Pengeluaran, {
+    foreignKey: "kategori_pengeluaran_id",
+    as: "pengeluaran"
+})
+
+Pengeluaran.belongsTo(KategoriPengeluaran, {
+    foreignKey: "kategori_pengeluaran_id",
+    as: "kategori_pengeluaran"
+})
+
+MetodePembayaran.hasMany(Pengeluaran, {
+    foreignKey: "metode_id",
+    as: "pengeluaran"
+})
+
+Pengeluaran.belongsTo(MetodePembayaran, {
+    foreignKey: "metode_id",
+    as: "metode"
+})
+
+Toko.hasMany(Cabang, {
+    foreignKey: "toko_id",
+    as: "cabang"
+})
+
+Cabang.belongsTo(Toko, {
+    foreignKey: "toko_id",
+    as: "toko"
 })
 // Sync models with the database  
 const syncDatabase = async () => {
