@@ -40,8 +40,17 @@ class AbsensiKaryawanService {
     });
   }
   
-  static async getAll(bulan, tahun) {  
-      const karyawanList = await Karyawan.findAll();  
+  static async getAll(bulan, tahun, toko_id) {  
+      const whereConditions = {
+          is_deleted: false
+      }
+
+      if (toko_id) {
+          whereConditions.toko_id = toko_id
+      }
+      const karyawanList = await Karyawan.findAll({
+          where: whereConditions
+      });  
     
       // Initialize an array to hold the results  
       const results = [];  

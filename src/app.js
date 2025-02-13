@@ -74,7 +74,7 @@ watchRoutes(app);
 //Error Handling
 app.use(errorHandler);
 
-sequelize.sequelize.sync({ force: true }).then(() => {
+sequelize.sequelize.sync({ force: false }).then(() => {
   console.log("database synced");
   app.listen(port, () => {
     console.log(`Server runs on ${port}`);
