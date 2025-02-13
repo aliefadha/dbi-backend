@@ -2,9 +2,15 @@ const { where } = require("sequelize");
 const MetodePembayaran = require("../models/metodePembayaran");
 
 class MetodePembayaranService {
-    static async getAll() {
+    static async getAll(toko_id) {
+        const whereConditions = {
+            is_deleted: false
+        }
+        if (toko_id) {
+            whereConditions.toko_id = toko_id
+        }
         return await MetodePembayaran.findAll({
-            where: {is_deleted: false}
+            where: whereConditions
         });
     }
     static async getById(id) {
