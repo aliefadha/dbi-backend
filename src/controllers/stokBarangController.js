@@ -20,8 +20,8 @@ class StokBarangController {
   
   static async getAll(req, res) {  
     try {  
-      const { cabang } = req.query;
-      const stokBarangs = await StokBarangService.getAll(cabang);  
+      const { cabang, toko_id } = req.query;
+      const stokBarangs = await StokBarangService.getAll(cabang, toko_id);  
       res.status(200).json({  
         success: true,  
         data: stokBarangs,  

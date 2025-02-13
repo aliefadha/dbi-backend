@@ -11,7 +11,8 @@ class PembelianService {
       const pembelian = await Pembelian.create(data, { transaction });  
       const produkPembelian = data.produk.map(item => ({
         ...item,
-        pembelian_id: pembelian.pembelian_id
+        pembelian_id: pembelian.pembelian_id,
+        toko_id: pembelian.toko_id
       }));
 
       await ProdukPembelianService.createMany(produkPembelian, { transaction });
@@ -24,17 +25,21 @@ class PembelianService {
     }  
   }  
   
-  static async getAll(bulan, tahun) {  
+  static async getAll(bulan, tahun, toko_id) {  
     const startDate = new Date(tahun, bulan-1, 1);
     const endDate = new Date(tahun, bulan, 0);
-
-    const data = await Pembelian.findAll({
-      where: {
-        is_deleted: false,
-        tanggal: {
+    const whereConditions = {
+      is_deleted: false,
+      tanggal: {
           [Op.between]: [startDate, endDate]
         }
-      },
+    }
+
+    if (toko_id) {
+      whereConditions.toko_id = toko_id
+    }
+    const data = await Pembelian.findAll({
+      where: whereConditions,
       attributes: {
         exclude: ["is_deleted"]
       },
@@ -108,7 +113,8 @@ class PembelianService {
         const produkData = data.produk.map(item => (  
           {  
             ...item,  
-            pembelian_id: id  
+            pembelian_id: id,
+            toko_id: data.toko_id
           }  
         ));  
         await ProdukPembelianService.updateMany(produkData, { transaction });  
