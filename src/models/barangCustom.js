@@ -44,6 +44,10 @@ const BarangCustom = sequelize.define("barang_custom", {
   harga_satuan: {
     type: DataTypes.INTEGER,
   },
+  harga_jual: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0
+  },
   is_deleted: {
     type: DataTypes.BOOLEAN,
     defaultValue: false
