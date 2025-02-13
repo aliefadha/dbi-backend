@@ -128,8 +128,6 @@ const seedDatabase = async () => {
         await Authentication.create({ email: "owner@gmail.com", password: 12345678 });
         await Authentication.create({ email: "finance@gmail.com", password: 12345678 });
         await Authentication.create({ email: "manager@gmail.com", password: 12345678 });
-        await Authentication.create({ email: "headgudang@gmail.com", password: 12345678 });
-        await Authentication.create({ email: "admingudang@gmail.com", password: 12345678 });
 
         console.log("Seed data created!");
     } catch (error) {

@@ -47,21 +47,21 @@ class AuthenticationService {
     } // head gudang
     else if(role == 5){
       let roleName = "Head Gudang";
-      let user = await Authentication.findOne({where: {email: email}});
+      let user = await Toko.findOne({where: {email: email}});
       if(!user) throw new Error("Invalid email or password");
       let valid = compare(password, user.password);
       if(!valid) throw new Error("Invalid email or password");
       
-      return this.generateToken(user.authentication_id, role, user.email, roleName);
+      return this.generateToken(user.toko_id, role, user.email, roleName);
     } // admin gudang
     else if(role == 6){
       let roleName = "Admin Gudang";
-      let user = await Authentication.findOne({where: {email: email}});
+      let user = await Cabang.findOne({where: {email: email}});
       if(!user) throw new Error("Invalid email or password");
       let valid = compare(password, user.password);
       if(!valid) throw new Error("Invalid email or password");
       
-      return this.generateToken(user.authentication_id, role, user.email, roleName);
+      return this.generateToken(user.cabang_id, role, user.email, roleName);
     } // kasir
     else if(role == 7){
       const roleName = "Kasir";
