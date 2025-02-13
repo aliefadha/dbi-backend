@@ -1,6 +1,7 @@
 const { DataTypes } = require("sequelize");  
 const sequelize = require("../config/database");
 const DivisiKaryawan = require("./divisiKaryawan");
+const Toko = require("./toko");
   
 const Kpi = sequelize.define("kpi", {  
     kpi_id: {  
@@ -9,6 +10,13 @@ const Kpi = sequelize.define("kpi", {
         primaryKey: true,
         autoIncrement: true,
     },  
+    toko_id: {
+        type: DataTypes.INTEGER,
+        references: {
+            model: Toko,
+            key: 'toko_id'
+        }
+    },
     divisi_karyawan_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -28,7 +36,11 @@ const Kpi = sequelize.define("kpi", {
     waktu: {
         type: DataTypes.STRING,
         allowNull: false,
-    } 
+    },
+    is_deleted: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    }
 }, {  
     timestamps: false,
 });  

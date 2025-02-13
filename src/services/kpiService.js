@@ -32,8 +32,16 @@ class KpiService {
 
 
 
-  static async getAll() {  
-    return await Kpi.findAll();  
+  static async getAll(toko_id) {  
+    const whereConditions = {
+      is_deleted: false
+    }
+    if (toko_id) {
+      whereConditions.toko_id = toko_id
+    }
+    return await Kpi.findAll({
+      where: whereConditions
+    });  
   }  
   
   static async getById(id) {  
@@ -76,11 +84,15 @@ class KpiService {
     return await Kpi.destroy({ where: { divisi_karyawan_id: id } });
   }  
 
-  static async getKpiByDivisi() {
+  static async getKpiByDivisi(toko_id) {
+    const whereConditions = {
+      is_deleted: false
+    }
+    if (toko_id) {
+      whereConditions.toko_id = toko_id
+    }
     const divisiKaryawanList = await DivisiKaryawan.findAll({
-      where: {
-        is_deleted: false 
-      },
+      where: whereConditions,
       include: [
         {
           model: Kpi,
@@ -101,11 +113,15 @@ class KpiService {
     return result;
   }
 
-  static async getDivisiKpi() {
+  static async getDivisiKpi(toko_id) {
+    const whereConditions = {
+      is_deleted: false
+    }
+    if (toko_id) {
+      whereConditions.toko_id = toko_id
+    }
     const divisiKpi = await DivisiKaryawan.findAll({
-        where: {
-            is_deleted: false 
-        },
+        where: whereConditions,
         include: [
             {
                 model: Kpi,

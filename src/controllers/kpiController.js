@@ -20,7 +20,8 @@ class KpiController {
   
   static async getAll(req, res) {  
     try {  
-      const kpis = await KpiService.getAll();  
+      const { toko_id } = req.query;
+      const kpis = await KpiService.getAll(toko_id);  
       res.status(200).json({  
         success: true,  
         data: kpis,  
@@ -109,7 +110,8 @@ class KpiController {
 
   static async getKpiByDivisi(req, res) {
     try {
-      const kpi = await KpiService.getKpiByDivisi(req.params.id);
+      const { toko_id } = req.query;
+      const kpi = await KpiService.getKpiByDivisi(toko_id);
       if (!kpi) {
         return res.status(404).json({
           success: false,
@@ -133,7 +135,8 @@ class KpiController {
 
   static async getDivisiKpi(req, res) {
     try {
-      const kpi = await KpiService.getDivisiKpi();
+      const { toko_id } = req.query;
+      const kpi = await KpiService.getDivisiKpi(toko_id);
       if (!kpi) {
         return res.status(404).json({
           success: false,
