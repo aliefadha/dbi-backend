@@ -33,7 +33,8 @@ class CabangController {
   
   static async getAll(req, res) {  
     try {  
-      const cabangs = await CabangService.getAll();  
+      const { toko_id } = req.query;
+      const cabangs = await CabangService.getAll(toko_id);  
       res.status(200).json({  
         success: true,  
         data: cabangs,  
