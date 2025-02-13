@@ -143,7 +143,7 @@ class ProdukPenjualanService {
 
         if (stokEntry && stokEntry.jumlah_stok < difference) {
           const availableStock = stokEntry.jumlah_stok ? stokEntry.jumlah_stok : 0;
-          throw new Error(`Not enough stock for this product`);
+          throw new Error(`Not enough stock for this product: ${fieldValue}. Available: ${availableStock}`);
         }
 
         if (stokEntry) {

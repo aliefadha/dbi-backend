@@ -3,12 +3,20 @@ const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");  
 const MetodePembayaran = require("./metodePembayaran");
 const Cabang = require("./cabang");
+const Toko = require("./toko");
   
 const Penjualan = sequelize.define("penjualan", {  
   penjualan_id: {  
     type: DataTypes.STRING,  
     allowNull: false,
     primaryKey: true,
+  },
+  toko_id: {
+    type: DataTypes.INTEGER,
+    references: {
+      model: Toko,
+      key: 'toko_id',
+    }
   },
   cabang_id: {
     type: DataTypes.INTEGER,
