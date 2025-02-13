@@ -52,8 +52,10 @@ class KaryawanService {
         ]});
     }
     static async create(data) {
-        const cabangIdFirst = data.cabang_id;
-        data.cabang_id_first = cabangIdFirst;
+        if(data.cabangId){
+            const cabangIdFirst = data.cabang_id;
+            data.cabang_id_first = cabangIdFirst;
+        }
         return await Karyawan.create(data);
     }
     static async update(id, data) {

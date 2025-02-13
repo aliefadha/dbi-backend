@@ -102,13 +102,18 @@ class KpiService {
     });
 
     const result = divisiKaryawanList.map(divisi => {
-      return {
-        divisi_karyawan_id: divisi.divisi_karyawan_id,
-        nama_divisi: divisi.nama_divisi,
-        kpi: divisi.kpi,
-        kpi_count: divisi.kpi.length
-      };
-    });
+      // Check if the divisi name is not "SPV" or "Head Gudang"
+      if (divisi.nama_divisi !== "SPV" && divisi.nama_divisi !== "Head Gudang") {
+        return {
+          divisi_karyawan_id: divisi.divisi_karyawan_id,
+          nama_divisi: divisi.nama_divisi,
+          kpi: divisi.kpi,
+          kpi_count: divisi.kpi ? divisi.kpi.length : 0
+        };
+      }
+      // Return null for divisi names that should be hidden
+      return null;
+    }).filter(item => item !== null); 
 
     return result;
   }
@@ -134,11 +139,11 @@ class KpiService {
     
     // Filter out entries with any Kpi data
     const result = divisiKpi.filter(entry => 
-        entry.kpi === undefined || entry.kpi.length === 0
+        (entry.kpi === undefined || entry.kpi.length === 0) &&
+        !["Head Gudang", "SPV"].includes(entry.nama_divisi)
     );
-    return result;
-}
-
+      return result;
+  }
 
 }  
   
