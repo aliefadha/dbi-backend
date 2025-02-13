@@ -13,7 +13,14 @@ class KpiKaryawanService {
     return await KpiKaryawan.create(data);  
   }  
   
-  static async getAll(bulan, tahun) {      
+  static async getAll(bulan, tahun, toko_id) {    
+      const whereConditions = {
+          is_deleted: false
+      }  
+
+      if (toko_id) {
+          whereConditions.toko_id = toko_id
+      }
       // Fetch the KPI count by division    
       const kpiByDivisi = await KpiService.getKpiByDivisi();    
       // Create a mapping of divisi_id to kpi_count    
@@ -23,7 +30,8 @@ class KpiKaryawanService {
       });    
       
       // Fetch all employees with their divisions and branches    
-      const karyawanList = await Karyawan.findAll({    
+      const karyawanList = await Karyawan.findAll({
+          where: whereConditions,    
           include: [    
               {    
                   model: DivisiKaryawan,    
