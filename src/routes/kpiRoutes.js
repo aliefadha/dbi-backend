@@ -9,5 +9,8 @@ router.put('/kpi/:id', KpiController.update);
 router.delete('/kpi/:id', KpiController.delete);
 router.get('/kpi-divisi', KpiController.getKpiByDivisi);  
 router.get('/get-divisi-kpi', KpiController.getDivisiKpi);  
+router.get('/manager-kpi', KpiController.getManagerKpi);
+router.get('/manager-kpi-divisi', KpiController.getManagerKpiByDivisi);
+router.get('/manager-kpi-list', KpiController.getManagerKpiList);
   
 module.exports = router;  

@@ -145,6 +145,63 @@ class KpiService {
       return result;
   }
 
+  static async getManagerKpi() {
+    const managerKpi =  await Kpi.findAll();
+    
+    const result = managerKpi.filter(entry => 
+        entry.kpi_id === 1
+    );
+    return result;
+  }
+
+  static async getManagerKpiByDivisi() {
+    const divisiKaryawanList = await DivisiKaryawan.findAll({
+      include: [
+        {
+          model: Kpi,
+          as: "kpi",
+        },
+      ],
+    });
+
+    const allowedDivisiNames = ["Manager", "Finance", "SPV", "Head Gudang"];
+    const result = divisiKaryawanList.map(divisi => {
+      // Check if the divisi name is one of the allowed divisi names
+      if (allowedDivisiNames.includes(divisi.nama_divisi)) {
+        return {
+          divisi_karyawan_id: divisi.divisi_karyawan_id,
+          nama_divisi: divisi.nama_divisi,
+          kpi: divisi.kpi,
+          kpi_count: divisi.kpi ? divisi.kpi.length : 0
+        };
+      }
+      // Return null for divisi names that should be hidden
+      return null;
+    }).filter(item => item !== null); 
+
+    return result;
+}
+
+  static async getManagerKpiList() {
+    const divisiKpi = await DivisiKaryawan.findAll({
+        include: [
+            {
+                model: Kpi,
+                as: "kpi",
+                // Exclude Kpi associations with through: null (if applicable)
+                through: null
+            },
+        ]
+    });
+    
+    // Filter out entries with any Kpi data
+    const result = divisiKpi.filter(entry => 
+        (entry.kpi === undefined || entry.kpi.length === 0) &&
+        ["Manager", "Finance", "Head Gudang", "SPV"].includes(entry.nama_divisi)
+    );
+      return result;
+  }
+
 }  
   
 module.exports = KpiService;  

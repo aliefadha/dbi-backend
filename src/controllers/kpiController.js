@@ -157,6 +157,78 @@ class KpiController {
       });  
     }  
   }
+
+  static async getManagerKpi(req, res) {
+    try {
+      const kpi = await KpiService.getManagerKpi();
+      if (!kpi) {
+        return res.status(404).json({
+          success: false,
+          data: null,
+          message: "not found",
+        });
+      }
+      res.status(200).json({
+        success: true,
+        data: kpi,
+        message: "retrieved successfully",
+      });
+    } catch (error) {  
+      res.status(500).json({    
+        success: false,  
+        data: null,  
+        message: error.message,  
+      });  
+    }  
+  }
+
+  static async getManagerKpiByDivisi(req, res) {
+    try {
+      const kpi = await KpiService.getManagerKpiByDivisi();
+      if (!kpi) {
+        return res.status(404).json({
+          success: false,
+          data: null,
+          message: "not found",
+        });
+      }
+      res.status(200).json({
+        success: true,
+        data: kpi,
+        message: "retrieved successfully",
+      });
+    } catch (error) {  
+      res.status(500).json({    
+        success: false,  
+        data: null,  
+        message: error.message,  
+      });  
+    }  
+  }
+
+  static async getManagerKpiList(req, res) {
+    try {
+      const kpi = await KpiService.getManagerKpiList();
+      if (!kpi) {
+        return res.status(404).json({
+          success: false,
+          data: null,
+          message: "not found",
+        });
+      }
+      res.status(200).json({
+        success: true,
+        data: kpi,
+        message: "retrieved successfully",
+      });
+    } catch (error) {  
+      res.status(500).json({    
+        success: false,  
+        data: null,  
+        message: error.message,  
+      });  
+    }  
+  }
 }  
   
 module.exports = KpiController;  
