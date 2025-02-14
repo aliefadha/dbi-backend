@@ -16,7 +16,7 @@ class AuthenticationService {
       let valid = compare(password, user.password);
       if(!valid) throw new Error("Invalid email or password");
       
-      return this.generateToken(user.authentication_id, role, user.email, roleName);
+      return this.generateToken(user.authentication_id, null, role, user.email, roleName);
     } // finance
     else if(role == 2){
       let roleName = "Finance";
@@ -25,7 +25,7 @@ class AuthenticationService {
       let valid = compare(password, user.password);
       if(!valid) throw new Error("Invalid email or password");
       
-      return this.generateToken(user.authentication_id, role, user.email, roleName);
+      return this.generateToken(user.authentication_id, null, role, user.email, roleName);
     } // manager
     else if(role == 3){
       let roleName = "Manager";
@@ -34,7 +34,7 @@ class AuthenticationService {
       let valid = compare(password, user.password);
       if(!valid) throw new Error("Invalid email or password");
       
-      return this.generateToken(user.authentication_id, role, user.email, roleName);
+      return this.generateToken(user.authentication_id, null, role, user.email, roleName);
     } // spv
     else if(role == 4){
       let roleName = "SPV";
@@ -43,25 +43,25 @@ class AuthenticationService {
       let valid = compare(password, user.password);
       if(!valid) throw new Error("Invalid email or password");
       
-      return this.generateToken(user.toko_id, role, user.email, roleName);
+      return this.generateToken(user.toko_id, null, role, user.email, roleName);
     } // head gudang
     else if(role == 5){
       let roleName = "Head Gudang";
-      let user = await Authentication.findOne({where: {email: email}});
+      let user = await Toko.findOne({where: {email: email}});
       if(!user) throw new Error("Invalid email or password");
       let valid = compare(password, user.password);
       if(!valid) throw new Error("Invalid email or password");
       
-      return this.generateToken(user.authentication_id, role, user.email, roleName);
+      return this.generateToken(user.toko_id, null, role, user.email, roleName);
     } // admin gudang
     else if(role == 6){
       let roleName = "Admin Gudang";
-      let user = await Authentication.findOne({where: {email: email}});
+      let user = await Cabang.findOne({where: {email: email}});
       if(!user) throw new Error("Invalid email or password");
       let valid = compare(password, user.password);
       if(!valid) throw new Error("Invalid email or password");
       
-      return this.generateToken(user.authentication_id, role, user.email, roleName);
+      return this.generateToken(user.cabang_id, null, role, user.email, roleName);
     } // kasir
     else if(role == 7){
       const roleName = "Kasir";
@@ -70,7 +70,7 @@ class AuthenticationService {
       let valid = compare(password, user.password);
       if(!valid) throw new Error("Invalid email or password");
       
-      return this.generateToken(user.cabang_id, role, user.email, roleName);
+      return this.generateToken(user.cabang_id, user.toko_id, role, user.email, roleName);
     } // karyawan umum
     else if(role == 8){
       const roleName = "Karyawan Umum";
@@ -79,7 +79,7 @@ class AuthenticationService {
       let valid = compare(password, user.password);
       if(!valid) throw new Error("Invalid email or password");
 
-      return this.generateToken(user.karyawan_id, role, user.email, roleName);
+      return this.generateToken(user.karyawan_id, null, role, user.email, roleName);
     }
     else if (role == 9) {
       const roleName = "Karyawan Logistik";
@@ -88,7 +88,7 @@ class AuthenticationService {
       let valid = compare(password, user.password);
       if(!valid) throw new Error("Invalid email or password");
 
-      return this.generateToken(user.karyawan_id, role, user.email, roleName);
+      return this.generateToken(user.karyawan_id, null, role, user.email, roleName);
     }
     else if (role == 10) {
       const roleName = "Karyawan Produksi";
@@ -106,27 +106,37 @@ class AuthenticationService {
       let valid = compare(password, user.password);
       if(!valid) throw new Error("Invalid email or password");
 
-      return this.generateToken(user.karyawan_id, role, user.email, roleName);
+      return this.generateToken(user.karyawan_id, null, role, user.email, roleName);
     }
   }
   
-  static async generateToken(userId, roleId, userEmail, roleName) {
+  static async generateToken(userId,toko_id, roleId, userEmail, roleName) {
     const payload = {
         userId: userId,
         roleId: roleId,
         email: userEmail,
-        role_name: roleName
+        roleName: roleName
     };
+
+    if (toko_id) {
+        payload.tokoId = toko_id;
+    }
     // console.log(`JWT_SECRET_KEY: ${process.env.JWT_SECRET_KEY}`);
     const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, { expiresIn: '1d' });
 
-    return {
+    const response = {
         userId: userId,
-        role_id: roleId,
-        role_name: roleName,
+        roleId: roleId,
+        roleName: roleName,
         email: userEmail,
         token: token
     };
+
+    if (toko_id) {
+        response.tokoId = toko_id;
+    }
+
+    return response;
   }
 }  
   

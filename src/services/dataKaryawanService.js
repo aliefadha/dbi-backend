@@ -6,6 +6,7 @@ const { Op } = require("sequelize");
 const CutiKaryawan = require("../models/cutiKaryawan");
 const KpiKaryawan = require("../models/kpiKaryawan");
 const Kpi = require("../models/kpi");
+const Toko = require("../models/toko");
 
 class DataKaryawanService {
     static async getListAbsensiByKaryawan(id, bulan, tahun) {
@@ -44,19 +45,24 @@ class DataKaryawanService {
         where: {karyawan_id: id},
         include: [
             {
-            model: Cabang,
-            as: 'cabang',
-            attributes: ['nama_cabang']
+                model: Toko,
+                as: 'toko',
+                attributes: ['nama_toko']
             },
             {
-            model: Cabang,
-            as: 'cabang_first',
-            attributes: ['nama_cabang']
+                model: Cabang,
+                as: 'cabang',
+                attributes: ['nama_cabang']
             },
             {
-            model: DivisiKaryawan,
-            as: 'divisi',
-            attributes: ['nama_divisi']
+                model: Cabang,
+                as: 'cabang_first',
+                attributes: ['nama_cabang']
+            },
+            {
+                model: DivisiKaryawan,
+                as: 'divisi',
+                attributes: ['nama_divisi']
             }
         ]});
 

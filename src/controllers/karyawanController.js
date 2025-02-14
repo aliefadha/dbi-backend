@@ -18,7 +18,8 @@ const upload = multer({ storage: storage });
 class KaryawanController {
     static async getAll(req, res) {
         try {
-            const karyawan = await KaryawanService.getAll();
+            const { toko_id } = req.query;
+            const karyawan = await KaryawanService.getAll(toko_id);
             res.status(200).json({
                 success: true,
                 data: karyawan,

@@ -12,10 +12,17 @@ class CutiKaryawanService {
     return await CutiKaryawan.create(data);  
   }  
   
-  static async getAll(bulan, tahun) {  
+  static async getAll(bulan, tahun, toko_id) {  
+    const whereConditions = {  
+      is_deleted: false
+    };  
+    if (toko_id) {  
+      whereConditions.toko_id = toko_id;  
+    }
     const startDate = new Date(tahun, bulan - 1, 1);
     const endDate = new Date(tahun, bulan, 0);
     return await Karyawan.findAll({
+      where: whereConditions,
       include: [
         {
           model: CutiKaryawan,

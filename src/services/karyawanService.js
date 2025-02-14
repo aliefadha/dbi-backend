@@ -3,8 +3,15 @@ const DivisiKaryawan = require("../models/divisiKaryawan");
 const Cabang = require("../models/cabang");
 
 class KaryawanService {
-    static async getAll() {
+    static async getAll(toko_id) {
+        const whereConditions = {
+            is_deleted: false
+        }
+        if (toko_id) {
+            whereConditions.toko_id = toko_id
+        }
         return await Karyawan.findAll({
+            where: whereConditions,
             include: [
             {
                 model: DivisiKaryawan,
@@ -25,7 +32,7 @@ class KaryawanService {
     }
     static async getById(id) {
         return await Karyawan.findOne({
-            where: { karyawan_id: id },
+            where: { karyawan_id: id, is_deleted: false },
             include:  [
                 {
                     model: DivisiKaryawan,
@@ -45,8 +52,10 @@ class KaryawanService {
         ]});
     }
     static async create(data) {
-        const cabangIdFirst = data.cabang_id;
-        data.cabang_id_first = cabangIdFirst;
+        if(data.cabangId){
+            const cabangIdFirst = data.cabang_id;
+            data.cabang_id_first = cabangIdFirst;
+        }
         return await Karyawan.create(data);
     }
     static async update(id, data) {

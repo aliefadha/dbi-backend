@@ -32,8 +32,16 @@ class KpiService {
 
 
 
-  static async getAll() {  
-    return await Kpi.findAll();  
+  static async getAll(toko_id) {  
+    const whereConditions = {
+      is_deleted: false
+    }
+    if (toko_id) {
+      whereConditions.toko_id = toko_id
+    }
+    return await Kpi.findAll({
+      where: whereConditions
+    });  
   }  
   
   static async getById(id) {  
@@ -76,11 +84,15 @@ class KpiService {
     return await Kpi.destroy({ where: { divisi_karyawan_id: id } });
   }  
 
-  static async getKpiByDivisi() {
+  static async getKpiByDivisi(toko_id) {
+    const whereConditions = {
+      is_deleted: false
+    }
+    if (toko_id) {
+      whereConditions.toko_id = toko_id
+    }
     const divisiKaryawanList = await DivisiKaryawan.findAll({
-      where: {
-        is_deleted: false 
-      },
+      where: whereConditions,
       include: [
         {
           model: Kpi,
@@ -90,22 +102,31 @@ class KpiService {
     });
 
     const result = divisiKaryawanList.map(divisi => {
-      return {
-        divisi_karyawan_id: divisi.divisi_karyawan_id,
-        nama_divisi: divisi.nama_divisi,
-        kpi: divisi.kpi,
-        kpi_count: divisi.kpi.length
-      };
-    });
+      // Check if the divisi name is not "SPV" or "Head Gudang"
+      if (divisi.nama_divisi !== "SPV" && divisi.nama_divisi !== "Head Gudang") {
+        return {
+          divisi_karyawan_id: divisi.divisi_karyawan_id,
+          nama_divisi: divisi.nama_divisi,
+          kpi: divisi.kpi,
+          kpi_count: divisi.kpi ? divisi.kpi.length : 0
+        };
+      }
+      // Return null for divisi names that should be hidden
+      return null;
+    }).filter(item => item !== null); 
 
     return result;
   }
 
-  static async getDivisiKpi() {
+  static async getDivisiKpi(toko_id) {
+    const whereConditions = {
+      is_deleted: false
+    }
+    if (toko_id) {
+      whereConditions.toko_id = toko_id
+    }
     const divisiKpi = await DivisiKaryawan.findAll({
-        where: {
-            is_deleted: false 
-        },
+        where: whereConditions,
         include: [
             {
                 model: Kpi,
@@ -118,11 +139,68 @@ class KpiService {
     
     // Filter out entries with any Kpi data
     const result = divisiKpi.filter(entry => 
-        entry.kpi === undefined || entry.kpi.length === 0
+        (entry.kpi === undefined || entry.kpi.length === 0) &&
+        !["Head Gudang", "SPV"].includes(entry.nama_divisi)
     );
+      return result;
+  }
+
+  static async getManagerKpi() {
+    const managerKpi =  await Kpi.findAll();
+    
+    const result = managerKpi.filter(entry => 
+        entry.kpi_id === 1
+    );
+    return result;
+  }
+
+  static async getManagerKpiByDivisi() {
+    const divisiKaryawanList = await DivisiKaryawan.findAll({
+      include: [
+        {
+          model: Kpi,
+          as: "kpi",
+        },
+      ],
+    });
+
+    const allowedDivisiNames = ["Manager", "Finance", "SPV", "Head Gudang"];
+    const result = divisiKaryawanList.map(divisi => {
+      // Check if the divisi name is one of the allowed divisi names
+      if (allowedDivisiNames.includes(divisi.nama_divisi)) {
+        return {
+          divisi_karyawan_id: divisi.divisi_karyawan_id,
+          nama_divisi: divisi.nama_divisi,
+          kpi: divisi.kpi,
+          kpi_count: divisi.kpi ? divisi.kpi.length : 0
+        };
+      }
+      // Return null for divisi names that should be hidden
+      return null;
+    }).filter(item => item !== null); 
+
     return result;
 }
 
+  static async getManagerKpiList() {
+    const divisiKpi = await DivisiKaryawan.findAll({
+        include: [
+            {
+                model: Kpi,
+                as: "kpi",
+                // Exclude Kpi associations with through: null (if applicable)
+                through: null
+            },
+        ]
+    });
+    
+    // Filter out entries with any Kpi data
+    const result = divisiKpi.filter(entry => 
+        (entry.kpi === undefined || entry.kpi.length === 0) &&
+        ["Manager", "Finance", "Head Gudang", "SPV"].includes(entry.nama_divisi)
+    );
+      return result;
+  }
 
 }  
   

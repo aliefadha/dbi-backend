@@ -1,3 +1,4 @@
+const { where } = require("sequelize");
 const BarangCustom = require("../models/barangCustom"); 
 const JenisBarang = require("../models/jenisBarang");
 const KategoriBarang = require("../models/kategoriBarang"); 
@@ -7,11 +8,17 @@ class BarangCustomService {
     return await BarangCustom.create(data);  
   }  
   
-  static async getAll() {  
+  static async getAll(toko_id) {  
+    const whereConditions = {
+      is_deleted: false
+    }
+
+    if (toko_id) {
+      whereConditions.toko_id = toko_id
+    }
+
     return await BarangCustom.findAll({
-      where: {
-        is_deleted: false
-      },
+      where: whereConditions,
       include: [
         { model: JenisBarang, as: "jenis_barang" },
         { model: KategoriBarang, as: "kategori" },

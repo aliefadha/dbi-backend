@@ -30,6 +30,10 @@ const Cabang = sequelize.define("cabang", {
       type: DataTypes.STRING,
       allowNull: false,
   },  
+  is_deleted: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+  }
 },{
     timestamps: false,
 });  

@@ -12,13 +12,17 @@ class StokBarangService {
     return await StokBarang.create(data);  
   }  
   
-  static async getAll(cabang) {  
+  static async getAll(cabang, toko_id) {  
     const whereConditions = {
       is_deleted: false,
     };
 
     if (cabang) {
       whereConditions.cabang_id = cabang;
+    }
+    
+    if (toko_id) {
+      whereConditions.toko_id = toko_id;
     }
 
     const data = await StokBarang.findAll({

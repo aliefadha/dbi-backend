@@ -21,7 +21,7 @@ class ProdukPembelianService {
         transaction,
         returning: true,
       });
-
+      const toko_id = data[0].toko_id;
       for (const produk of createdProdukList) {
         const { cabang_id, packaging_id, barang_custom_id, barang_non_handmade_id, barang_handmade_id, kuantitas } = produk;
 
@@ -46,6 +46,7 @@ class ProdukPembelianService {
           where: {
             [fieldName]: fieldValue,
             cabang_id: cabang_id,  
+            toko_id: toko_id,
             is_deleted: false
           },
           transaction,
@@ -59,6 +60,7 @@ class ProdukPembelianService {
         } else {
           await StokBarang.create({
             cabang_id: cabang_id,  
+            toko_id: toko_id,
             [fieldName]: fieldValue,
             jumlah_stok: kuantitas
           }, { transaction });
@@ -140,7 +142,7 @@ class ProdukPembelianService {
         {
           model: Packaging,
           as: "packaging",
-          attributes: ["image", "nama_packaging", "ukuran", "harga_satuan"],
+          attributes: ["image", "packaging_id", "nama_packaging", "ukuran", "harga_satuan"],
           include: [
             {
               model: JenisBarang,
@@ -192,6 +194,7 @@ class ProdukPembelianService {
 
     try {
         const pembelianId = data[0]?.pembelian_id;
+        const toko_id = data[0].toko_id;
         if (!pembelianId) throw new Error("Missing pembelian_id");
 
         // Fetch existing products for the given pembelian_id
@@ -241,7 +244,7 @@ class ProdukPembelianService {
                 await stokEntry.increment("jumlah_stok", { by: difference, transaction });
             } else {
                 await StokBarang.create(
-                    { cabang_id, [fieldName]: fieldValue, jumlah_stok: kuantitas },
+                    { toko_id, cabang_id, [fieldName]: fieldValue, jumlah_stok: kuantitas },
                     { transaction }
                 );
             }

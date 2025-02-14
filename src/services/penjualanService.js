@@ -15,7 +15,7 @@ class PenjualanService {
       const produkPenjualan = data.produk.map(item => ({
         ...item,
         penjualan_id: penjualan.penjualan_id,
-        cabang_id: penjualan.cabang_id
+        cabang_id: penjualan.cabang_id,
       }));
 
       await ProdukPenjualanService.createMany(produkPenjualan, { transaction });
@@ -38,7 +38,7 @@ class PenjualanService {
     }    
   }  
   
-  static async getAll(bulan, tahun, cabang) {  
+  static async getAll(bulan, tahun, cabang, toko_id) {  
     const startDate = new Date(tahun, bulan-1, 1);
     const endDate = new Date(tahun, bulan, 0);
 
@@ -51,6 +51,10 @@ class PenjualanService {
 
     if (cabang) {
       whereConditions.cabang_id = cabang;
+    }
+
+    if (toko_id) {
+      whereConditions.toko_id = toko_id;
     }
 
     const data = await Penjualan.findAll({

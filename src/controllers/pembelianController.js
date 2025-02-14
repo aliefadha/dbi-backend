@@ -26,8 +26,8 @@ class PembelianController {
   
   static async getAll(req, res) {  
     try {  
-      const { bulan, tahun } = req.query;
-      const pembelians = await PembelianService.getAll(bulan, tahun);  
+      const { bulan, tahun, toko_id } = req.query;
+      const pembelians = await PembelianService.getAll(bulan, tahun, toko_id);  
       res.status(200).json({  
         success: true,  
         data: pembelians,  

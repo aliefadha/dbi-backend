@@ -5,6 +5,7 @@ const BarangNonHandmade = require("./barangNonHandmade");
 const BarangCustom = require("./barangCustom");
 const Packaging = require("./packaging");
 const Cabang = require("./cabang");
+const Toko = require("./toko");
   
 const StokBarang = sequelize.define("stok_barang", {  
   stok_barang_id: {  
@@ -13,6 +14,13 @@ const StokBarang = sequelize.define("stok_barang", {
     primaryKey: true,
     autoIncrement: true,
   }, 
+  toko_id: {
+    type: DataTypes.INTEGER,
+    references: {
+      model: Toko,
+      key: 'toko_id'
+    }
+  },
   cabang_id: {
     type: DataTypes.INTEGER,
     allowNull: false,

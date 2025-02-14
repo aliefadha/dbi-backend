@@ -5,8 +5,17 @@ class CabangService {
     return await Cabang.create(data);  
   }  
   
-  static async getAll() {  
-    return await Cabang.findAll();  
+  static async getAll(toko_id) {
+    const whereConditions = {
+        is_deleted: false
+    }  
+
+    if (toko_id) {
+        whereConditions.toko_id = toko_id
+    }
+    return await Cabang.findAll({
+        where: whereConditions
+    });  
   }  
   
   static async getById(id) {  

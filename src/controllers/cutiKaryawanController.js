@@ -20,7 +20,8 @@ class CutiKaryawanController {
   
   static async getAll(req, res) {  
     try {  
-      const cutiKaryawans = await CutiKaryawanService.getAll(req.params.bulan, req.params.tahun);  
+      const { toko_id } = req.query;
+      const cutiKaryawans = await CutiKaryawanService.getAll(req.params.bulan, req.params.tahun, toko_id);  
       res.status(200).json({  
         success: true,  
         data: cutiKaryawans,  

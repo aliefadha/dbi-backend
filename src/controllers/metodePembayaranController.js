@@ -20,7 +20,8 @@ class MetodePembayaranController {
 
     static async getAll(req, res) {
         try {
-            const metode = await MetodePembayaranService.getAll();
+            const { toko_id } = req.query;
+            const metode = await MetodePembayaranService.getAll(toko_id);
             res.status(200).json({
                 success: true,
                 data: metode,
