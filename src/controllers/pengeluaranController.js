@@ -24,9 +24,10 @@ class PengeluaranController {
     }  
   }  
   
-  static async getAll(req, res) {  
+  static async getAll(req, res) { 
+    const { startDate, endDate } = req.query; 
     try {  
-      const pengeluarans = await PengeluaranService.getAll();  
+      const pengeluarans = await PengeluaranService.getAll(startDate, endDate);  
       res.status(200).json({  
         success: true,  
         data: pengeluarans,  
@@ -64,6 +65,55 @@ class PengeluaranController {
       });  
     }  
   }  
+
+  static async getByKategori(req, res) {
+    try {
+      const pengeluarans = await PengeluaranService.getByKategori(req.params.kategori_id);
+      if (!pengeluarans) {
+        return res.status(404).json({
+          success: false,
+          data: null,
+          message: "not found",
+        });
+      }
+      res.status(200).json({
+        success: true,
+        data: pengeluarans,
+        message: "retrieved successfully",
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        data: null,
+        message: error.message,
+      });
+    }
+  }
+
+  static async getByToko(req, res) {
+    const { startDate, endDate } = req.query; 
+    try {
+      const pengeluarans = await PengeluaranService.getByToko(req.params.toko_id, startDate, endDate);
+      if (!pengeluarans) {
+        return res.status(404).json({
+          success: false,
+          data: null,
+          message: "not found",
+        });
+      }
+      res.status(200).json({
+        success: true,
+        data: pengeluarans,
+        message: "retrieved successfully",
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        data: null,
+        message: error.message,
+      });
+    }
+  }
   
   static async update(req, res) {  
     try {  
@@ -114,4 +164,4 @@ class PengeluaranController {
   }  
 }  
   
-module.exports = PengeluaranController;  
+module.exports = PengeluaranController;

@@ -33,14 +33,6 @@ const Pengeluaran = sequelize.define("pengeluaran", {
       key: 'metode_id'
     }
   },
-  sub_total: {
-    type: DataTypes.INTEGER,
-    defaultValue: 0
-  },  
-  pemotongan: {
-    type: DataTypes.INTEGER,
-    defaultValue: 0
-  },
   total: {
     type: DataTypes.INTEGER,
     defaultValue: 0

@@ -225,87 +225,11 @@ class ProdukPenjualanGudangService {
         transaction
       });
 
-      // Create a map of new products for easy lookup
-      const newProductIds = new Set(data.produk.map(p => {
-        if (p.packaging_id) return `packaging_${p.packaging_id}`;
-        if (p.barang_mentah_id) return `mentah_${p.barang_mentah_id}`;
-        if (p.barang_nonhandmade_id) return `nonhandmade_${p.barang_nonhandmade_id}`;
-        if (p.barang_handmade_id) return `handmade_${p.barang_handmade_id}`;
-      }));
-
-      // Return stock for products that will be removed
+      // Return stock for ALL existing products
       for (const product of existingProducts) {
         const { packaging_id, barang_mentah_id, barang_nonhandmade_id, barang_handmade_id, kuantitas } = product;
-        let productIdentifier;
-
-        if (packaging_id) productIdentifier = `packaging_${packaging_id}`;
-        else if (barang_mentah_id) productIdentifier = `mentah_${barang_mentah_id}`;
-        else if (barang_nonhandmade_id) productIdentifier = `nonhandmade_${barang_nonhandmade_id}`;
-        else if (barang_handmade_id) productIdentifier = `handmade_${barang_handmade_id}`;
-        else continue;
-
-        // Only return stock if product is not in new data
-        if (!newProductIds.has(productIdentifier)) {
-          let fieldName, fieldValue;
-          if (packaging_id) {
-            fieldName = 'packaging_id';
-            fieldValue = packaging_id;
-          } else if (barang_mentah_id) {
-            fieldName = 'barang_mentah_id';
-            fieldValue = barang_mentah_id;
-          } else if (barang_nonhandmade_id) {
-            fieldName = 'barang_nonhandmade_id';
-            fieldValue = barang_nonhandmade_id;
-          } else if (barang_handmade_id) {
-            fieldName = 'barang_handmade_id';
-            fieldValue = barang_handmade_id;
-          }
-
-          let stockEntry = await StokBarangGudang.findOne({
-            where: {
-              [fieldName]: fieldValue,
-              is_deleted: false,
-            },
-            transaction,
-          });
-
-          if (stockEntry) {
-            await stockEntry.increment('jumlah_stok', {
-              by: kuantitas,
-              transaction,
-            });
-          }
-        }
-      }
-
-      // Delete existing products
-      await ProdukPenjualanGudang.destroy({
-        where: {
-          penjualan_id: data.penjualan_id
-        },
-        transaction
-      });
-
-      // Create new products and update stock
-      const createdProdukList = await ProdukPenjualanGudang.bulkCreate(data.produk, {
-        transaction,
-        returning: true,
-      });
-
-      // Update stock for new products
-      for (const produk of createdProdukList) {
-        const { packaging_id, barang_mentah_id, barang_nonhandmade_id, barang_handmade_id, kuantitas } = produk;
-
-        // Find existing product to compare quantities
-        const existingProduct = existingProducts.find(ep => {
-          if (packaging_id && ep.packaging_id === packaging_id) return true;
-          if (barang_mentah_id && ep.barang_mentah_id === barang_mentah_id) return true;
-          if (barang_nonhandmade_id && ep.barang_nonhandmade_id === barang_nonhandmade_id) return true;
-          if (barang_handmade_id && ep.barang_handmade_id === barang_handmade_id) return true;
-          return false;
-        });
-
         let fieldName, fieldValue;
+
         if (packaging_id) {
           fieldName = 'packaging_id';
           fieldValue = packaging_id;
@@ -331,35 +255,23 @@ class ProdukPenjualanGudangService {
         });
 
         if (stockEntry) {
-          if (existingProduct) {
-            // If product existed before, calculate the difference
-            const stockDiff = existingProduct.kuantitas - kuantitas;
-            const newStockAmount = stockEntry.jumlah_stok + stockDiff;
-
-            // Check if we have enough stock
-            if (newStockAmount < 0) {
-              throw new Error(`Stok barang ${fieldName}: ${fieldValue} tidak cukup. Tersedia: ${stockEntry.jumlah_stok}, Kuantitas: ${kuantitas}`);
-            }
-
-            await stockEntry.update(
-              { jumlah_stok: newStockAmount },
-              { transaction }
-            );
-          } else {
-            // If it's a new product, check if we have enough stock
-            if (stockEntry.jumlah_stok < kuantitas) {
-              throw new Error(`Stok barang ${fieldName}: ${fieldValue} tidak cukup. Tersedia: ${stockEntry.jumlah_stok}, Kuantitas: ${kuantitas}`);
-            }
-
-            await stockEntry.decrement('jumlah_stok', {
-              by: kuantitas,
-              transaction,
-            });
-          }
-        } else {
-          throw new Error(`Stok barang ${fieldName}: ${fieldValue} tidak ditemukan`);
+          await stockEntry.increment('jumlah_stok', {
+            by: kuantitas,
+            transaction,
+          });
         }
       }
+
+      // Delete existing products
+      await ProdukPenjualanGudang.destroy({
+        where: {
+          penjualan_id: data.penjualan_id
+        },
+        transaction
+      });
+
+      // Create new products using createMany instead of bulkCreate
+      const createdProdukList = await this.createMany(data.produk, { transaction });
 
       return createdProdukList;
     } catch (error) {

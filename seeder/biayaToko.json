@@ -1,0 +1,132 @@
+[
+    {
+      "cabang_id": 1,
+      "biaya_operasional": [
+        {
+          "nama_biaya": "Listrik",
+          "jumlah_biaya": 1650000
+        },
+        {
+          "nama_biaya": "Air",
+          "jumlah_biaya": 575000
+        }
+      ],
+      "biaya_staff": [
+        {
+          "nama_biaya": "Head",
+          "jumlah_biaya": 2100000
+        },
+        {
+          "nama_biaya": "Produksi",
+          "jumlah_biaya": 1550000
+        }
+      ],
+      "total": 310000,
+      "rata_rata": 2150,
+      "total_biaya": 144
+    },
+    {
+      "cabang_id": 2,
+      "biaya_operasional": [
+        {
+          "nama_biaya": "Listrik",
+          "jumlah_biaya": 1250000
+        },
+        {
+          "nama_biaya": "Air",
+          "jumlah_biaya": 425000
+        }
+      ],
+      "biaya_staff": [
+        {
+          "nama_biaya": "Head",
+          "jumlah_biaya": 1750000
+        },
+        {
+          "nama_biaya": "Produksi",
+          "jumlah_biaya": 1150000
+        }
+      ],
+      "total": 230000,
+      "rata_rata": 1650,
+      "total_biaya": 139
+    },
+    {
+      "cabang_id": 3,
+      "biaya_operasional": [
+        {
+          "nama_biaya": "Listrik",
+          "jumlah_biaya": 1800000
+        },
+        {
+          "nama_biaya": "Air",
+          "jumlah_biaya": 625000
+        }
+      ],
+      "biaya_staff": [
+        {
+          "nama_biaya": "Head",
+          "jumlah_biaya": 2350000
+        },
+        {
+          "nama_biaya": "Produksi",
+          "jumlah_biaya": 1700000
+        }
+      ],
+      "total": 360000,
+      "rata_rata": 2450,
+      "total_biaya": 146
+    },
+    {
+      "cabang_id": 4,
+      "biaya_operasional": [
+        {
+          "nama_biaya": "Listrik",
+          "jumlah_biaya": 1400000
+        },
+        {
+          "nama_biaya": "Air",
+          "jumlah_biaya": 475000
+        }
+      ],
+      "biaya_staff": [
+        {
+          "nama_biaya": "Head",
+          "jumlah_biaya": 1900000
+        },
+        {
+          "nama_biaya": "Produksi",
+          "jumlah_biaya": 1300000
+        }
+      ],
+      "total": 260000,
+      "rata_rata": 1850,
+      "total_biaya": 140
+    },
+    {
+      "cabang_id": 5,
+      "biaya_operasional": [
+        {
+          "nama_biaya": "Listrik",
+          "jumlah_biaya": 1500000
+        },
+        {
+          "nama_biaya": "Air",
+          "jumlah_biaya": 525000
+        }
+      ],
+      "biaya_staff": [
+        {
+          "nama_biaya": "Head",
+          "jumlah_biaya": 2000000
+        },
+        {
+          "nama_biaya": "Produksi",
+          "jumlah_biaya": 1450000
+        }
+      ],
+      "total": 290000,
+      "rata_rata": 2000,
+      "total_biaya": 145
+    }
+  ]

@@ -1,0 +1,196 @@
+[
+    {
+      "nama_barang": "Gelang Karet",
+      "kategori_barang_id": 1,
+      "jumlah_minimum_stok": 250,
+      "waktu_pengerjaan": 60,
+      "keuntungan": 100,
+      "harga_jual": 100,
+      "total_hpp": 100,
+      "rincian_biaya": [
+        {
+          "nama_biaya": "Modal",
+          "jumlah_biaya": 100000
+        }
+      ]
+    },
+    {
+      "nama_barang": "Kalung Manik-Manik",
+      "kategori_barang_id": 2,
+      "jumlah_minimum_stok": 150,
+      "waktu_pengerjaan": 90,
+      "keuntungan": 120,
+      "harga_jual": 200,
+      "total_hpp": 80,
+      "rincian_biaya": [
+        {
+          "nama_biaya": "Bahan Baku",
+          "jumlah_biaya": 75000
+        },
+        {
+          "nama_biaya": "Tenaga Kerja",
+          "jumlah_biaya": 20000
+        }
+      ]
+    },
+    {
+      "nama_barang": "Cincin Perak",
+      "kategori_barang_id": 1,
+      "jumlah_minimum_stok": 80,
+      "waktu_pengerjaan": 120,
+      "keuntungan": 180,
+      "harga_jual": 350,
+      "total_hpp": 170,
+      "rincian_biaya": [
+        {
+          "nama_biaya": "Perak",
+          "jumlah_biaya": 120000
+        },
+        {
+          "nama_biaya": "Pengemasan",
+          "jumlah_biaya": 50000
+        }
+      ]
+    },
+    {
+      "nama_barang": "Gelang Tali",
+      "kategori_barang_id": 2,
+      "jumlah_minimum_stok": 200,
+      "waktu_pengerjaan": 30,
+      "keuntungan": 75,
+      "harga_jual": 120,
+      "total_hpp": 45,
+      "rincian_biaya": [
+        {
+          "nama_biaya": "Tali",
+          "jumlah_biaya": 30000
+        },
+        {
+          "nama_biaya": "Aksesoris",
+          "jumlah_biaya": 15000
+        }
+      ]
+    },
+    {
+      "nama_barang": "Bros Kain",
+      "kategori_barang_id": 1,
+      "jumlah_minimum_stok": 120,
+      "waktu_pengerjaan": 45,
+      "keuntungan": 90,
+      "harga_jual": 180,
+      "total_hpp": 90,
+      "rincian_biaya": [
+        {
+          "nama_biaya": "Kain",
+          "jumlah_biaya": 60000
+        },
+        {
+          "nama_biaya": "Peniti",
+          "jumlah_biaya": 10000
+        },
+        {
+          "nama_biaya": "Pewarna",
+          "jumlah_biaya": 20000
+        }
+      ]
+    },
+    {
+      "nama_barang": "anting-anting",
+      "kategori_barang_id": 1,
+      "jumlah_minimum_stok": 100,
+      "waktu_pengerjaan": 30,
+      "keuntungan": 80,
+      "harga_jual": 150,
+      "total_hpp": 70,
+      "rincian_biaya": [
+        {
+          "nama_biaya": "bahan baku",
+          "jumlah_biaya": 40000
+        },
+        {
+          "nama_biaya": "tenaga kerja",
+          "jumlah_biaya": 15000
+        }
+      ]
+    },
+    {
+      "nama_barang": "gelang kaki",
+      "kategori_barang_id": 2,
+      "jumlah_minimum_stok": 180,
+      "waktu_pengerjaan": 60,
+      "keuntungan": 110,
+      "harga_jual": 220,
+      "total_hpp": 110,
+      "rincian_biaya": [
+        {
+          "nama_biaya": "bahan baku",
+          "jumlah_biaya": 60000
+        },
+        {
+          "nama_biaya": "kemasan",
+          "jumlah_biaya": 5000
+        }
+      ]
+    },
+    {
+      "nama_barang": "liontin",
+      "kategori_barang_id": 1,
+      "jumlah_minimum_stok": 60,
+      "waktu_pengerjaan": 90,
+      "keuntungan": 150,
+      "harga_jual": 300,
+      "total_hpp": 150,
+      "rincian_biaya": [
+        {
+          "nama_biaya": "bahan baku",
+          "jumlah_biaya": 80000
+        },
+        {
+          "nama_biaya": "tenaga kerja",
+          "jumlah_biaya": 25000
+        },
+        {
+          "nama_biaya": "lain-lain",
+          "jumlah_biaya": 10000
+        }
+      ]
+    },
+    {
+      "nama_barang": "bros",
+      "kategori_barang_id": 2,
+      "jumlah_minimum_stok": 140,
+      "waktu_pengerjaan": 45,
+      "keuntungan": 90,
+      "harga_jual": 180,
+      "total_hpp": 90,
+      "rincian_biaya": [
+        {
+          "nama_biaya": "bahan baku",
+          "jumlah_biaya": 50000
+        },
+        {
+          "nama_biaya": "kemasan",
+          "jumlah_biaya": 10000
+        }
+      ]
+    },
+    {
+      "nama_barang": "ikat rambut",
+      "kategori_barang_id": 1,
+      "jumlah_minimum_stok": 200,
+      "waktu_pengerjaan": 15,
+      "keuntungan": 60,
+      "harga_jual": 100,
+      "total_hpp": 40,
+      "rincian_biaya": [
+        {
+          "nama_biaya": "bahan baku",
+          "jumlah_biaya": 25000
+        },
+        {
+          "nama_biaya": "tenaga kerja",
+          "jumlah_biaya": 5000
+        }
+      ]
+    }
+  ]

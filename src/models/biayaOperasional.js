@@ -26,13 +26,6 @@ const BiayaOperasional = sequelize.define("biaya_operasional", {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
-  operasional_produksi_id: {
-    type: DataTypes.INTEGER,
-    references: {
-      model: OperasionalProduksiGudang,
-      key: "operasional_produksi_id"
-    }
-  },
   is_deleted: {
     type: DataTypes.BOOLEAN,
     defaultValue: false

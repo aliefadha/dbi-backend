@@ -1,15 +1,15 @@
-const { DataTypes } = require("sequelize");  
-const sequelize = require("../config/database");  
+const { DataTypes } = require("sequelize");
+const sequelize = require("../config/database");
 const Karyawan = require("./karyawan");
-  
-const ProduksiGudang = sequelize.define("produksi_gudang", {  
-  produksi_gudang_id: {  
-    type: DataTypes.INTEGER,  
+
+const ProduksiGudang = sequelize.define("produksi_gudang", {
+  produksi_gudang_id: {
+    type: DataTypes.INTEGER,
     allowNull: false,
     primaryKey: true,
     autoIncrement: true,
   },
-  karyawan_id : {
+  karyawan_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
@@ -37,13 +37,17 @@ const ProduksiGudang = sequelize.define("produksi_gudang", {
     defaultValue: 'proses',
     allowNull: false
   },
+  gaji_pokok_perhari: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+  },
   is_deleted: {
     type: DataTypes.BOOLEAN,
     defaultValue: false
   },
 
-},{
+}, {
   timestamps: false
-});  
-  
+});
+
 module.exports = ProduksiGudang;  

@@ -47,7 +47,7 @@ class PembelianGudangService {
         {
           model: MetodePembayaranGudang,
           as: "metode_pembelian",
-          attributes: ["nama_metode"]
+          attributes: ["nama_metode"],
         }
       ]
     });
