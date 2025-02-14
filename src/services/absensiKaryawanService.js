@@ -1,9 +1,6 @@
 const AbsensiKaryawan = require("../models/absensiKaryawan"); 
 const Karyawan = require("../models/karyawan"); 
 const DivisiKaryawan = require("../models/divisiKaryawan");
-const Cabang = require("../models/cabang");
-const { Op } = require("sequelize");
-const CutiKaryawan = require("../models/cutiKaryawan");
 const DataKaryawanService = require("./dataKaryawanService");
 
 class AbsensiKaryawanService {  
@@ -90,16 +87,45 @@ class AbsensiKaryawanService {
     return true;  
   }  
 
-  static async test(){
-    return 'a';
-  }
-
   static async getListAbsensiByKaryawan(id, bulan, tahun){
     return await DataKaryawanService.getListAbsensiByKaryawan(id, bulan, tahun);
   }
 
   static async getDataAbsensiByKaryawan(id, bulan, tahun){
     return await DataKaryawanService.getDataAbsensiByKaryawan(id, bulan, tahun);
+  }
+
+  static async getManagerAbsensi(bulan, tahun) {
+      const karyawanList = await Karyawan.findAll({
+          include: [
+            {
+              model: DivisiKaryawan,
+              as: "divisi",
+              attributes: ["nama_divisi"]
+            }
+          ]
+      });  
+      const allowedDivisiNames = ["Manager", "Finance", "SPV", "Head Gudang"];
+      // Initialize an array to hold the results  
+      const results = [];  
+
+      // Iterate through each employee  
+      for (const karyawan of karyawanList) {  
+          // Check if the divisi of the employee is in the allowed list
+          if (karyawan.divisi && allowedDivisiNames.includes(karyawan.divisi.nama_divisi)) {
+              const id = karyawan.karyawan_id;
+
+              // Call the getDataAbsensiByKaryawan function for each employee  
+              const data = await DataKaryawanService.getDataAbsensiByKaryawan(id, bulan, tahun);  
+
+              // Add the data to the results if it exists
+              if (data) {
+                  results.push(data);  
+              }
+          }
+      }  
+
+      return results; 
   }
 }  
   

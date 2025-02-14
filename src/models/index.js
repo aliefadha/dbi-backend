@@ -805,6 +805,16 @@ Cabang.belongsTo(Toko, {
     foreignKey: "toko_id",
     as: "toko"
 })
+
+Toko.hasMany(Karyawan, {
+    foreignKey: "toko_id",
+    as: "karyawan"
+})
+
+Karyawan.belongsTo(Toko, {
+    foreignKey: "toko_id",
+    as: "toko"
+})
 // Sync models with the database  
 const syncDatabase = async () => {
     try {

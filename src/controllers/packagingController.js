@@ -42,7 +42,8 @@ class PackagingController {
   
   static async getAll(req, res) {  
     try {  
-      const packagings = await PackagingService.getAll();  
+      const { toko_id } = req.query;
+      const packagings = await PackagingService.getAll(toko_id);  
       res.status(200).json({  
         success: true,  
         data: packagings,  

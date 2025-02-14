@@ -194,6 +194,31 @@ class AbsensiKaryawanController {
       });
     }
   }
+
+  static async getManagerAbsensi(req, res) {
+    try {
+      const { bulan, tahun } = req.query;
+      const absensiKaryawan = await AbsensiKaryawanService.getManagerAbsensi(bulan, tahun);
+      if (!absensiKaryawan) {
+        return res.status(404).json({
+          success: false,
+          data: null,
+          message: "not found",
+        });
+      }
+      res.status(200).json({
+        success: true,
+        data: absensiKaryawan,
+        message: "retrieved successfully",
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        data: null,
+        message: error.message,
+      });
+    }
+  }
 }  
   
 module.exports = { AbsensiKaryawanController, upload };  

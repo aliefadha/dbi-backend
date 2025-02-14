@@ -2,12 +2,20 @@ const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");  
 const JenisBarang = require("./jenisBarang");
 const KategoriBarang = require("./kategoriBarang");
+const Toko = require("./toko");
   
 const BarangCustom = sequelize.define("barang_custom", {  
   barang_custom_id: {  
     type: DataTypes.STRING,  
     allowNull: false,
     primaryKey: true,
+  },
+  toko_id: {
+    type: DataTypes.INTEGER,
+    references: {
+      model: Toko,
+      key: 'toko_id'
+    }
   },
   image: {
     type: DataTypes.STRING,  
