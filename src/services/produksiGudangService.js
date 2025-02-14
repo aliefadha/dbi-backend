@@ -1,6 +1,8 @@
 const { sequelize } = require("../models");
+const AbsensiKaryawan = require("../models/absensiKaryawan");
 const BarangHandmadeGudang = require("../models/barangHandmadeGudang");
 const BarangProduksiGudang = require("../models/barangProduksiGudang");
+const Karyawan = require("../models/karyawan");
 const ProduksiGudang = require("../models/produksiGudang");
 const RincianBahanGudang = require("../models/rincianBahanGudang");
 const StokBarangGudang = require("../models/stokBarangGudang");
@@ -161,9 +163,8 @@ class ProduksiGudangService {
       const bahanProduction = produksiGudang.produk.flatMap(item =>
         item.barang.rincian_bahan
       );
-
-
       if (status === "terima") {
+        // Process stock updates
         for (const bahan of bahanProduction) {
           const stockRecord = await StokBarangGudang.findOne({
             where: {
@@ -180,6 +181,34 @@ class ProduksiGudangService {
             transaction
           });
         }
+
+        // Process karyawan data
+        const karyawanData = await Karyawan.findOne({
+          where: { 
+            karyawan_id: produksiGudang.karyawan_id,
+          },
+          transaction
+        });
+
+        if (!karyawanData) {  
+          throw new Error("Karyawan not found");  
+        } 
+
+        let gajiPokokPerhari = (karyawanData.jumlah_gaji_pokok / karyawanData.waktu_kerja_sebulan_menit) * produksiGudang.total_menit; 
+
+        // Create absensi record
+        await AbsensiKaryawan.create({
+          image: produksiGudang.image,
+          karyawan_id: produksiGudang.karyawan_id,
+          tanggal: produksiGudang.tanggal,
+          total_menit: produksiGudang.total_menit,
+          status: status,
+          gaji_pokok_perhari: gajiPokokPerhari,
+        }, { transaction });
+
+        await produksiGudang.update({
+          gaji_pokok_perhari: gajiPokokPerhari,
+        }, { transaction });
       }
 
       await transaction.commit();

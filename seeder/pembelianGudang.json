@@ -1,0 +1,312 @@
+[
+    {
+      "cash_or_non": true,
+      "metode_id": 1,
+      "sub_total": 250000,
+      "diskon": 10,
+      "pajak": 5,
+      "total_penjualan": 236250,
+      "produk": [
+        {
+          "barang_mentah_id": "MTH0001",
+          "harga_satuan": 15000,
+          "kuantitas": 5,
+          "total_biaya": 75000
+        },
+        {
+          "barang_handmade_id": "BHM0002",
+          "harga_satuan": 25000,
+          "kuantitas": 3,
+          "total_biaya": 75000
+        },
+        {
+          "barang_nonhandmade_id": "BNH0003",
+          "harga_satuan": 35000,
+          "kuantitas": 2,
+          "total_biaya": 70000
+        },
+        {
+          "packaging_id": "PCK0004",
+          "harga_satuan": 5000,
+          "kuantitas": 10,
+          "total_biaya": 50000
+        }
+      ]
+    },
+    {
+      "cash_or_non": false,
+      "metode_id": 2,
+      "sub_total": 180000,
+      "diskon": 5,
+      "pajak": 10,
+      "total_penjualan": 170100,
+      "produk": [
+        {
+          "barang_mentah_id": "MTH0005",
+          "harga_satuan": 10000,
+          "kuantitas": 8,
+          "total_biaya": 80000
+        },
+        {
+          "barang_handmade_id": "BHM0006",
+          "harga_satuan": 20000,
+          "kuantitas": 4,
+          "total_biaya": 80000
+        },
+        {
+          "barang_nonhandmade_id": "BNH0007",
+          "harga_satuan": 30000,
+          "kuantitas": 1,
+          "total_biaya": 30000
+        }
+      ]
+    },
+    {
+      "cash_or_non": true,
+      "metode_id": 1,
+      "sub_total": 320000,
+      "diskon": 15,
+      "pajak": 0,
+      "total_penjualan": 272000,
+      "produk": [
+        {
+          "barang_mentah_id": "MTH0008",
+          "harga_satuan": 25000,
+          "kuantitas": 3,
+          "total_biaya": 75000
+        },
+        {
+          "barang_handmade_id": "BHM0009",
+          "harga_satuan": 35000,
+          "kuantitas": 2,
+          "total_biaya": 70000
+        },
+        {
+          "barang_nonhandmade_id": "BNH0010",
+          "harga_satuan": 45000,
+          "kuantitas": 1,
+          "total_biaya": 45000
+        },
+        {
+          "packaging_id": "PCK0001",
+          "harga_satuan": 7500,
+          "kuantitas": 5,
+          "total_biaya": 37500
+        }
+      ]
+    },
+      {
+      "cash_or_non": false,
+      "metode_id": 2,
+      "sub_total": 210000,
+      "diskon": 0,
+      "pajak": 5,
+      "total_penjualan": 220500,
+      "produk": [
+        {
+          "barang_mentah_id": "MTH0002",
+          "harga_satuan": 12000,
+          "kuantitas": 7,
+          "total_biaya": 84000
+        },
+        {
+          "barang_handmade_id": "BHM0003",
+          "harga_satuan": 22000,
+          "kuantitas": 3,
+          "total_biaya": 66000
+        },
+        {
+          "barang_nonhandmade_id": "BNH0004",
+          "harga_satuan": 32000,
+          "kuantitas": 2,
+          "total_biaya": 64000
+        }
+      ]
+    },
+    {
+      "cash_or_non": true,
+      "metode_id": 1,
+      "sub_total": 280000,
+      "diskon": 20,
+      "pajak": 10,
+      "total_penjualan": 254800,
+      "produk": [
+        {
+          "barang_mentah_id": "MTH0006",
+          "harga_satuan": 18000,
+          "kuantitas": 4,
+          "total_biaya": 72000
+        },
+        {
+          "barang_handmade_id": "BHM0007",
+          "harga_satuan": 28000,
+          "kuantitas": 2,
+          "total_biaya": 56000
+        },
+        {
+          "barang_nonhandmade_id": "BNH0008",
+          "harga_satuan": 38000,
+          "kuantitas": 3,
+          "total_biaya": 114000
+        },
+        {
+          "packaging_id": "PCK0009",
+          "harga_satuan": 6000,
+          "kuantitas": 8,
+          "total_biaya": 48000
+        }
+      ]
+    },
+    {
+      "cash_or_non": false,
+      "metode_id": 2,
+      "sub_total": 150000,
+      "diskon": 10,
+      "pajak": 0,
+      "total_penjualan": 135000,
+      "produk": [
+        {
+          "barang_mentah_id": "MTH0009",
+          "harga_satuan": 9000,
+          "kuantitas": 6,
+          "total_biaya": 54000
+        },
+        {
+          "barang_handmade_id": "BHM0010",
+          "harga_satuan": 19000,
+          "kuantitas": 3,
+          "total_biaya": 57000
+        },
+        {
+          "barang_nonhandmade_id": "BNH0001",
+          "harga_satuan": 29000,
+          "kuantitas": 1,
+          "total_biaya": 29000
+        }
+      ]
+    },
+    {
+      "cash_or_non": true,
+      "metode_id": 1,
+      "sub_total": 350000,
+      "diskon": 5,
+      "pajak": 10,
+      "total_penjualan": 344250,
+      "produk": [
+        {
+          "barang_mentah_id": "MTH0003",
+          "harga_satuan": 22000,
+          "kuantitas": 5,
+          "total_biaya": 110000
+        },
+        {
+          "barang_handmade_id": "BHM0004",
+          "harga_satuan": 32000,
+          "kuantitas": 4,
+            "total_biaya": 88000
+        },
+        {
+            "barang_nonhandmade_id": "BNH0005",
+            "harga_satuan": 42000,
+            "kuantitas": 2,
+            "total_biaya": 84000
+        },
+        {
+            "packaging_id": "PCK0006",
+            "harga_satuan": 8000,
+            "kuantitas": 10,
+            "total_biaya": 80000
+        }
+        ]
+    },
+    {
+        "cash_or_non": false,
+        "metode_id": 2,
+        "sub_total": 190000,
+        "diskon": 15,
+        "pajak": 5,
+        "total_penjualan": 170850,
+        "produk": [
+        {
+            "barang_mentah_id": "MTH0007",
+            "harga_satuan": 11000,
+            "kuantitas": 5,
+            "total_biaya": 55000
+        },
+        {
+            "barang_handmade_id": "BHM0008",
+            "harga_satuan": 21000,
+            "kuantitas": 3,
+            "total_biaya": 63000
+        },
+        {
+            "barang_nonhandmade_id": "BNH0009",
+            "harga_satuan": 31000,
+            "kuantitas": 2,
+            "total_biaya": 62000
+        }
+        ]
+    },
+    {
+        "cash_or_non": true,
+        "metode_id": 1,
+        "sub_total": 240000,
+        "diskon": 0,
+        "pajak": 10,
+        "total_penjualan": 264000,
+        "produk": [
+        {
+            "barang_mentah_id": "MTH0010",
+            "harga_satuan": 14000,
+            "kuantitas": 8,
+            "total_biaya": 112000
+        },
+        {
+            "barang_handmade_id": "BHM0001",
+            "harga_satuan": 24000,
+            "kuantitas": 4,
+            "total_biaya": 96000
+        },
+        {
+            "barang_nonhandmade_id": "BNH0002",
+            "harga_satuan": 34000,
+            "kuantitas": 1,
+            "total_biaya": 34000
+        }
+        ]
+    },
+    {
+        "cash_or_non": false,
+        "metode_id": 2,
+        "sub_total": 310000,
+        "diskon": 10,
+        "pajak": 5,
+        "total_penjualan": 284650,
+        "produk": [
+        {
+            "barang_mentah_id": "MTH0004",
+            "harga_satuan": 21000,
+            "kuantitas": 3,
+            "total_biaya": 63000
+        },
+        {
+            "barang_handmade_id": "BHM0005",
+            "harga_satuan": 31000,
+            "kuantitas": 2,
+            "total_biaya": 62000
+        },
+        {
+            "barang_nonhandmade_id": "BNH0006",
+            "harga_satuan": 41000,
+            "kuantitas": 4,
+            "total_biaya": 164000
+        },
+        {
+            "packaging_id": "PCK0007",
+            "harga_satuan": 7000,
+            "kuantitas": 5,
+            "total_biaya": 35000
+        }
+        ]
+    }
+]

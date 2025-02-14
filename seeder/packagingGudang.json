@@ -1,0 +1,82 @@
+[
+    {
+      "nama_packaging": "Zipper",
+      "ukuran": "Besar",
+      "jumlah_minimum_stok": 10,
+      "harga": 10000,
+      "isi": 10,
+      "harga_satuan": 1000
+    },
+    {
+      "nama_packaging": "Karton",
+      "ukuran": "Sedang",
+      "jumlah_minimum_stok": 25,
+      "harga": 5000,
+      "isi": 50,
+      "harga_satuan": 100
+    },
+    {
+      "nama_packaging": "Plastik",
+      "ukuran": "Kecil",
+      "jumlah_minimum_stok": 50,
+      "harga": 2000,
+      "isi": 100,
+      "harga_satuan": 20
+    },
+    {
+      "nama_packaging": "Bubble Wrap",
+      "ukuran": "Sedang",
+      "jumlah_minimum_stok": 15,
+      "harga": 7500,
+      "isi": 25,
+      "harga_satuan": 300
+    },
+    {
+      "nama_packaging": "Amplop",
+      "ukuran": "Kecil",
+      "jumlah_minimum_stok": 100,
+      "harga": 1000,
+      "isi": 200,
+      "harga_satuan": 5
+    },
+    {
+      "nama_packaging": "Kotak",
+      "ukuran": "Besar",
+      "jumlah_minimum_stok": 5,
+      "harga": 15000,
+      "isi": 5,
+      "harga_satuan": 3000
+    },
+    {
+      "nama_packaging": "Paper Bag",
+      "ukuran": "Sedang",
+      "jumlah_minimum_stok": 30,
+      "harga": 3000,
+      "isi": 75,
+      "harga_satuan": 40
+    },
+    {
+      "nama_packaging": "Botol",
+      "ukuran": "Kecil",
+      "jumlah_minimum_stok": 75,
+      "harga": 6000,
+      "isi": 150,
+      "harga_satuan": 40
+    },
+    {
+      "nama_packaging": "Tube",
+      "ukuran": "Sedang",
+      "jumlah_minimum_stok": 20,
+      "harga": 9000,
+      "isi": 30,
+      "harga_satuan": 300
+    },
+    {
+      "nama_packaging": "Kaleng",
+      "ukuran": "Besar",
+      "jumlah_minimum_stok": 10,
+      "harga": 12000,
+      "isi": 20,
+      "harga_satuan": 600
+    }
+  ]

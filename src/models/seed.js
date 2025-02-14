@@ -14,8 +14,24 @@ const MetodePembayaranGudang = require('./metodePembayaranGudang');
 const BiayaOperasionalStaffGudang = require('./biayaOperasionalStaffGudang');
 const BiayaOperasionalProduksiGudang = require('./biayaOperasionalProduksiGudang');
 const BiayaGudang = require('./biayaGudang');
-const BarangHandmade = require('./barangHandmade');
 const Authentication = require('./authentication');
+const barangMentah = require('../../seeder/barangMentah.json');
+const barangHandmadeGudang = require('../../seeder/barangHandmadeGudang.json');
+const packagingGudang = require('../../seeder/packagingGudang.json');
+const barangNonHandmadeGudang = require('../../seeder/barangNonHandmadeGudang.json');
+const biayaToko = require('../../seeder/biayaToko.json');
+const pembelianGudang = require('../../seeder/pembelianGudang.json');
+const CustomIdGenerateService = require('../services/customIdGenerateService');
+const RincianBahanGudang = require('./rincianBahanGudang');
+const BarangHandmadeGudang = require('./barangHandmadeGudang');
+const RincianBiayaGudangService = require('../services/rincianBiayaGudangService');
+const BarangNonHandmadeGudang = require('./barangNonHandmadeGudang');
+const BiayaTokoService = require('../services/biayaTokoService');
+const PackagingGudangService = require('../services/packagingGudangService');
+const PembelianGudangService = require('../services/pembelianGudangService');
+const Toko = require('./toko');
+const KategoriPengeluaran = require('./kategoriPengeluaran');
+const KategoriPemasukan = require('./kategoriPemasukan');
 
 const seedDatabase = async () => {
     try {
@@ -44,9 +60,10 @@ const seedDatabase = async () => {
 
         //Seed data for MetodePembayaran
         await MetodePembayaran.create({ nama_metode: "BCA" })
-        
+
         //Seed data for MetodePembayaran
         await MetodePembayaranGudang.create({ nama_metode: "BCA" })
+        await MetodePembayaranGudang.create({ nama_metode: "MANDIRI" })
 
         //Seed data for biaya gudang
         await BiayaGudang.create({
@@ -71,27 +88,15 @@ const seedDatabase = async () => {
             biaya_gudang_id: 1
         })
 
-        //Seed data for barang mentah
-        await BarangMentah.create({
-            barang_mentah_id: "MTH0001",
-            nama_barang: "Manik-Manik Angka",
-            harga: 10000,
-            jumlah_minimum_stok: 10,
-            harga_satuan: 1000,
-            isi: 10,
-            is_deleted: false
-        })
+        //Seed for kategori pengeluaran
+        await KategoriPengeluaran.create({kategori_pengeluaran: "Pembelian"})
+        await KategoriPengeluaran.create({kategori_pengeluaran: "Beban Listrik"})
 
-        await BarangMentah.create({
-            barang_mentah_id: "MTH0002",
-            nama_barang: "Manik-Manik Huruf",
-            harga: 10000,
-            jumlah_minimum_stok: 10,
-            harga_satuan: 1000,
-            isi: 10,
-            is_deleted: false
-        })
-        
+        //Seed for kategori pemasukan
+        await KategoriPemasukan.create({kategori_pemasukan: "Penjualan"})
+        await KategoriPemasukan.create({kategori_pemasukan: "Hibah"})
+
+
 
         // Seed data for Penjualan
         // await Penjualan.create({
@@ -110,9 +115,16 @@ const seedDatabase = async () => {
         await DivisiKaryawan.create({ divisi_karyawan_id: 1, nama_divisi: "Produksi" });
         await DivisiKaryawan.create({ divisi_karyawan_id: 2, nama_divisi: "Pemasaran" });
 
+        // Seed data for Toko
+        await Toko.create({nama_toko: "Tatitatu", email: "tatitatu@gmail.com", password: 12345678});
+        await Toko.create({nama_toko: "Gudang", email: "gudang@gmail.com", password: 12345678});
+
         // Seed data for Cabang  
-        await Cabang.create({ cabang_id: 1, nama_cabang: "Gor", email: "gor@gmail.com", password: 12345678 });
-        await Cabang.create({ cabang_id: 2, nama_cabang: "Upi", email: "upi@gmail.com", password: 12345678 });
+        await Cabang.create({ cabang_id: 1, toko_id: 1, nama_cabang: "Gor", email: "gor@gmail.com", password: 12345678 });
+        await Cabang.create({ cabang_id: 2, toko_id: 1, nama_cabang: "Upi", email: "upi@gmail.com", password: 12345678 });
+        await Cabang.create({ cabang_id: 3, toko_id: 1, nama_cabang: "Taplau", email: "taplau@gmail.com", password: 12345678 });
+        await Cabang.create({ cabang_id: 4, toko_id: 1, nama_cabang: "Gunung Pangilun", email: "gpangilung@gmail.com", password: 12345678 });
+        await Cabang.create({ cabang_id: 5, toko_id: 1, nama_cabang: "Soetomo", email: "soetomo@gmail.com", password: 12345678 });
 
         // Seed data for Karyawan  
         await Karyawan.create({ karyawan_id: 1, nama_karyawan: "Budi", divisi_karyawan_id: 1, cabang_id: 1, cabang_id_first: 1, email: 'aa@gmail.com', password: '123', jumlah_gaji_pokok: 2000000, bonus: 250000, waktu_kerja_sebulan_menit: 806400 });
@@ -136,10 +148,123 @@ const seedDatabase = async () => {
         await Authentication.create({ email: "headgudang@gmail.com", password: 12345678 });
         await Authentication.create({ email: "admingudang@gmail.com", password: 12345678 });
 
+        // Proper seed barang mentah
+        for (const item of barangMentah) {
+            const barangMentahId = await CustomIdGenerateService.generateBarangMentahId();
+            await BarangMentah.create({
+                barang_mentah_id: barangMentahId,
+                nama_barang: item.nama_barang,
+                harga: item.harga,
+                jumlah_minimum_stok: item.jumlah_minimum_stok,
+                harga_satuan: item.harga_satuan,
+                isi: item.isi,
+                is_deleted: item.is_deleted
+            });
+        }
+
+        // Proper seed barang handmade
+        for (const item of barangHandmadeGudang) {
+            const barangHandmadeId = await CustomIdGenerateService.generateBarangHandmadeGudangId();
+
+            await BarangHandmadeGudang.create({
+                barang_handmade_id: barangHandmadeId,
+                nama_barang: item.nama_barang,
+                image: null,
+                kategori_barang_id: item.kategori_barang_id,
+                jumlah_minimum_stok: item.jumlah_minimum_stok,
+                waktu_pengerjaan: item.waktu_pengerjaan,
+                keuntungan: item.keuntungan,
+                harga_jual: item.harga_jual,
+                total_hpp: item.total_hpp,
+                is_deleted: false
+            });
+
+            // Create rincian bahan
+            for (const bahan of item.rincian_bahan) {
+                await RincianBahanGudang.create({
+                    barang_handmade_id: barangHandmadeId,
+                    ...bahan
+                });
+            }
+
+            await RincianBiayaGudangService.createMany([
+                {
+                    barang_handmade_id: barangHandmadeId,
+                    nama_biaya: "Biaya Operasional dan Staff",
+                    jumlah_biaya: 10000000
+                },
+                {
+                    barang_handmade_id: barangHandmadeId,
+                    nama_biaya: "Biaya Operasional Produksi",
+                    jumlah_biaya: 3000000
+                }
+            ]);
+        }
+
+        // Proper seed barang non-handmade
+        for (const item of barangNonHandmadeGudang) {
+            const barangNonHandmadeId = await CustomIdGenerateService.generateBarangNonHandmadeGudangId();
+            
+            await BarangNonHandmadeGudang.create({
+                barang_nonhandmade_id: barangNonHandmadeId,
+                nama_barang: item.nama_barang,
+                image: null,
+                kategori_barang_id: item.kategori_barang_id,
+                jumlah_minimum_stok: item.jumlah_minimum_stok,
+                harga: item.harga,
+                total_hpp: item.total_hpp,
+                keuntungan: item.keuntungan,
+                harga_jual: item.harga_jual,
+                is_deleted: false
+            });
+
+            await RincianBiayaGudangService.createMany([
+                {
+                    barang_nonhandmade_id: barangNonHandmadeId,
+                    nama_biaya: "Biaya Operasional dan Staff",
+                    jumlah_biaya: 10000000
+                },
+                {
+                    barang_nonhandmade_id: barangNonHandmadeId,
+                    nama_biaya: "Biaya Operasional Produksi",
+                    jumlah_biaya: 3000000
+                },
+                ...item.rincian_biaya.map(bahan => ({
+                    barang_nonhandmade_id: barangNonHandmadeId,
+                    ...bahan
+                }))
+            ]);
+        }
+
+        for(const item of packagingGudang) {
+            const newId = await CustomIdGenerateService.generatePackagingGudangId();
+            await PackagingGudangService.create({
+                ...item,
+                packaging_id: newId,
+                image: null
+            })
+        }
+
+        for(const item of biayaToko) {
+            await BiayaTokoService.create({
+                ...item
+            })
+        }
+
+        for(const item of pembelianGudang) {
+            const newId = await CustomIdGenerateService.generatePembelianGudangId();
+            await PembelianGudangService.create({
+                ...item,
+                pembelian_id: newId
+              });
+        }
+
+
+
         console.log("Seed data created!");
     } catch (error) {
         console.error("Error seeding database:", error);
     }
 };
 
-module.exports = seedDatabase;  
+module.exports = seedDatabase;

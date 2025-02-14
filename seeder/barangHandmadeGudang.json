@@ -1,0 +1,214 @@
+[
+    {
+      "nama_barang": "Gelang Karet",
+      "kategori_barang_id": 1,
+      "jumlah_minimum_stok": 250,
+      "waktu_pengerjaan": 60,
+      "keuntungan": 100,
+      "harga_jual": 100,
+      "total_hpp": 100,
+      "rincian_bahan": [
+        {
+          "barang_mentah_id": "MTH0001",
+          "harga_satuan": 10,
+          "kuantitas": 5,
+          "total_biaya": 50
+        }
+      ]
+    },
+    {
+      "nama_barang": "Kalung Manik-Manik",
+      "kategori_barang_id": 2,
+      "jumlah_minimum_stok": 100,
+      "waktu_pengerjaan": 90,
+      "keuntungan": 150,
+      "harga_jual": 250,
+      "total_hpp": 100,
+      "rincian_bahan": [
+        {
+          "barang_mentah_id": "MTH0002",
+          "harga_satuan": 50,
+          "kuantitas": 1,
+          "total_biaya": 50
+        },
+        {
+          "barang_mentah_id": "MTH0003",
+          "harga_satuan": 25,
+          "kuantitas": 2,
+          "total_biaya": 50
+        }
+      ]
+    },
+    {
+      "nama_barang": "Anting-Anting Mutiara",
+      "kategori_barang_id": 1,
+      "jumlah_minimum_stok": 50,
+      "waktu_pengerjaan": 120,
+      "keuntungan": 200,
+      "harga_jual": 300,
+      "total_hpp": 100,
+      "rincian_bahan": [
+        {
+          "barang_mentah_id": "MTH0004",
+          "harga_satuan": 80,
+          "kuantitas": 1,
+          "total_biaya": 80
+        },
+        {
+          "barang_mentah_id": "MTH0005",
+          "harga_satuan": 10,
+          "kuantitas": 2,
+          "total_biaya": 20
+        }
+      ]
+    },
+    {
+      "nama_barang": "Cincin Perak",
+      "kategori_barang_id": 2,
+      "jumlah_minimum_stok": 30,
+      "waktu_pengerjaan": 180,
+      "keuntungan": 300,
+      "harga_jual": 400,
+      "total_hpp": 100,
+      "rincian_bahan": [
+        {
+          "barang_mentah_id": "MTH0006",
+          "harga_satuan": 100,
+          "kuantitas": 1,
+          "total_biaya": 100
+        }
+      ]
+    },
+    {
+      "nama_barang": "Bros Bunga",
+      "kategori_barang_id": 1,
+      "jumlah_minimum_stok": 80,
+      "waktu_pengerjaan": 60,
+      "keuntungan": 100,
+      "harga_jual": 200,
+      "total_hpp": 100,
+      "rincian_bahan": [
+        {
+          "barang_mentah_id": "MTH0007",
+          "harga_satuan": 40,
+          "kuantitas": 2,
+          "total_biaya": 80
+        },
+        {
+          "barang_mentah_id": "MTH0008",
+          "harga_satuan": 10,
+          "kuantitas": 2,
+          "total_biaya": 20
+        }
+      ]
+    },
+    {
+      "nama_barang": "Gelang Kulit",
+      "kategori_barang_id": 2,
+      "jumlah_minimum_stok": 60,
+      "waktu_pengerjaan": 120,
+      "keuntungan": 200,
+      "harga_jual": 300,
+      "total_hpp": 100,
+      "rincian_bahan": [
+        {
+          "barang_mentah_id": "MTH0009",
+          "harga_satuan": 70,
+          "kuantitas": 1,
+          "total_biaya": 70
+        },
+        {
+          "barang_mentah_id": "MTH0010",
+          "harga_satuan": 15,
+          "kuantitas": 2,
+          "total_biaya": 30
+        }
+      ]
+    },
+    {
+      "nama_barang": "Ikat Rambut Mutiara",
+      "kategori_barang_id": 1,
+      "jumlah_minimum_stok": 100,
+      "waktu_pengerjaan": 30,
+      "keuntungan": 50,
+      "harga_jual": 150,
+      "total_hpp": 100,
+      "rincian_bahan": [
+        {
+          "barang_mentah_id": "MTH0011",
+          "harga_satuan": 60,
+          "kuantitas": 1,
+          "total_biaya": 60
+        },
+        {
+          "barang_mentah_id": "MTH0005",
+          "harga_satuan": 20,
+          "kuantitas": 2,
+          "total_biaya": 40
+        }
+      ]
+    },
+    {
+      "nama_barang": "Bandana Rajut",
+      "kategori_barang_id": 2,
+      "jumlah_minimum_stok": 50,
+      "waktu_pengerjaan": 120,
+      "keuntungan": 200,
+      "harga_jual": 300,
+      "total_hpp": 100,
+      "rincian_bahan": [
+        {
+          "barang_mentah_id": "MTH0012",
+          "harga_satuan": 100,
+          "kuantitas": 1,
+          "total_biaya": 100
+        }
+      ]
+    },
+    {
+      "nama_barang": "Jepit Rambut Bunga",
+      "kategori_barang_id": 1,
+      "jumlah_minimum_stok": 80,
+      "waktu_pengerjaan": 60,
+      "keuntungan": 100,
+      "harga_jual": 200,
+      "total_hpp": 100,
+      "rincian_bahan": [
+        {
+          "barang_mentah_id": "MTH0013",
+          "harga_satuan": 50,
+          "kuantitas": 1,
+          "total_biaya": 50
+        },
+        {
+          "barang_mentah_id": "MTH0008",
+          "harga_satuan": 25,
+          "kuantitas": 2,
+          "total_biaya": 50
+        }
+      ]
+    },
+    {
+      "nama_barang": "Topi Pantai",
+      "kategori_barang_id": 2,
+      "jumlah_minimum_stok": 40,
+      "waktu_pengerjaan": 90,
+      "keuntungan": 150,
+      "harga_jual": 250,
+      "total_hpp": 100,
+      "rincian_bahan": [
+        {
+          "barang_mentah_id": "MTH0014",
+          "harga_satuan": 80,
+          "kuantitas": 1,
+          "total_biaya": 80
+        },
+        {
+          "barang_mentah_id": "MTH0015",
+          "harga_satuan": 10,
+          "kuantitas": 2,
+          "total_biaya": 20
+      }
+    ]
+  }
+]

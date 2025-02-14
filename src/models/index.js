@@ -53,6 +53,10 @@ const RincianBiayaCustom = require('./rincianBiayaCustom');
 const KategoriPengeluaran = require('./kategoriPengeluaran');
 const Pengeluaran = require('./pengeluaran');
 const Toko = require('./toko');
+const DeskripsiPengeluaran = require('./deskripsiPengeluaran');
+const KategoriPemasukan = require('./kategoriPemasukan');
+const Pemasukan = require('./pemasukan');
+const DeskripsiPemasukan = require('./deskripsiPemasukan');
 
 
 
@@ -384,6 +388,16 @@ MetodePembayaran.hasMany(Pembelian, {
 ProduksiGudang.hasMany(BarangProduksiGudang, {
     foreignKey: "produksi_gudang_id",
     as: "produk"
+})
+
+ProduksiGudang.belongsTo(Karyawan, {
+    foreignKey: "karyawan_id",
+    as: "karyawan"
+})
+
+Karyawan.hasMany(ProduksiGudang, {
+    foreignKey: "karyawan_id",
+    as: "produksi"
 })
 
 BarangProduksiGudang.belongsTo(ProduksiGudang, {
@@ -805,6 +819,83 @@ Cabang.belongsTo(Toko, {
     foreignKey: "toko_id",
     as: "toko"
 })
+
+
+Pengeluaran.hasMany(DeskripsiPengeluaran, {
+    foreignKey: "pengeluaran_id",
+    as: "deskripsi_pengeluaran"
+})
+
+Toko.hasMany(DeskripsiPengeluaran, {
+    foreignKey: "toko_id",
+    as: "pengeluaran"
+})
+
+DeskripsiPengeluaran.belongsTo(Toko, {
+    foreignKey: "toko_id",
+    as: "toko"
+})
+
+Cabang.hasMany(DeskripsiPengeluaran, {
+    foreignKey: "cabang_id",
+    as: "pengeluaran"
+})
+
+DeskripsiPengeluaran.belongsTo(Cabang, {
+    foreignKey: "cabang_id",
+    as: "cabang"
+})
+
+KategoriPemasukan.hasMany(Pemasukan, {
+    foreignKey: "kategori_pemasukan_id",
+    as: "pemasukan"
+})
+
+Pemasukan.belongsTo(KategoriPemasukan, {
+    foreignKey: "kategori_pemasukan_id",
+    as: "kategori_pemasukan"
+})
+
+MetodePembayaran.hasMany(Pemasukan, {
+    foreignKey: "metode_id",
+    as: "pemasukan"
+})
+
+Pemasukan.belongsTo(MetodePembayaran, {
+    foreignKey: "metode_id",
+    as: "metode"
+})
+
+DeskripsiPemasukan.belongsTo(Pemasukan, {
+    foreignKey: "pemasukan_id",
+    as: "pemasukan"
+})
+
+Pemasukan.hasMany(DeskripsiPemasukan, {
+    foreignKey: "pemasukan_id",
+    as: "deskripsi_pemasukan"
+})
+
+Toko.hasMany(DeskripsiPemasukan, {
+    foreignKey: "toko_id",
+    as: "pemasukan"
+})
+
+DeskripsiPemasukan.belongsTo(Toko, {
+    foreignKey: "toko_id",
+    as: "toko"
+})
+
+Cabang.hasMany(DeskripsiPemasukan, {
+    foreignKey: "cabang_id",
+    as: "pemasukan"
+})
+
+DeskripsiPemasukan.belongsTo(Cabang, {
+    foreignKey: "cabang_id",
+    as: "cabang"
+})
+
 // Sync models with the database  
 const syncDatabase = async () => {
     try {

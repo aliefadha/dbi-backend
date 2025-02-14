@@ -1,9 +1,16 @@
+const CustomIdGenerateService = require("../services/customIdGenerateService");
+const DeskripsiPemasukanService = require("../services/deskripsiPemasukanService");
 const PemasukanService = require("../services/pemasukanService");  
   
 class PemasukanController {  
   static async create(req, res) {  
     try {  
-      const pemasukan = await PemasukanService.create(req.body);  
+      const newId = await CustomIdGenerateService.generatePemasukanId();
+      const pemasukanData = {
+        ...req.body,
+       pemasukan_id: newId,
+      }
+      const pemasukan = await PemasukanService.create(pemasukanData);  
       res.status(201).json({  
         success: true,  
         data: pemasukan,  
@@ -19,8 +26,9 @@ class PemasukanController {
   }  
   
   static async getAll(req, res) {  
+    const { startDate, endDate } = req.query; 
     try {  
-      const pemasukans = await PemasukanService.getAll();  
+      const pemasukans = await PemasukanService.getAll(startDate, endDate);  
       res.status(200).json({  
         success: true,  
         data: pemasukans,  
@@ -58,6 +66,55 @@ class PemasukanController {
       });  
     }  
   }  
+
+  static async getByKategori(req, res) {
+    try {
+      const pemasukans = await PemasukanService.getByKategori(req.params.kategori_id);
+      if (!pemasukans) {
+        return res.status(404).json({
+          success: false,
+          data: null,
+          message: "not found",
+        });
+      }
+      res.status(200).json({
+        success: true,
+        data: pemasukans,
+        message: "retrieved successfully",
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        data: null,
+        message: error.message,
+      });
+    }
+  }
+
+  static async getByToko(req, res) {
+    const { startDate, endDate } = req.query; 
+    try {
+      const pemasukans = await PemasukanService.getByToko(req.params.toko_id, startDate, endDate);
+      if (!pemasukans) {
+        return res.status(404).json({
+          success: false,
+          data: null,
+          message: "not found",
+        });
+      }
+      res.status(200).json({
+        success: true,
+        data: pemasukans,
+        message: "retrieved successfully",
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        data: null,
+        message: error.message,
+      });
+    }
+  }
   
   static async update(req, res) {  
     try {  

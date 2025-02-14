@@ -19,7 +19,7 @@ class AbsensiKaryawanController {
     try {  
       const absensiKaryawanData = {
         ...req.body,
-        image: req.file.filename
+        image: req.file ? req.file.filename : null,
       }
       const absensiKaryawan = await AbsensiKaryawanService.create(absensiKaryawanData);  
       res.status(201).json({  
