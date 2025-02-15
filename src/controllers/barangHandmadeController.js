@@ -21,7 +21,7 @@ class BarangHandmadeController {
       const newId = await CustomIdGenerateService.generateBarangHandmadeId();
       const barangHandmadeData = {
         ...req.body,  
-        image: req.file.filename,  
+        image: req.file ? req.file.filename : null,  
         barang_handmade_id: newId,  
         jenis_barang_id: 1,
       }

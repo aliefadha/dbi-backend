@@ -1,0 +1,262 @@
+[
+    {
+      "kategori_barang_id": 1,
+      "nama_barang": "Gelang Emas",
+      "jumlah_minimum_stok": 50,
+      "rincian_biaya": [
+        {
+          "cabang_id": 1,
+          "total_hpp": 3000,
+          "keuntungan": 1500,
+          "harga_jual": 20000,
+          "detail_rincian_biaya": [
+            {
+              "biaya_toko_id": 1
+            },
+            {
+              "nama_biaya": "Modal",
+              "jumlah_biaya": 2000
+            },
+            {
+              "nama_biaya": "Packaging",
+              "jumlah_biaya": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kategori_barang_id": 2,
+      "nama_barang": "Kalung Perak",
+      "jumlah_minimum_stok": 75,
+      "rincian_biaya": [
+        {
+          "cabang_id": 2,
+          "total_hpp": 2500,
+          "keuntungan": 1250,
+          "harga_jual": 15000,
+          "detail_rincian_biaya": [
+            {
+              "biaya_toko_id": 1
+            },
+            {
+              "nama_biaya": "Modal",
+              "jumlah_biaya": 1500
+            },
+            {
+              "nama_biaya": "Packaging",
+              "jumlah_biaya": 750
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kategori_barang_id": 1,
+      "nama_barang": "Cincin Berlian",
+      "jumlah_minimum_stok": 25,
+      "rincian_biaya": [
+        {
+          "cabang_id": 1,
+          "total_hpp": 5000,
+          "keuntungan": 2500,
+          "harga_jual": 35000,
+          "detail_rincian_biaya": [
+            {
+              "biaya_toko_id": 1
+            },
+            {
+              "nama_biaya": "Modal",
+              "jumlah_biaya": 3000
+            },
+            {
+              "nama_biaya": "Packaging",
+              "jumlah_biaya": 1500
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kategori_barang_id": 3,
+      "nama_barang": "Gelang Mutiara",
+      "jumlah_minimum_stok": 100,
+      "rincian_biaya": [
+        {
+          "cabang_id": 2,
+          "total_hpp": 1500,
+          "keuntungan": 750,
+          "harga_jual": 10000,
+          "detail_rincian_biaya": [
+            {
+              "biaya_toko_id": 1
+            },
+            {
+              "nama_biaya": "Modal",
+              "jumlah_biaya": 1000
+            },
+            {
+              "nama_biaya": "Packaging",
+              "jumlah_biaya": 500
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kategori_barang_id": 2,
+      "nama_barang": "Anting-anting Emas",
+      "jumlah_minimum_stok": 60,
+      "rincian_biaya": [
+        {
+          "cabang_id": 1,
+          "total_hpp": 2000,
+          "keuntungan": 1000,
+          "harga_jual": 12000,
+          "detail_rincian_biaya": [
+            {
+              "biaya_toko_id": 1
+            },
+            {
+              "nama_biaya": "Modal",
+              "jumlah_biaya": 1200
+            },
+            {
+              "nama_biaya": "Packaging",
+              "jumlah_biaya": 800
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kategori_barang_id": 1,
+      "nama_barang": "Liontin Perak",
+      "jumlah_minimum_stok": 80,
+      "rincian_biaya": [
+        {
+          "cabang_id": 2,
+          "total_hpp": 1800,
+          "keuntungan": 900,
+          "harga_jual": 11000,
+          "detail_rincian_biaya": [
+            {
+              "biaya_toko_id": 1
+            },
+            {
+              "nama_biaya": "Modal",
+              "jumlah_biaya": 1100
+            },
+            {
+              "nama_biaya": "Packaging",
+              "jumlah_biaya": 700
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kategori_barang_id": 3,
+      "nama_barang": "Bros Mutiara",
+      "jumlah_minimum_stok": 90,
+      "rincian_biaya": [
+        {
+          "cabang_id": 1,
+          "total_hpp": 1200,
+          "keuntungan": 600,
+          "harga_jual": 8000,
+          "detail_rincian_biaya": [
+            {
+              "biaya_toko_id": 1
+            },
+            {
+              "nama_biaya": "Modal",
+              "jumlah_biaya": 800
+            },
+            {
+              "nama_biaya": "Packaging",
+              "jumlah_biaya": 400
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kategori_barang_id": 2,
+      "nama_barang": "Gelang Tangan Emas",
+      "jumlah_minimum_stok": 40,
+      "rincian_biaya": [
+        {
+          "cabang_id": 2,
+          "total_hpp": 2800,
+          "keuntungan": 1400,
+          "harga_jual": 17000,
+          "detail_rincian_biaya": [
+            {
+              "biaya_toko_id": 1
+            },
+            {
+              "nama_biaya": "Modal",
+              "jumlah_biaya": 1700
+            },
+            {
+              "nama_biaya": "Packaging",
+              "jumlah_biaya": 1100
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kategori_barang_id": 1,
+      "nama_barang": "Kalung Emas Putih",
+      "jumlah_minimum_stok": 70,
+      "rincian_biaya": [
+        {
+          "cabang_id": 1,
+          "total_hpp": 3500,
+          "keuntungan": 1750,
+          "harga_jual": 22000,
+          "detail_rincian_biaya": [
+            {
+              "biaya_toko_id": 1
+            },
+            {
+              "nama_biaya": "Modal",
+              "jumlah_biaya": 2200
+            },
+            {
+              "nama_biaya": "Packaging",
+              "jumlah_biaya": 1300
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kategori_barang_id": 3,
+      "nama_barang": "Cincin Safir",
+      "jumlah_minimum_stok": 55,
+      "rincian_biaya": [
+        {
+          "cabang_id": 2,
+          "total_hpp": 2200,
+          "keuntungan": 1100,
+          "harga_jual": 14000,
+          "detail_rincian_biaya": [
+            {
+              "biaya_toko_id":1
+            },
+            {
+              "nama_biaya": "Modal",
+              "jumlah_biaya": 1400
+            },
+            {
+              "nama_biaya": "Packaging",
+              "jumlah_biaya": 800
+            }
+          ]
+        }
+      ]
+    }
+  ]

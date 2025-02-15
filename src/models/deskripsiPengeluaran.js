@@ -27,7 +27,7 @@ const DeskripsiPengeluaran = sequelize.define("deskripsi_pengeluaran", {
     type: DataTypes.INTEGER,
     references: {
       model: Toko,
-      key: 'toko_id'
+      key: 'toko_id',
     }
   },
   cabang_id: {

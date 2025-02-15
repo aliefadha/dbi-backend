@@ -1,0 +1,177 @@
+[
+    {
+      "nama_barang": "Kertas Origami",
+      "jumlah_minimum_stok": 50,
+      "harga": 10000,
+      "isi": 100,
+      "harga_satuan": 100
+    },
+    {
+      "nama_barang": "Benang Jahit",
+      "jumlah_minimum_stok": 50,
+      "harga": 3000,
+      "isi": 1,
+      "harga_satuan": 3000
+    },
+    {
+      "nama_barang": "Pita Ukur",
+      "jumlah_minimum_stok": 30,
+      "harga": 10000,
+      "isi": 1,
+      "harga_satuan": 10000
+    },
+    {
+      "nama_barang": "Manik-Manik",
+      "jumlah_minimum_stok": 1000,
+      "harga": 20000,
+      "isi": 500,
+      "harga_satuan": 40
+    },
+    {
+      "nama_barang": "Kawat Baja",
+      "jumlah_minimum_stok": 50,
+      "harga": 15000,
+      "isi": 10,
+      "harga_satuan": 1500
+    },
+    {
+      "nama_barang": "Benang Nilon",
+      "jumlah_minimum_stok": 100,
+      "harga": 8000,
+      "isi": 100,
+      "harga_satuan": 80
+    },
+    {
+      "nama_barang": "Jarum Pentul",
+      "jumlah_minimum_stok": 200,
+      "harga": 3000,
+      "isi": 100,
+      "harga_satuan": 30
+    },
+    {
+      "nama_barang": "Renda",
+      "jumlah_minimum_stok": 50,
+      "harga": 20000,
+      "isi": 1,
+      "harga_satuan": 20000
+    },
+    {
+      "nama_barang": "Kain Perca",
+      "jumlah_minimum_stok": 100,
+      "harga": 50000,
+      "isi": 1,
+      "harga_satuan": 50000
+    },
+    {
+      "nama_barang": "Kertas Kado",
+      "jumlah_minimum_stok": 50,
+      "harga": 10000,
+      "isi": 1,
+      "harga_satuan": 10000
+    },
+    {
+      "nama_barang": "Pita Kado",
+      "jumlah_minimum_stok": 100,
+      "harga": 5000,
+      "isi": 1,
+      "harga_satuan": 5000
+    },
+    {
+      "nama_barang": "Kartu Ucapan",
+      "jumlah_minimum_stok": 50,
+      "harga": 2000,
+      "isi": 1,
+      "harga_satuan": 2000
+    },
+    {
+      "nama_barang": "Stiker",
+      "jumlah_minimum_stok": 200,
+      "harga": 5000,
+      "isi": 50,
+      "harga_satuan": 100
+    },
+    {
+      "nama_barang": "Gunting Hias",
+      "jumlah_minimum_stok": 20,
+      "harga": 15000,
+      "isi": 1,
+      "harga_satuan": 15000
+    },
+    {
+      "nama_barang": "Lem Glitter",
+      "jumlah_minimum_stok": 30,
+      "harga": 8000,
+      "isi": 1,
+      "harga_satuan": 8000
+    },
+    {
+      "nama_barang": "Kertas Lipat",
+      "jumlah_minimum_stok": 100,
+      "harga": 12000,
+      "isi": 100,
+      "harga_satuan": 120
+    },
+    {
+      "nama_barang": "Plastisin",
+      "jumlah_minimum_stok": 50,
+      "harga": 15000,
+      "isi": 12,
+      "harga_satuan": 1250
+    },
+    {
+      "nama_barang": "Lempung",
+      "jumlah_minimum_stok": 30,
+      "harga": 20000,
+      "isi": 1,
+      "harga_satuan": 20000
+    },
+    {
+      "nama_barang": "Cetakan Kue",
+      "jumlah_minimum_stok": 20,
+      "harga": 10000,
+      "isi": 1,
+      "harga_satuan": 10000
+    },
+    {
+      "nama_barang": "Pewarna Makanan",
+      "jumlah_minimum_stok": 40,
+      "harga": 15000,
+      "isi": 6,
+      "harga_satuan": 2500
+    },
+    {
+      "nama_barang": "Sprinkle",
+      "jumlah_minimum_stok": 100,
+      "harga": 5000,
+      "isi": 1,
+      "harga_satuan": 5000
+    },
+    {
+      "nama_barang": "Manik-Manik Kayu",
+      "jumlah_minimum_stok": 500,
+      "harga": 30000,
+      "isi": 1000,
+      "harga_satuan": 30
+    },
+    {
+      "nama_barang": "Kapas",
+      "jumlah_minimum_stok": 50,
+      "harga": 3000,
+      "isi": 1,
+      "harga_satuan": 3000
+    },
+    {
+      "nama_barang": "Jarum",
+      "jumlah_minimum_stok": 100,
+      "harga": 2000,
+      "isi": 12,
+      "harga_satuan": 166.67
+    },
+    {
+      "nama_barang": "Benang Wol",
+      "jumlah_minimum_stok": 50,
+      "harga": 10000,
+      "isi": 1,
+      "harga_satuan": 10000
+    }
+]

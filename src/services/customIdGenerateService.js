@@ -216,12 +216,12 @@ class CustomIdGenerateService {
         });
 
         if (!lastPengeluaran) {
-            return 'EXC0001';
+            return 'EXP0001';
         }
         const lastId = lastPengeluaran.pengeluaran_id;
         const numericPart = parseInt(lastId.slice(3), 10);
         const newNumericPart = numericPart + 1;
-        const newId = `EXC${String(newNumericPart).padStart(4, '0')}`;
+        const newId = `EXP${String(newNumericPart).padStart(4, '0')}`;
         return newId;
     }
 

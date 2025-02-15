@@ -27,7 +27,7 @@ class DeskripsiPengeluaranService {
   }  
   
   static async update(data, options = {}) {  
-    const transaction = options.transaction || await sequelize.transaction(); // Ensure transaction  
+    const transaction = options.transaction || await sequelize.transaction();
     try {
       if (!Array.isArray(data) || data.length === 0) {
         throw new Error("Invalid input: Data must be a non-empty array");
@@ -68,10 +68,15 @@ class DeskripsiPengeluaranService {
         await DeskripsiPengeluaran.bulkCreate(newRecords, { transaction });
       }
 
-      // Mark existing records as deleted
+      // Delete records that are no longer in the data array
       const toDelete = existingRecords.filter(item => !updatedIds.has(item.deskripsi_pengeluaran_id));
       if (toDelete.length > 0) {
-        await DeskripsiPengeluaran.bulkDestroy({ where: { deskripsi_pengeluaran_id: toDelete.map(item => item.deskripsi_pengeluaran_id) }, transaction });
+        await DeskripsiPengeluaran.destroy({ 
+          where: { 
+            deskripsi_pengeluaran_id: toDelete.map(item => item.deskripsi_pengeluaran_id) 
+          }, 
+          transaction 
+        });
       }
 
       if (!options.transaction) await transaction.commit();
@@ -81,7 +86,7 @@ class DeskripsiPengeluaranService {
       if (!options.transaction) await transaction.rollback();
       throw error;
     }
-  }  
+  }
   
   static async delete(id) {  
     const deskripsiPengeluaran = await DeskripsiPengeluaran.findByPk(id);  
@@ -91,4 +96,4 @@ class DeskripsiPengeluaranService {
   }  
 }  
   
-module.exports = DeskripsiPengeluaranService;  
+module.exports = DeskripsiPengeluaranService;
