@@ -5,6 +5,7 @@ const KategoriBarang = require("../models/kategoriBarang");
 const JenisBarang = require("../models/jenisBarang");
 const Cabang = require("../models/cabang");
 const BiayaToko = require("../models/biayaToko");
+const Toko = require("../models/toko");
 class BarangNonHandmadeService {  
   static async create(data) {  
     const { image, barang_non_handmade_id, jenis_barang_id, kategori_barang_id, nama_barang, jumlah_minimum_stok, rincian_biaya } = data;
@@ -42,7 +43,22 @@ class BarangNonHandmadeService {
     return barangNonHandmade;
   }  
   
-  static async getAll() {  
+  static async getAll(toko_id, cabang_id) {  
+    const whereConditionsToko = {
+      is_deleted: false
+    }
+
+    const whereConditionsCabang = {
+      is_deleted: false
+    }
+
+    if (toko_id) {
+      whereConditionsToko.toko_id = toko_id;
+    }
+
+    if (cabang_id) {
+      whereConditionsCabang.cabang_id = cabang_id;
+    }
     return await BarangNonHandmade.findAll({
       where: {
         is_deleted: false
@@ -61,11 +77,23 @@ class BarangNonHandmadeService {
         {
           model: RincianBiaya,
           as: "rincian_biaya",
+          required: true, 
           include: [
             {
               model: Cabang,
               as: "cabang",
-              attributes: ["nama_cabang"]
+              attributes: ["cabang_id", "nama_cabang"],
+              required: true, 
+              where: whereConditionsCabang,
+              include: [
+                {
+                  model: Toko,
+                  as: "toko",
+                  attributes: ["toko_id", "nama_toko"],
+                  required: true, 
+                  where: whereConditionsToko
+                }
+              ]
             },
             {
               model: DetailRincianBiaya,

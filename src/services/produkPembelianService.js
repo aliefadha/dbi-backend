@@ -142,7 +142,7 @@ class ProdukPembelianService {
         {
           model: Packaging,
           as: "packaging",
-          attributes: ["image", "packaging_id", "nama_packaging", "ukuran", "harga_satuan"],
+          attributes: ["image", "packaging_id", "nama_packaging", "ukuran", "harga_satuan", "harga_jual"],
           include: [
             {
               model: JenisBarang,
@@ -159,7 +159,7 @@ class ProdukPembelianService {
         {
           model: BarangCustom,
           as: "barang_custom",
-          attributes: ["image", "barang_custom_id", "nama_barang", "harga_satuan", "jumlah_minimum_stok"],
+          attributes: ["image", "barang_custom_id", "nama_barang", "harga_satuan", "jumlah_minimum_stok", "harga_jual"],
           include: [
             {
               model: JenisBarang,

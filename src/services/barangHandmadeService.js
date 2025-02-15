@@ -5,6 +5,8 @@ const KategoriBarang = require("../models/kategoriBarang");
 const JenisBarang = require("../models/jenisBarang");
 const BiayaToko = require("../models/biayaToko");
 const Cabang = require("../models/cabang");
+const Toko = require("../models/toko");
+const { Op } = require("sequelize");
 class BarangHandmadeService {  
   static async create(data) {  
     const { image, barang_handmade_id, jenis_barang_id, kategori_barang_id, nama_barang, jumlah_minimum_stok, rincian_biaya } = data;
@@ -41,7 +43,22 @@ class BarangHandmadeService {
     return barangHandmade;
   }  
   
-  static async getAll() {  
+  static async getAll(toko_id, cabang_id) {
+    const whereConditionsToko = {
+      is_deleted: false
+    }
+
+    const whereConditionsCabang = {
+      is_deleted: false
+    }
+
+    if (toko_id) {
+      whereConditionsToko.toko_id = toko_id;
+    }
+
+    if (cabang_id) {
+      whereConditionsCabang.cabang_id = cabang_id;
+    }
     return await BarangHandmade.findAll({
       where: {
         is_deleted: false
@@ -50,19 +67,36 @@ class BarangHandmadeService {
         {
           model: KategoriBarang,
           as: "kategori_barang",
+          attributes: ["nama_kategori_barang"]
         },
         {
           model: JenisBarang,
           as: "jenis_barang",
+          attributes: ["nama_jenis_barang"]
         },
         {
           model: RincianBiaya,
           as: "rincian_biaya",
+          required: true, 
+          where: {
+            is_deleted: false
+          },
           include: [
             {
               model: Cabang,
               as: "cabang",
-              attributes: ["nama_cabang"]
+              attributes: ["cabang_id", "nama_cabang"],
+              required: true, 
+              where: whereConditionsCabang,
+              include: [
+                {
+                  model: Toko,
+                  as: "toko",
+                  attributes: ["toko_id", "nama_toko"],
+                  required: true, 
+                  where: whereConditionsToko
+                }
+              ]
             },
             {
               model: DetailRincianBiaya,
@@ -71,8 +105,9 @@ class BarangHandmadeService {
           ]
         }
       ]
-    });  
-  }  
+    });
+  }
+  
   
   static async getById(id) {  
     return await BarangHandmade.findOne({
