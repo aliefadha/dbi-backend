@@ -95,6 +95,9 @@ class PemasukanService {
         pemasukan_id: id,
         is_deleted: false
       },
+      attributes: {
+        exclude: ['is_deleted', 'metode_id', 'kategori_pemasukan_id']
+      },
       include: [
         {
           model: KategoriPemasukan,
@@ -140,12 +143,20 @@ class PemasukanService {
       }))
     };
   }  
-  static async getByKategori(id) {
+  static async getByKategori(id, start_date = null, end_date = null) {
+    const whereClause = {
+      kategori_pemasukan_id: id,
+      is_deleted: false
+    };
+
+    if (start_date && end_date) {
+      whereClause.tanggal = {
+        [Op.between]: [start_date, end_date]
+      };
+    }
+
     const pemasukans = await Pemasukan.findAll({
-      where: {
-        kategori_pemasukan_id: id,
-        is_deleted: false
-      },
+      where: whereClause,
       attributes: {
         exclude: ['is_deleted', 'metode_id', 'kategori_pemasukan_id']
       },
@@ -181,17 +192,20 @@ class PemasukanService {
       order: [['tanggal', 'DESC']]
     });
 
-    return pemasukans.map(p => ({
-      ...p.get({ plain: true }),
-      kategori_pemasukan: p.kategori_pemasukan.kategori_pemasukan,
-      metode: p.metode.nama_metode,
-      deskripsi_pemasukan: p.deskripsi_pemasukan.map(d => ({
-        deskripsi: d.deskripsi,
-        jumlah_pemasukan: d.jumlah_pemasukan,
-        toko: d.toko?.nama_toko,
-        cabang: d.cabang?.nama_cabang
-      }))
-    }));
+    return pemasukans.map(pemasukan => {
+      const plainPemasukan = pemasukan.get({ plain: true });
+      return {
+        ...plainPemasukan,
+        kategori_pemasukan: plainPemasukan.kategori_pemasukan.kategori_pemasukan,
+        metode: plainPemasukan.metode.nama_metode,
+        deskripsi_pemasukan: plainPemasukan.deskripsi_pemasukan.map(d => ({
+          deskripsi: d.deskripsi,
+          jumlah_pemasukan: d.jumlah_pemasukan,
+          toko: d.toko?.nama_toko,
+          cabang: d.cabang?.nama_cabang
+        }))
+      };
+    });
   }
 
   static async getByToko(id, start_date = null, end_date = null) {
@@ -263,6 +277,75 @@ class PemasukanService {
       }))
     }));
   }
+
+  static async getByCashOrNon(cash_or_non, start_date = null, end_date = null) {
+    const whereClause = {
+      cash_or_non: cash_or_non,
+      is_deleted: false
+    };
+    if (start_date && end_date) {
+      whereClause.tanggal = {
+        [Op.between]: [start_date, end_date]
+      };
+    }
+    const deskripsiPemasukans = await Pemasukan.findAll({
+      where: whereClause,
+      attributes: {
+        exclude: ['is_deleted','metode_id', 'kategori_pemasukan_id', 'cash_or_non']
+      },
+      include: [
+        {
+          model: KategoriPemasukan,
+          as: 'kategori_pemasukan',
+          attributes: ['kategori_pemasukan']
+        },
+        {
+          model: MetodePembayaran,
+          as:'metode',
+          attributes: ['nama_metode']
+        },
+        {
+          model: DeskripsiPemasukan,
+          as: 'deskripsi_pemasukan',
+          where: {
+            is_deleted: false
+          },
+          attributes: {
+            exclude: ["deskripsi_pemasukan_id", "toko_id", "cabang_id", "is_deleted"]
+          },
+          include: [
+            {
+              model: Toko,
+              attributes: ['nama_toko'],
+              as: 'toko'
+            },
+            {
+              model: Cabang,
+              attributes: ['nama_cabang'],
+              as: 'cabang'
+            }
+          ]
+        }
+      ],
+      order: [['tanggal', 'DESC']]
+    });
+
+    return deskripsiPemasukans.map(item => ({
+      ...item.get({ plain: true }),
+      metode: item.metode.nama_metode,
+      kategori_pemasukan: item.kategori_pemasukan.kategori_pemasukan,
+      deskripsi_pemasukan: item.deskripsi_pemasukan.map(d => ({
+        deskripsi_pemasukan_id: d.deskripsi_pemasukan_id,
+        pemasukan_id: d.pemasukan_id,
+        deskripsi: d.deskripsi,
+        jumlah_pemasukan: d.jumlah_pemasukan,
+        is_deleted: d.is_deleted,
+        toko: d.toko?.nama_toko,
+        cabang: d.cabang?.nama_cabang
+      }))
+    }));
+  }
+
   
   static async update(id, data) {  
     const transaction = await sequelize.transaction();

@@ -1,0 +1,412 @@
+[
+    {
+      "kategori_barang_id": 1,
+      "nama_barang": "Gelang Non Handmade",
+      "jumlah_minimum_stok": 100,
+      "rincian_biaya": [
+        {
+          "cabang_id": 2,
+          "total_hpp": 2000,
+          "keuntungan": 1000,
+          "harga_jual": 15000,
+          "detail_rincian_biaya": [
+            {
+              "biaya_toko_id": 1,
+              "nama_biaya": "Modal",
+              "jumlah_biaya": 1500
+            },
+            {
+              "nama_biaya": "Packaging",
+              "jumlah_biaya": 2500
+            }
+          ]
+        },
+        {
+          "cabang_id": 3,
+          "total_hpp": 2000,
+          "keuntungan": 1000,
+          "harga_jual": 15000,
+          "detail_rincian_biaya": [
+            {
+              "biaya_toko_id": 1,
+              "nama_biaya": "Modal",
+              "jumlah_biaya": 1500
+            },
+            {
+              "nama_biaya": "Packaging",
+              "jumlah_biaya": 2500
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kategori_barang_id": 2,
+      "nama_barang": "Gelang Handmade",
+      "jumlah_minimum_stok": 50,
+      "rincian_biaya": [
+        {
+          "cabang_id": 2,
+          "total_hpp": 1500,
+          "keuntungan": 500,
+          "harga_jual": 10000,
+          "detail_rincian_biaya": [
+            {
+              "biaya_toko_id": 1,
+              "nama_biaya": "Modal",
+              "jumlah_biaya": 1000
+            },
+            {
+              "nama_biaya": "Packaging",
+              "jumlah_biaya": 1000
+            }
+          ]
+        },
+        {
+          "cabang_id": 3,
+          "total_hpp": 1500,
+          "keuntungan": 500,
+          "harga_jual": 10000,
+          "detail_rincian_biaya": [
+            {
+              "biaya_toko_id": 1,
+              "nama_biaya": "Modal",
+              "jumlah_biaya": 1000
+            },
+            {
+              "nama_biaya": "Packaging",
+              "jumlah_biaya": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kategori_barang_id": 3,
+      "nama_barang": "Kalung Non Handmade",
+      "jumlah_minimum_stok": 75,
+      "rincian_biaya": [
+        {
+          "cabang_id": 2,
+          "total_hpp": 2500,
+          "keuntungan": 1500,
+          "harga_jual": 20000,
+          "detail_rincian_biaya": [
+            {
+              "biaya_toko_id": 1,
+              "nama_biaya": "Modal",
+              "jumlah_biaya": 2000
+            },
+            {
+              "nama_biaya": "Packaging",
+              "jumlah_biaya": 3000
+            }
+          ]
+        },
+        {
+          "cabang_id": 3,
+          "total_hpp": 2500,
+          "keuntungan": 1500,
+          "harga_jual": 20000,
+          "detail_rincian_biaya": [
+            {
+              "biaya_toko_id": 1,
+              "nama_biaya": "Modal",
+              "jumlah_biaya": 2000
+            },
+            {
+              "nama_biaya": "Packaging",
+              "jumlah_biaya": 3000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kategori_barang_id": 1,
+      "nama_barang": "Kalung Handmade",
+      "jumlah_minimum_stok": 60,
+      "rincian_biaya": [
+        {
+          "cabang_id": 2,
+          "total_hpp": 2000,
+          "keuntungan": 1000,
+          "harga_jual": 15000,
+          "detail_rincian_biaya": [
+            {
+              "biaya_toko_id": 1,
+              "nama_biaya": "Modal",
+              "jumlah_biaya": 1500
+            },
+            {
+              "nama_biaya": "Packaging",
+              "jumlah_biaya": 2000
+            }
+          ]
+        },
+        {
+          "cabang_id": 3,
+          "total_hpp": 2000,
+          "keuntungan": 1000,
+          "harga_jual": 15000,
+          "detail_rincian_biaya": [
+            {
+              "biaya_toko_id": 1,
+              "nama_biaya": "Modal",
+              "jumlah_biaya": 1500
+            },
+            {
+              "nama_biaya": "Packaging",
+              "jumlah_biaya": 2000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kategori_barang_id": 2,
+      "nama_barang": "Cincin Non Handmade",
+      "jumlah_minimum_stok": 80,
+      "rincian_biaya": [
+        {
+          "cabang_id": 2,
+          "total_hpp": 1800,
+          "keuntungan": 700,
+          "harga_jual": 12000,
+          "detail_rincian_biaya": [
+            {
+              "biaya_toko_id": 1,
+              "nama_biaya": "Modal",
+              "jumlah_biaya": 1200
+            },
+            {
+              "nama_biaya": "Packaging",
+              "jumlah_biaya": 1800
+            }
+          ]
+        },
+        {
+          "cabang_id": 3,
+          "total_hpp": 1800,
+          "keuntungan": 700,
+          "harga_jual": 12000,
+          "detail_rincian_biaya": [
+            {
+              "biaya_toko_id": 1,
+              "nama_biaya": "Modal",
+              "jumlah_biaya": 1200
+            },
+            {
+              "nama_biaya": "Packaging",
+              "jumlah_biaya": 1800
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kategori_barang_id": 1,
+      "nama_barang": "Cincin Handmade",
+      "jumlah_minimum_stok": 70,
+      "rincian_biaya": [
+        {
+          "cabang_id": 2,
+          "total_hpp": 1600,
+          "keuntungan": 600,
+          "harga_jual": 11000,
+          "detail_rincian_biaya": [
+            {
+              "biaya_toko_id": 1,
+              "nama_biaya": "Modal",
+              "jumlah_biaya": 1100
+            },
+            {
+              "nama_biaya": "Packaging",
+              "jumlah_biaya": 1600
+            }
+          ]
+        },
+        {
+          "cabang_id": 3,
+          "total_hpp": 1600,
+          "keuntungan": 600,
+          "harga_jual": 11000,
+          "detail_rincian_biaya": [
+            {
+                "biaya_toko_id": 1,
+                "nama_biaya": "Modal",
+                "jumlah_biaya": 1100
+              },
+              {
+                "nama_biaya": "Packaging",
+                "jumlah_biaya": 1600
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kategori_barang_id": 2,
+        "nama_barang": "Anting Non Handmade",
+        "jumlah_minimum_stok": 90,
+        "rincian_biaya": [
+          {
+            "cabang_id": 2,
+            "total_hpp": 1500,
+            "keuntungan": 500,
+            "harga_jual": 10000,
+            "detail_rincian_biaya": [
+              {
+                "biaya_toko_id": 1,
+                "nama_biaya": "Modal",
+                "jumlah_biaya": 1000
+              },
+              {
+                "nama_biaya": "Packaging",
+                "jumlah_biaya": 1500
+              }
+            ]
+          },
+          {
+            "cabang_id": 3,
+            "total_hpp": 1500,
+            "keuntungan": 500,
+            "harga_jual": 10000,
+            "detail_rincian_biaya": [
+              {
+                "biaya_toko_id": 1,
+                "nama_biaya": "Modal",
+                "jumlah_biaya": 1000
+              },
+              {
+                "nama_biaya": "Packaging",
+                "jumlah_biaya": 1500
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kategori_barang_id": 2,
+        "nama_barang": "Anting Handmade",
+        "jumlah_minimum_stok": 80,
+        "rincian_biaya": [
+          {
+            "cabang_id": 2,
+            "total_hpp": 1300,
+            "keuntungan": 400,
+            "harga_jual": 9000,
+            "detail_rincian_biaya": [
+              {
+                "biaya_toko_id": 1,
+                "nama_biaya": "Modal",
+                "jumlah_biaya": 800
+              },
+              {
+                "nama_biaya": "Packaging",
+                "jumlah_biaya": 1300
+              }
+            ]
+          },
+          {
+            "cabang_id": 3,
+            "total_hpp": 1300,
+            "keuntungan": 400,
+            "harga_jual": 9000,
+            "detail_rincian_biaya": [
+              {
+                "biaya_toko_id": 1,
+                "nama_biaya": "Modal",
+                "jumlah_biaya": 800
+              },
+              {
+                "nama_biaya": "Packaging",
+                "jumlah_biaya": 1300
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kategori_barang_id": 1,
+        "nama_barang": "Bros Non Handmade",
+        "jumlah_minimum_stok": 100,
+        "rincian_biaya": [
+          {
+            "cabang_id": 2,
+            "total_hpp": 1000,
+            "keuntungan": 300,
+            "harga_jual": 7000,
+            "detail_rincian_biaya": [
+              {
+                "biaya_toko_id": 1,
+                "nama_biaya": "Modal",
+                "jumlah_biaya": 500
+              },
+              {
+                "nama_biaya": "Packaging",
+                "jumlah_biaya": 1000
+              }
+            ]
+          },
+          {
+            "cabang_id": 3,
+            "total_hpp": 1000,
+            "keuntungan": 300,
+            "harga_jual": 7000,
+            "detail_rincian_biaya": [
+              {
+                "biaya_toko_id": 1,
+                "nama_biaya": "Modal",
+                "jumlah_biaya": 500
+              },
+              {
+                "nama_biaya": "Packaging",
+                "jumlah_biaya": 1000
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kategori_barang_id": 2,
+        "nama_barang": "Bros Handmade",
+        "jumlah_minimum_stok": 90,
+        "rincian_biaya": [
+          {
+            "cabang_id": 2,
+            "total_hpp": 800,
+            "keuntungan": 200,
+            "harga_jual": 5000,
+            "detail_rincian_biaya": [
+              {
+                "biaya_toko_id": 1,
+                "nama_biaya": "Modal",
+                "jumlah_biaya": 300
+              },
+              {
+                "nama_biaya": "Packaging",
+                "jumlah_biaya": 800
+              }
+            ]
+          },
+          {
+            "cabang_id": 3,
+            "total_hpp": 800,
+            "keuntungan": 200,
+            "harga_jual": 5000,
+            "detail_rincian_biaya": [
+              {
+                "biaya_toko_id": 1,
+                "nama_biaya": "Modal",
+                "jumlah_biaya": 300
+              },
+              {
+                "nama_biaya": "Packaging",
+                "jumlah_biaya": 800
+              }
+            ]
+          }
+        ]
+      }
+    ]

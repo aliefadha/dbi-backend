@@ -22,6 +22,9 @@ const packagingGudang = require('../../seeder/packagingGudang.json');
 const barangNonHandmadeGudang = require('../../seeder/barangNonHandmadeGudang.json');
 const biayaToko = require('../../seeder/biayaToko.json');
 const pembelianGudang = require('../../seeder/pembelianGudang.json');
+const barangHandmade = require('../../seeder/barangHandmade.json');
+const barangNonHandmade = require('../../seeder/barangNonHandmade.json');
+
 const CustomIdGenerateService = require('../services/customIdGenerateService');
 const RincianBahanGudang = require('./rincianBahanGudang');
 const BarangHandmadeGudang = require('./barangHandmadeGudang');
@@ -33,8 +36,9 @@ const PembelianGudangService = require('../services/pembelianGudangService');
 const Toko = require('./toko');
 const KategoriPengeluaran = require('./kategoriPengeluaran');
 const KategoriPemasukan = require('./kategoriPemasukan');
-
-const Toko = require('./toko');
+const BarangHandmade = require('./barangHandmade');
+const BarangHandmadeService = require('../services/barangHandmadeService');
+const BarangNonHandmadeService = require('../services/barangNonHandmadeService');
 
 
 const seedDatabase = async () => {
@@ -53,6 +57,7 @@ const seedDatabase = async () => {
         // Seed data for KategoriBarang  
         await KategoriBarang.create({ kategori_barang_id: 1, nama_kategori_barang: "Gelang" });
         await KategoriBarang.create({ kategori_barang_id: 2, nama_kategori_barang: "Kalung" });
+        await KategoriBarang.create({ kategori_barang_id: 3, nama_kategori_barang: "Cincin" });
 
         // Seed data for KategoriBarangGudang
         await KategoriBarangGudang.create({ kategori_barang_id: 1, nama_kategori_barang: "Gelang" });
@@ -62,8 +67,6 @@ const seedDatabase = async () => {
         await Packaging.create({ packaging_id: 'PCK0001', nama_packaging: "Zipper", ukuran: "XL", jumlah_minimum_stok: 10, harga: 10, isi: 10, harga_satuan: 100, jenis_barang_id: 4, kategori_barang_id: 1 });
         await Packaging.create({ packaging_id: 'PCK0002', nama_packaging: "Kantong Kain", ukuran: "XL", jumlah_minimum_stok: 100, harga: 100, isi: 50, harga_satuan: 125, jenis_barang_id: 4, kategori_barang_id: 2 });
 
-        //Seed data for MetodePembayaran
-        await MetodePembayaran.create({ nama_metode: "BCA" })
         //Seed data for MetodePembayaran
         await MetodePembayaranGudang.create({ nama_metode: "BCA" })
         await MetodePembayaranGudang.create({ nama_metode: "MANDIRI" })
@@ -92,14 +95,12 @@ const seedDatabase = async () => {
         })
 
         //Seed for kategori pengeluaran
-        await KategoriPengeluaran.create({kategori_pengeluaran: "Pembelian"})
-        await KategoriPengeluaran.create({kategori_pengeluaran: "Beban Listrik"})
+        await KategoriPengeluaran.create({ kategori_pengeluaran: "Pembelian" })
+        await KategoriPengeluaran.create({ kategori_pengeluaran: "Beban Listrik" })
 
         //Seed for kategori pemasukan
-        await KategoriPemasukan.create({kategori_pemasukan: "Penjualan"})
-        await KategoriPemasukan.create({kategori_pemasukan: "Hibah"})
-
-
+        await KategoriPemasukan.create({ kategori_pemasukan: "Penjualan" })
+        await KategoriPemasukan.create({ kategori_pemasukan: "Hibah" })
 
         // Seed data fot toko
         await Toko.create({ toko_id: 1, nama_toko: "Rumah Produksi", email: "headgudang@gmail.com", password: 12345678 });
@@ -111,10 +112,6 @@ const seedDatabase = async () => {
         await DivisiKaryawan.create({ toko_id: 1, nama_divisi: "Head Gudang" });
         await DivisiKaryawan.create({ toko_id: 1, nama_divisi: "Admin Gudang" });
         await DivisiKaryawan.create({ toko_id: 2, nama_divisi: "SPV" });
-
-        // Seed data for Toko
-        await Toko.create({nama_toko: "Tatitatu", email: "tatitatu@gmail.com", password: 12345678});
-        await Toko.create({nama_toko: "Gudang", email: "gudang@gmail.com", password: 12345678});
 
         // Seed data for Cabang  
 
@@ -130,7 +127,7 @@ const seedDatabase = async () => {
         await Karyawan.create({ karyawan_id: 2, nama_karyawan: "Siti", divisi_karyawan_id: 2, cabang_id: 2, cabang_id_first: 2, email: 'ab@gmail.com', password: '123', jumlah_gaji_pokok: 100, bonus: 250000, });
 
         //Seed data for MetodePembayaran
-        await MetodePembayaran.create({ toko_id: 1, nama_metode: "BCA" }) 
+        await MetodePembayaran.create({ nama_metode: "BCA", toko_id: 1 });
 
         // Seed data for Kpi  
         await Kpi.create({ divisi_karyawan_id: 1, nama_kpi: "Target Penjualan", persentase: 30, waktu: "Bulanan" });
@@ -204,7 +201,7 @@ const seedDatabase = async () => {
         // Proper seed barang non-handmade
         for (const item of barangNonHandmadeGudang) {
             const barangNonHandmadeId = await CustomIdGenerateService.generateBarangNonHandmadeGudangId();
-            
+
             await BarangNonHandmadeGudang.create({
                 barang_nonhandmade_id: barangNonHandmadeId,
                 nama_barang: item.nama_barang,
@@ -236,7 +233,7 @@ const seedDatabase = async () => {
             ]);
         }
 
-        for(const item of packagingGudang) {
+        for (const item of packagingGudang) {
             const newId = await CustomIdGenerateService.generatePackagingGudangId();
             await PackagingGudangService.create({
                 ...item,
@@ -245,20 +242,35 @@ const seedDatabase = async () => {
             })
         }
 
-        for(const item of biayaToko) {
+        for (const item of biayaToko) {
             await BiayaTokoService.create({
                 ...item
             })
         }
 
-        for(const item of pembelianGudang) {
+        for (const item of pembelianGudang) {
             const newId = await CustomIdGenerateService.generatePembelianGudangId();
             await PembelianGudangService.create({
                 ...item,
                 pembelian_id: newId
-              });
+            });
         }
 
+        for (const item of barangHandmade) {
+            const newId = await CustomIdGenerateService.generateBarangHandmadeId();
+            await BarangHandmadeService.create({
+                ...item,
+                barang_handmade_id: newId
+            });
+        }
+
+        for (const item of barangNonHandmade) {
+            const newId = await CustomIdGenerateService.generateBarangNonHandmadeId();
+            await BarangNonHandmadeService.create({
+               ...item,
+                barang_non_handmade_id: newId
+            });
+        }
 
 
         console.log("Seed data created!");
