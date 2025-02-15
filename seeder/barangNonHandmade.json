@@ -11,7 +11,9 @@
           "harga_jual": 15000,
           "detail_rincian_biaya": [
             {
-              "biaya_toko_id": 1,
+              "biaya_toko_id": 1
+            },
+            {
               "nama_biaya": "Modal",
               "jumlah_biaya": 1500
             },
@@ -52,7 +54,9 @@
           "harga_jual": 10000,
           "detail_rincian_biaya": [
             {
-              "biaya_toko_id": 1,
+              "biaya_toko_id": 1
+            },
+            {
               "nama_biaya": "Modal",
               "jumlah_biaya": 1000
             },
@@ -69,7 +73,9 @@
           "harga_jual": 10000,
           "detail_rincian_biaya": [
             {
-              "biaya_toko_id": 1,
+              "biaya_toko_id": 1
+            },
+            {
               "nama_biaya": "Modal",
               "jumlah_biaya": 1000
             },
@@ -93,7 +99,9 @@
           "harga_jual": 20000,
           "detail_rincian_biaya": [
             {
-              "biaya_toko_id": 1,
+              "biaya_toko_id": 1
+            },
+            {
               "nama_biaya": "Modal",
               "jumlah_biaya": 2000
             },
@@ -110,7 +118,9 @@
           "harga_jual": 20000,
           "detail_rincian_biaya": [
             {
-              "biaya_toko_id": 1,
+              "biaya_toko_id": 1
+            },
+            {
               "nama_biaya": "Modal",
               "jumlah_biaya": 2000
             },
@@ -134,7 +144,9 @@
           "harga_jual": 15000,
           "detail_rincian_biaya": [
             {
-              "biaya_toko_id": 1,
+              "biaya_toko_id": 1
+            },
+            {
               "nama_biaya": "Modal",
               "jumlah_biaya": 1500
             },
@@ -151,7 +163,9 @@
           "harga_jual": 15000,
           "detail_rincian_biaya": [
             {
-              "biaya_toko_id": 1,
+              "biaya_toko_id": 1
+            },
+            {
               "nama_biaya": "Modal",
               "jumlah_biaya": 1500
             },
@@ -175,7 +189,9 @@
           "harga_jual": 12000,
           "detail_rincian_biaya": [
             {
-              "biaya_toko_id": 1,
+              "biaya_toko_id": 1
+            },
+            {
               "nama_biaya": "Modal",
               "jumlah_biaya": 1200
             },
@@ -192,7 +208,9 @@
           "harga_jual": 12000,
           "detail_rincian_biaya": [
             {
-              "biaya_toko_id": 1,
+              "biaya_toko_id": 1
+            },
+            {
               "nama_biaya": "Modal",
               "jumlah_biaya": 1200
             },
@@ -216,7 +234,9 @@
           "harga_jual": 11000,
           "detail_rincian_biaya": [
             {
-              "biaya_toko_id": 1,
+              "biaya_toko_id": 1
+            },
+            {
               "nama_biaya": "Modal",
               "jumlah_biaya": 1100
             },
@@ -233,7 +253,9 @@
           "harga_jual": 11000,
           "detail_rincian_biaya": [
             {
-                "biaya_toko_id": 1,
+              "biaya_toko_id": 1
+            },
+            {
                 "nama_biaya": "Modal",
                 "jumlah_biaya": 1100
               },
@@ -257,7 +279,9 @@
             "harga_jual": 10000,
             "detail_rincian_biaya": [
               {
-                "biaya_toko_id": 1,
+                "biaya_toko_id": 1
+              },
+              {
                 "nama_biaya": "Modal",
                 "jumlah_biaya": 1000
               },
@@ -274,7 +298,9 @@
             "harga_jual": 10000,
             "detail_rincian_biaya": [
               {
-                "biaya_toko_id": 1,
+                "biaya_toko_id": 1
+              },
+              {
                 "nama_biaya": "Modal",
                 "jumlah_biaya": 1000
               },
@@ -298,7 +324,9 @@
             "harga_jual": 9000,
             "detail_rincian_biaya": [
               {
-                "biaya_toko_id": 1,
+                "biaya_toko_id": 1
+              },
+              {
                 "nama_biaya": "Modal",
                 "jumlah_biaya": 800
               },
@@ -315,7 +343,9 @@
             "harga_jual": 9000,
             "detail_rincian_biaya": [
               {
-                "biaya_toko_id": 1,
+                "biaya_toko_id": 1
+              },
+              {
                 "nama_biaya": "Modal",
                 "jumlah_biaya": 800
               },
@@ -339,7 +369,9 @@
             "harga_jual": 7000,
             "detail_rincian_biaya": [
               {
-                "biaya_toko_id": 1,
+                "biaya_toko_id": 1
+              },
+              {
                 "nama_biaya": "Modal",
                 "jumlah_biaya": 500
               },
@@ -356,7 +388,9 @@
             "harga_jual": 7000,
             "detail_rincian_biaya": [
               {
-                "biaya_toko_id": 1,
+                "biaya_toko_id": 1
+              },
+              {
                 "nama_biaya": "Modal",
                 "jumlah_biaya": 500
               },
@@ -380,7 +414,9 @@
             "harga_jual": 5000,
             "detail_rincian_biaya": [
               {
-                "biaya_toko_id": 1,
+                "biaya_toko_id": 1
+              },
+              {
                 "nama_biaya": "Modal",
                 "jumlah_biaya": 300
               },
@@ -397,7 +433,9 @@
             "harga_jual": 5000,
             "detail_rincian_biaya": [
               {
-                "biaya_toko_id": 1,
+                "biaya_toko_id": 2
+              },
+              {
                 "nama_biaya": "Modal",
                 "jumlah_biaya": 300
               },

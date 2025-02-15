@@ -740,6 +740,11 @@ ProdukPenjualan.belongsTo(Penjualan, {
     as: "penjualan",
 })
 
+ProdukPenjualan.belongsTo(Cabang, {
+    foreignKey: "cabang_id",
+    as: "cabang",
+})
+
 BarangHandmade.hasMany(ProdukPenjualan, {
     foreignKey: "barang_handmade_id",
     as: "produk_penjualan",
@@ -798,6 +803,11 @@ Cabang.hasMany(Penjualan, {
 Penjualan.belongsTo(Cabang, {
     foreignKey: "cabang_id",
     as: "cabang"
+})
+
+Penjualan.belongsTo(Toko, {
+    foreignKey: "toko_id",
+    as: "toko"
 })
 
 KategoriPengeluaran.hasMany(Pengeluaran, {

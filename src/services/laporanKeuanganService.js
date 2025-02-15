@@ -14,6 +14,7 @@ const Pembelian = require("../models/pembelian");
 const Pengeluaran = require("../models/pengeluaran");
 const Penjualan = require("../models/penjualan");
 const ProdukPembelian = require("../models/produkPembelian");
+const ProdukPenjualan = require("../models/produkPenjualan");
 const Toko = require("../models/toko");
   
 class LaporanKeuanganService {  
@@ -108,6 +109,11 @@ class LaporanKeuanganService {
             model: Packaging,
             as: 'packaging',
             attributes: ["nama_packaging"]
+          },
+          {
+            model: Cabang,
+            as: 'cabang',
+            attributes: ["nama_cabang"]
           }
         ],
         raw: true,
@@ -117,13 +123,14 @@ class LaporanKeuanganService {
       return {
         pembelian_id: pembelian.pembelian_id,
         tanggal: pembelian.tanggal,
-        total_pembelian: pembelian.total_pembelian,
+        total_pengeluaran: pembelian.total_pembelian,
         nama_toko: pembelian.toko.nama_toko,
         produk: produk.map(item => ({
           nama_barang: item.barang_handmade?.nama_barang || 
                       item.barang_non_handmade?.nama_barang || 
                       item.barang_custom?.nama_barang ||
-                      item.packaging?.nama_packaging
+                      item.packaging?.nama_packaging,
+          nama_cabang: item.cabang?.nama_cabang
         })),
         kategori_pengeluaran: "Pembelian"
       };
@@ -162,16 +169,93 @@ class LaporanKeuanganService {
       nest: true
     });
 
-    const penjualan = await Penjualan.findAll({
-      where: {
-        is_deleted: false
-      }
-    });
+    const penjualanData = await Penjualan.findAll({
+          where: {
+            is_deleted: false
+          },
+          attributes: ['penjualan_id', 'tanggal', 'total_penjualan'],
+          include: [
+            {
+              model: Toko,
+              as: "toko",
+              attributes: ["nama_toko"]
+            },
+          ],
+          raw: true,
+          nest: true
+        });
+    
+        const transformedPenjualan = await Promise.all(penjualanData.map(async (penjualan) => {
+          const produk = await ProdukPenjualan.findAll({
+            where: {
+              penjualan_id: penjualan.penjualan_id,
+              is_deleted: false
+            },
+            include: [
+              {
+                model: BarangHandmade,
+                as: 'barang_handmade',
+                attributes: ["nama_barang"]
+              },
+              {
+                model: BarangNonHandmade,
+                as: 'barang_non_handmade',
+                attributes: ["nama_barang"]
+              },
+              {
+                model: BarangCustom,
+                as: 'barang_custom',
+                attributes: ["nama_barang"]
+              },
+              {
+                model: Packaging,
+                as: 'packaging',
+                attributes: ["nama_packaging"]
+              },
+              {
+                model: Cabang,
+                as: 'cabang',
+                attributes: ["nama_cabang"]
+              }
+            ],
+            raw: true,
+            nest: true
+          });
+    
+          return {
+            penjualan_id: penjualan.penjualan_id,
+            tanggal: penjualan.tanggal,
+            total_pengeluaran: penjualan.total_penjualan,
+            nama_toko: penjualan.toko.nama_toko,
+            produk: produk.map(item => ({
+              nama_barang: item.barang_handmade?.nama_barang || 
+                          item.barang_non_handmade?.nama_barang || 
+                          item.barang_custom?.nama_barang ||
+                          item.packaging?.nama_packaging,
+              nama_cabang: item.cabang?.nama_cabang
+            })),
+            kategori_pemasukan: "Penjualan"
+          };
+        }));
 
-    const laporan = {
-      pengeluaran: [...transformedPengeluaran,...transformedPembelian],
-      pemasukan: [...pemasukan, ...penjualan]
-    }
+        const totalPemasukan = [
+          ...pemasukan.map(item => item.jumlah_pemasukan),
+          ...transformedPenjualan.map(item => item.total_pengeluaran)
+        ].reduce((total, amount) => total + amount, 0);
+
+        const totalPengeluaran = [
+          ...pengeluaran.map(item => item.jumlah_pengeluaran),
+          ...transformedPembelian.map(item => item.total_pengeluaran)
+        ].reduce((total, amount) => total + amount, 0);
+
+        const laporan = {
+          pengeluaran: [...transformedPengeluaran,...transformedPembelian],
+          pemasukan: [...pemasukan, ...transformedPenjualan],
+          total_pemasukan: totalPemasukan,
+          total_pengeluaran: totalPengeluaran,
+          keuntungan: totalPemasukan - totalPengeluaran,
+          produk_terjual: transformedPenjualan.reduce((total, item) => total + item.produk.length, 0),
+        }
     return laporan;
   }
   
