@@ -14,6 +14,7 @@ const MetodePembayaranGudang = require('./metodePembayaranGudang');
 const BiayaOperasionalStaffGudang = require('./biayaOperasionalStaffGudang');
 const BiayaOperasionalProduksiGudang = require('./biayaOperasionalProduksiGudang');
 const BiayaGudang = require('./biayaGudang');
+const BarangHandmade = require('./barangHandmade');
 const Authentication = require('./authentication');
 
 const barangMentah = require('../../seeder/barangMentah.json');
@@ -66,10 +67,9 @@ const seedDatabase = async () => {
         // Seed data for Packaging  
         await Packaging.create({ packaging_id: 'PCK0001', nama_packaging: "Zipper", ukuran: "XL", jumlah_minimum_stok: 10, harga: 10, isi: 10, harga_satuan: 100, jenis_barang_id: 4, kategori_barang_id: 1 });
         await Packaging.create({ packaging_id: 'PCK0002', nama_packaging: "Kantong Kain", ukuran: "XL", jumlah_minimum_stok: 100, harga: 100, isi: 50, harga_satuan: 125, jenis_barang_id: 4, kategori_barang_id: 2 });
-
+        
         //Seed data for MetodePembayaran
         await MetodePembayaranGudang.create({ nama_metode: "BCA" })
-        await MetodePembayaranGudang.create({ nama_metode: "MANDIRI" })
 
         //Seed data for biaya gudang
         await BiayaGudang.create({
@@ -114,13 +114,8 @@ const seedDatabase = async () => {
         await DivisiKaryawan.create({ toko_id: 2, nama_divisi: "SPV" });
 
         // Seed data for Cabang  
-
-        await Cabang.create({ cabang_id: 1, toko_id: 1, nama_cabang: "Gor", email: "gor@gmail.com", password: 12345678 });
-        await Cabang.create({ cabang_id: 2, toko_id: 1, nama_cabang: "Upi", email: "upi@gmail.com", password: 12345678 });
-        await Cabang.create({ cabang_id: 3, toko_id: 1, nama_cabang: "Taplau", email: "taplau@gmail.com", password: 12345678 });
-        await Cabang.create({ cabang_id: 4, toko_id: 1, nama_cabang: "Gunung Pangilun", email: "gpangilung@gmail.com", password: 12345678 });
-        await Cabang.create({ cabang_id: 5, toko_id: 1, nama_cabang: "Soetomo", email: "soetomo@gmail.com", password: 12345678 });
-
+        await Cabang.create({ cabang_id: 1, toko_id: 1, nama_cabang: "Gudang", email: "admingudang@gmail.com", password: 12345678 });
+        await Cabang.create({ cabang_id: 2, toko_id: 2, nama_cabang: "Upi", email: "upi@gmail.com", password: 12345678 });
 
         // Seed data for Karyawan  
         await Karyawan.create({ karyawan_id: 1, nama_karyawan: "Budi", divisi_karyawan_id: 1, cabang_id: 1, cabang_id_first: 1, email: 'aa@gmail.com', password: '123', jumlah_gaji_pokok: 2000000, bonus: 250000, waktu_kerja_sebulan_menit: 806400 });

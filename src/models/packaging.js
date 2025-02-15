@@ -60,6 +60,10 @@ const Packaging = sequelize.define("packaging", {
     type: DataTypes.INTEGER,
     defaultValue: 0,
   },
+  harga_jual: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0
+  },
   is_deleted: {
     type: DataTypes.BOOLEAN,
     defaultValue: false

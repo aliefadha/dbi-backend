@@ -42,7 +42,8 @@ class BarangHandmadeController {
   
   static async getAll(req, res) {  
     try {  
-      const barangHandmades = await BarangHandmadeService.getAll();  
+      const { toko_id, cabang } = req.query;
+      const barangHandmades = await BarangHandmadeService.getAll(toko_id, cabang);  
       res.status(200).json({  
         success: true,  
         data: barangHandmades,  

@@ -20,7 +20,8 @@ class KategoriBarangController {
 
     static async getAll(req, res) {
         try {
-            const kategori = await KategoriBarangService.getAll();
+            const { toko_id } = req.query;
+            const kategori = await KategoriBarangService.getAll(toko_id);
             res.status(200).json({
                 success: true,
                 data: kategori,

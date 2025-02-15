@@ -23,11 +23,16 @@ class KategoriBarangService {
         return true;
     }
 
-    static async getAll() {
+    static async getAll(toko_id) {
+        const whereConditions = {
+            "is_deleted": false
+        }
+
+        if (toko_id) {
+            whereConditions.toko_id = toko_id
+        }
         return await KategoriBarang.findAll({
-            where: {
-                "is_deleted": false
-            }
+            where: whereConditions
         });
     }
 
