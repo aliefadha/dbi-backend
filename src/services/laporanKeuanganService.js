@@ -1,3 +1,4 @@
+const { Op } = require("sequelize");
 const BarangCustom = require("../models/barangCustom");
 const BarangHandmade = require("../models/barangHandmade");
 const BarangNonHandmade = require("../models/barangNonHandmade");
@@ -22,16 +23,33 @@ class LaporanKeuanganService {
     return await LaporanKeuangan.create(data);  
   }  
   
-  static async getAll() {  
+  static async getAll(toko_id = null, startDate = null, endDate = null) {  
+    const whereClause = {
+      is_deleted: false
+    };
+
+    if (startDate && endDate) {
+      whereClause.tanggal = {
+        [Op.between]: [startDate, endDate]
+      };
+    }
+
+    const pengeluaranWhereClause = {
+      is_deleted: false
+    };
+
+    if (toko_id) {
+      pengeluaranWhereClause.toko_id = toko_id;
+    }
+
     const pengeluaran = await DeskripsiPengeluaran.findAll({
-      where: {
-        is_deleted: false
-      },
+      where: pengeluaranWhereClause,
       attributes: ['pengeluaran_id', 'deskripsi', 'jumlah_pengeluaran',],
       include: [
         {
           model: Pengeluaran,
           as: 'pengeluaran',
+          where: whereClause,
           attributes: ['tanggal'],
           include: [
             {
@@ -56,7 +74,6 @@ class LaporanKeuanganService {
       nest: true
     });
 
-    // Transform the data to flatten the structure
     const transformedPengeluaran = pengeluaran.map(item => ({
       pengeluaran_id: item.pengeluaran_id,
       deskripsi: item.deskripsi,
@@ -69,7 +86,8 @@ class LaporanKeuanganService {
     
     const data = await Pembelian.findAll({
       where: {
-        is_deleted: false
+        ...whereClause,
+        ...(toko_id && { toko_id: toko_id })
       },
       attributes: ['pembelian_id', 'tanggal', 'total_pembelian'],
       include: [
@@ -138,13 +156,15 @@ class LaporanKeuanganService {
 
     const pemasukan = await DeskripsiPemasukan.findAll({
       where: {
-        is_deleted: false
+        is_deleted: false,
+        ...(toko_id && { toko_id: toko_id })
       },
       attributes: ['pemasukan_id', 'deskripsi', 'jumlah_pemasukan',],
       include: [
         {
           model: Pemasukan,
           as: 'pemasukan',
+          where: whereClause,
           attributes: ['tanggal'],
           include: [
             {
@@ -169,9 +189,20 @@ class LaporanKeuanganService {
       nest: true
     });
 
+    const transformedPemasukan = pemasukan.map(item => ({
+      pemasukan_id: item.pemasukan_id,
+      deskripsi: item.deskripsi,
+      jumlah_pemasukan: item.jumlah_pemasukan,
+      nama_toko: item.toko.nama_toko,
+      nama_cabang: item.cabang.nama_cabang,
+      kategori_pemasukan: item.pemasukan.kategori_pemasukan.kategori_pemasukan,
+      tanggal: item.pemasukan.tanggal
+    }));
+    
     const penjualanData = await Penjualan.findAll({
           where: {
-            is_deleted: false
+            ...whereClause,
+            ...(toko_id && { toko_id: toko_id })
           },
           attributes: ['penjualan_id', 'tanggal', 'total_penjualan'],
           include: [
@@ -239,7 +270,7 @@ class LaporanKeuanganService {
         }));
 
         const totalPemasukan = [
-          ...pemasukan.map(item => item.jumlah_pemasukan),
+          ...transformedPemasukan.map(item => item.jumlah_pemasukan),
           ...transformedPenjualan.map(item => item.total_pengeluaran)
         ].reduce((total, amount) => total + amount, 0);
 
@@ -250,15 +281,69 @@ class LaporanKeuanganService {
 
         const laporan = {
           pengeluaran: [...transformedPengeluaran,...transformedPembelian],
-          pemasukan: [...pemasukan, ...transformedPenjualan],
+          pemasukan: [...transformedPemasukan, ...transformedPenjualan],
           total_pemasukan: totalPemasukan,
           total_pengeluaran: totalPengeluaran,
           keuntungan: totalPemasukan - totalPengeluaran,
           produk_terjual: transformedPenjualan.reduce((total, item) => total + item.produk.length, 0),
         }
     return laporan;
+  } 
+
+  static async getByTokoId(id) {
+    const pengeluaran = await DeskripsiPengeluaran.findAll({
+      where: {
+        is_deleted: false,
+        toko_id: id
+      },
+      attributes: ['pengeluaran_id', 'deskripsi', 'jumlah_pengeluaran',],
+      include: [
+        {
+          model: Pengeluaran,
+          as: 'pengeluaran',
+          attributes: ['tanggal'],
+          include: [
+            {
+              model: KategoriPengeluaran,
+              as: 'kategori_pengeluaran',
+              attributes: ["kategori_pengeluaran"]
+            },
+          ]
+        },
+        {
+          model: Toko,
+          as: 'toko',
+          attributes: ["nama_toko"]
+        },
+        {
+          model: Cabang,
+          as: 'cabang',
+          attributes: ["nama_cabang"]
+        },
+      ],
+      raw: true,
+      nest: true
+    });
+
+    // Transform the data to flatten the structure
+    const transformedPengeluaran = pengeluaran.map(item => ({
+      pengeluaran_id: item.pengeluaran_id,
+      deskripsi: item.deskripsi,
+      jumlah_pengeluaran: item.jumlah_pengeluaran,
+      nama_toko: item.toko.nama_toko,
+      nama_cabang: item.cabang.nama_cabang,
+      kategori_pengeluaran: item.pengeluaran.kategori_pengeluaran.kategori_pengeluaran,
+      tanggal: item.pengeluaran.tanggal
+    }));
+    
+    const laporan = {
+      pengeluaran: transformedPengeluaran,
+    }
+
+    return laporan
   }
   
+
   static async getById(id) {  
     return await LaporanKeuangan.findOne({
       where: {
@@ -266,8 +351,8 @@ class LaporanKeuanganService {
         is_deleted: false
       }
     });  
-  }  
-  
+  } 
+
   static async update(id, data) {  
     const laporanKeuangan = await LaporanKeuangan.findByPk(id);  
     if (!laporanKeuangan) return null;  
