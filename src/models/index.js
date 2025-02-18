@@ -1,5 +1,5 @@
 // relation files
-
+require('dotenv').config();
 // models/relation.js  
 const sequelize = require('../config/database');
 const DivisiKaryawan = require('./divisiKaryawan');
@@ -951,16 +951,21 @@ RincianGaji.belongsTo(Karyawan, {
 // Sync models with the database  
 const syncDatabase = async () => {
     try {
-        await sequelize.sync({ force: true }); // Use force: true only in development  
-        //Seederrrr
-        await require('./seed')();
-        console.log("Database & tables created!");
+        // Sync only in development environment
+        if (process.env.NODE_ENV === 'development') {
+            await sequelize.sync({ force: true });
+            await require('./seed')();
+            console.log("Database & tables created!");
+        } else {
+            await sequelize.sync();
+            console.log("Database synced without resetting tables.");
+        }
     } catch (error) {
         console.error("Error syncing database:", error);
     }
 };
 
-syncDatabase();
+syncDatabase()
 
 module.exports = {
     sequelize

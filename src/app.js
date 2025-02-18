@@ -8,6 +8,7 @@ const path = require('path');
 
 const app = express();
 const port = 3000;
+require('dotenv').config();
 
 //Middleware
 app.use(express.json());
@@ -74,9 +75,16 @@ watchRoutes(app);
 //Error Handling
 app.use(errorHandler);
 
-sequelize.sequelize.sync({ force: false }).then(() => {
-  console.log("database synced");
-  app.listen(port, () => {
-    console.log(`Server runs on ${port}`);
+// Sync the database only if not in production
+if (process.env.NODE_ENV !== 'production') {
+  sequelize.sequelize.sync().then(() => {
+      console.log("Database synced");
+      app.listen(port, () => {
+          console.log(`Server runs on ${port}`);
+      });
   });
-});
+} else {
+  app.listen(port, () => {
+      console.log(`Server runs on ${port}`);
+  });
+}

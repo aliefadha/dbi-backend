@@ -6,12 +6,18 @@ class TargetBulananKasirService {
     return await TargetBulananKasir.bulkCreate(data);  
   }  
   
-  static async getAll() {  
+  static async getAll(cabang) { 
+    const whereConditions = {};
+    if (cabang) {
+      whereConditions.cabang_id = cabang;
+    } 
     return await TargetBulananKasir.findAll({
+      where: whereConditions,
       include: [
         {
           model: Cabang,
           as: "cabang",
+          attributes: ["nama_cabang"],
         },
       ],
     });  

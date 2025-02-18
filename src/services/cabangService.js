@@ -1,8 +1,31 @@
+const { sequelize } = require("../models");
 const Cabang = require("../models/cabang");  
+const TargetBulananKasir = require("../models/targetBulananKasir");
   
 class CabangService {  
   static async create(data) {  
-    return await Cabang.create(data);  
+    const transaction = await sequelize.transaction();
+    try {
+      const cabang = await Cabang.create(data, { transaction });
+      const months = [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+      ];
+
+      for (const month of months) {
+        await TargetBulananKasir.create({
+          cabang_id: cabang.cabang_id,
+          bulan: month,
+          jumlah_target: 0
+        }, { transaction });
+      }
+
+      await transaction.commit();
+      return cabang;
+    } catch (error) {
+      await transaction.rollback();
+      throw error;
+    }
   }  
   
   static async getAll(toko_id) {
