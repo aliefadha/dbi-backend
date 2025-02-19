@@ -207,7 +207,7 @@ class LaporanKeuanganService {
               model: KategoriPemasukan,
               as: 'kategori_pemasukan',
               ...(kategori_pemasukan_id && {
-                where: { kategori_pemasukan_id : kategori_pemasukan_id }
+                where: { kategori_pemasukan_id: kategori_pemasukan_id }
               }),
               attributes: ["kategori_pemasukan"],
             },
@@ -310,32 +310,51 @@ class LaporanKeuanganService {
 
     const totalPemasukan = [
       ...transformedPemasukan.map(item => item.jumlah_pemasukan),
-      ...transformedPenjualan.map(item => item.total_pengeluaran)
+      ...(parseInt(kategori_pemasukan_id) === 1 || (!kategori_pengeluaran_id && !kategori_pemasukan_id)
+        ? transformedPenjualan.map(item => item.total_pengeluaran)
+        : [])
     ].reduce((total, amount) => total + amount, 0);
 
     const totalPengeluaran = [
       ...pengeluaran.map(item => item.jumlah_pengeluaran),
-      ...transformedPembelian.map(item => item.total_pengeluaran)
+      ...(parseInt(kategori_pengeluaran_id) === 1 || (!kategori_pengeluaran_id && !kategori_pemasukan_id)
+        ? transformedPembelian.map(item => item.total_pengeluaran)
+        : [])
     ].reduce((total, amount) => total + amount, 0);
 
-    const laporan = {
+     const laporan = {
       ...((!kategori_pemasukan_id) && {
-        pengeluaran: [...transformedPengeluaran, ...transformedPembelian].sort((a, b) =>
+        pengeluaran: [
+          ...transformedPengeluaran,
+          ...(parseInt(kategori_pengeluaran_id) === 1 || (!kategori_pengeluaran_id && !kategori_pemasukan_id) 
+            ? transformedPembelian 
+            : [])
+        ].sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal))
+      }),
+      ...((!kategori_pengeluaran_id) && {
+        pemasukan: [...transformedPemasukan,
+          ...(parseInt(kategori_pemasukan_id) === 1 || (!kategori_pengeluaran_id && !kategori_pemasukan_id) 
+            ? transformedPenjualan 
+            : [])
+        ].sort((a, b) =>
           new Date(a.tanggal) - new Date(b.tanggal)
         )
       }),
-      ...((!kategori_pengeluaran_id) && {
-        pemasukan: [...transformedPemasukan, ...transformedPenjualan]
-      }),
-      total_pemasukan: totalPemasukan,
-      total_pengeluaran: totalPengeluaran,
+      total_pemasukan: [
+        ...transformedPemasukan.map(item => item.jumlah_pemasukan),
+        ...transformedPenjualan.map(item => item.total_pengeluaran)
+      ].reduce((total, amount) => total + amount, 0),
+      total_pengeluaran: [
+        ...pengeluaran.map(item => item.jumlah_pengeluaran),
+        ...transformedPembelian.map(item => item.total_pengeluaran)
+      ].reduce((total, amount) => total + amount, 0),
       keuntungan: totalPemasukan - totalPengeluaran,
       produk_terjual: transformedPenjualan.reduce((total, item) => total + item.produk.length, 0),
     }
     return laporan;
   }
 
-  static async getGudang(startDate = null, endDate = null) {
+  static async getGudang(startDate = null, endDate = null, kategori_pemasukan_id = null, kategori_pengeluaran_id = null) {
     const whereClause = {
       is_deleted: false
     };
@@ -365,7 +384,10 @@ class LaporanKeuanganService {
             {
               model: KategoriPengeluaran,
               as: 'kategori_pengeluaran',
-              attributes: ["kategori_pengeluaran"]
+              ...(kategori_pengeluaran_id && {
+                where: { kategori_pengeluaran_id: kategori_pengeluaran_id }
+              }),
+              attributes: ["kategori_pengeluaran"],
             },
           ]
         },
@@ -464,7 +486,10 @@ class LaporanKeuanganService {
             {
               model: KategoriPemasukan,
               as: 'kategori_pemasukan',
-              attributes: ["kategori_pemasukan"]
+              ...(kategori_pemasukan_id && {
+                where: { kategori_pemasukan_id: kategori_pemasukan_id }
+              }),
+              attributes: ["kategori_pemasukan"],
             },
           ]
         },
@@ -544,17 +569,36 @@ class LaporanKeuanganService {
 
     const totalPemasukan = [
       ...transformedPemasukan.map(item => item.jumlah_pemasukan),
-      ...transformedPenjualan.map(item => item.total_pemasukan)
+      ...(parseInt(kategori_pemasukan_id) === 1 || (!kategori_pengeluaran_id && !kategori_pemasukan_id)
+        ? transformedPenjualan.map(item => item.total_pemasukan)
+        : [])
     ].reduce((total, amount) => total + amount, 0);
 
     const totalPengeluaran = [
       ...pengeluaran.map(item => item.jumlah_pengeluaran),
-      ...transformedPembelian.map(item => item.total_pengeluaran)
+      ...(parseInt(kategori_pengeluaran_id) === 1 || (!kategori_pengeluaran_id && !kategori_pemasukan_id)
+        ? transformedPembelian.map(item => item.total_pengeluaran)
+        : [])
     ].reduce((total, amount) => total + amount, 0);
 
     const laporan = {
-      pengeluaran: [...transformedPengeluaran, ...transformedPembelian],
-      pemasukan: [...transformedPemasukan, ...transformedPenjualan],
+      ...((!kategori_pemasukan_id) && {
+        pengeluaran: [
+          ...transformedPengeluaran,
+          ...(parseInt(kategori_pengeluaran_id) === 1 || (!kategori_pengeluaran_id && !kategori_pemasukan_id) 
+            ? transformedPembelian 
+            : [])
+        ].sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal))
+      }),
+      ...((!kategori_pengeluaran_id) && {
+        pemasukan: [...transformedPemasukan,
+          ...(parseInt(kategori_pemasukan_id) === 1 || (!kategori_pengeluaran_id && !kategori_pemasukan_id) 
+            ? transformedPenjualan 
+            : [])
+        ].sort((a, b) =>
+          new Date(a.tanggal) - new Date(b.tanggal)
+        )
+      }),
       total_pemasukan: totalPemasukan,
       total_pengeluaran: totalPengeluaran,
       keuntungan: totalPemasukan - totalPengeluaran,
