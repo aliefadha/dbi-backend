@@ -1,12 +1,18 @@
-const TargetBulananKasirService = require("../services/targetBulananKasirService");  
+const BayarGajiService = require("../services/bayarGajiService");  
+const CustomIdGenerateService = require("../services/customIdGenerateService");
   
-class TargetBulananKasirController {  
+class BayarGajiController {  
   static async create(req, res) {  
     try {  
-      const targetBulananKasir = await TargetBulananKasirService.create(req.body);  
+      const newId = await CustomIdGenerateService.generateBayarGajiId();
+      const bayarGajiData = {
+        ...req.body,
+        bayar_gaji_id: newId
+      }
+      const bayarGaji = await BayarGajiService.create(bayarGajiData);  
       res.status(201).json({  
         success: true,  
-        data: targetBulananKasir,  
+        data: bayarGaji,  
         message: "created successfully",  
       });  
     } catch (error) {  
@@ -20,11 +26,11 @@ class TargetBulananKasirController {
   
   static async getAll(req, res) {  
     try {  
-      const { cabang } = req.query;
-      const targetBulananKasirs = await TargetBulananKasirService.getAll(cabang);  
+      const { bulan, tahun } = req.query;
+      const bayarGajis = await BayarGajiService.getAll(bulan, tahun);  
       res.status(200).json({  
         success: true,  
-        data: targetBulananKasirs,  
+        data: bayarGajis,  
         message: "retrieved successfully",  
       });  
     } catch (error) {  
@@ -38,8 +44,8 @@ class TargetBulananKasirController {
   
   static async getById(req, res) {  
     try {  
-      const targetBulananKasir = await TargetBulananKasirService.getById(req.params.id);  
-      if (!targetBulananKasir) {  
+      const bayarGaji = await BayarGajiService.getById(req.params.id);  
+      if (!bayarGaji) {  
         return res.status(404).json({  
           success: false,  
           data: null,  
@@ -48,7 +54,7 @@ class TargetBulananKasirController {
       }  
       res.status(200).json({  
         success: true,  
-        data: targetBulananKasir,  
+        data: bayarGaji,  
         message: "retrieved successfully",  
       });  
     } catch (error) {  
@@ -62,8 +68,8 @@ class TargetBulananKasirController {
   
   static async update(req, res) {  
     try {  
-      const targetBulananKasir = await TargetBulananKasirService.update(req.params.id, req.body);  
-      if (!targetBulananKasir) {  
+      const bayarGaji = await BayarGajiService.update(req.params.id, req.body);  
+      if (!bayarGaji) {  
         return res.status(404).json({  
           success: false,  
           data: null,  
@@ -72,7 +78,7 @@ class TargetBulananKasirController {
       }  
       res.status(200).json({  
         success: true,  
-        data: targetBulananKasir,  
+        data: bayarGaji,  
         message: "updated successfully",  
       });  
     } catch (error) {  
@@ -86,7 +92,7 @@ class TargetBulananKasirController {
   
   static async delete(req, res) {  
     try {  
-      const deleted = await TargetBulananKasirService.delete(req.params.id);  
+      const deleted = await BayarGajiService.delete(req.params.id);  
       if (!deleted) {  
         return res.status(404).json({  
           success: false,  
@@ -106,24 +112,7 @@ class TargetBulananKasirController {
         message: error.message,  
       });  
     }  
-  } 
-  
-  static async getTargetByCabang(req, res) {  
-    try {  
-      const targetBulananKasirs = await TargetBulananKasirService.getTargetByCabang(req.params.id);  
-      res.status(200).json({  
-        success: true,  
-        data: targetBulananKasirs,  
-        message: "retrieved successfully",  
-      });  
-    } catch (error) {  
-      res.status(500).json({  
-        success: false,  
-        data: null,  
-        message: error.message,  
-      });  
-    }  
-  }
+  }  
 }  
   
-module.exports = TargetBulananKasirController;  
+module.exports = BayarGajiController;  

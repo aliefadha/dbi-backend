@@ -20,8 +20,10 @@ class AbsensiKaryawanService {
         gajiPokokPermenit = karyawanData.jumlah_gaji_pokok / karyawanData.waktu_kerja_sebulan_menit; 
         gajiPokokPerhari = gajiPokokPermenit * data.total_menit; 
     }  
+
+    const roundedGajiPokokPerhari = Math.round(gajiPokokPerhari)
   
-    data.gaji_pokok_perhari = gajiPokokPerhari;  
+    data.gaji_pokok_perhari = roundedGajiPokokPerhari;  
   
     return await AbsensiKaryawan.create(data); 
   }  

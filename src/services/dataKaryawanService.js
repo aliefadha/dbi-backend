@@ -110,6 +110,9 @@ class DataKaryawanService {
 
         const totalGajiAkhir = totalGajiPokok + totalBonusDiterima;
 
+        const roundedTotalPersentaseTercapai = parseFloat(totalPersentaseTercapai.toFixed(2));
+        const roundedTotalGajiAkhir = Math.round(totalGajiAkhir);
+
         return {  
             karyawan,  
             kehadiran,  
@@ -117,9 +120,9 @@ class DataKaryawanService {
             tidakHadir,
             totalGajiPokok,
             totalMenit,
-            totalPersentaseTercapai,
+            totalPersentaseTercapai: roundedTotalPersentaseTercapai,
             totalBonusDiterima,
-            totalGajiAkhir
+            totalGajiAkhir: roundedTotalGajiAkhir
         };
     }
 
@@ -206,7 +209,7 @@ class DataKaryawanService {
             // Store the calculated values back into the kpi object  
             kpi.tercapai = tercapai;  
             kpi.tidakTercapai = tidakTercapai;  
-            kpi.persentaseTercapai = persentaseTercapai;  
+            kpi.persentaseTercapai = parseFloat(persentaseTercapai.toFixed(2));  
             kpi.bonusDiterima = bonusDiterima;  
     
             // Accumulate total percentage and bonus    

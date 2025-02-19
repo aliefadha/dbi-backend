@@ -12,6 +12,7 @@ const Pembelian = require("../models/pembelian");
 const Penjualan = require("../models/penjualan");
 const Pengeluaran = require("../models/pengeluaran");
 const Pemasukan = require("../models/pemasukan");
+const BayarGaji = require("../models/bayarGaji");
 
 class CustomIdGenerateService {
     static async generatePackagingId() {
@@ -239,7 +240,21 @@ class CustomIdGenerateService {
         const newId = `INC${String(newNumericPart).padStart(4, '0')}`;  
         return newId;
     }
+    
+    static async generateBayarGajiId() {
+        const lastBayarGaji = await BayarGaji.findOne({
+            order: [['bayar_gaji_id', 'DESC']]
+        });
 
+        if (!lastBayarGaji) {
+            return 'BGA0001';
+        }
+        const lastId = lastBayarGaji.bayar_gaji_id;
+        const numericPart = parseInt(lastId.slice(3), 10);
+        const newNumericPart = numericPart + 1;
+        const newId = `BGA${String(newNumericPart).padStart(4, '0')}`;
+        return newId;
+    }
 
 }
 

@@ -8,6 +8,7 @@ const path = require('path');
 
 const app = express();
 const port = 3000;
+require('dotenv').config();
 
 //Middleware
 app.use(express.json());
@@ -28,8 +29,11 @@ app.use('/images-barang-mentah', express.static(path.join(__dirname, 'public/bar
 app.use('/images-toko', express.static(path.join(__dirname, 'public/toko')));
 
 const corsOptions = {
-  origin: ['http://localhost:5173'], 
+  origin: process.env.NODE_ENV === 'development'
+    ? [process.env.DEV_ORIGIN]
+    : [process.env.PROD_ORIGIN],
 };
+
 app.use(cors(corsOptions)); 
 
 const routesCache = {}; // Object to cache routes  
@@ -74,9 +78,16 @@ watchRoutes(app);
 //Error Handling
 app.use(errorHandler);
 
-sequelize.sequelize.sync({ force: false }).then(() => {
-  console.log("database synced");
-  app.listen(port, () => {
-    console.log(`Server runs on ${port}`);
+// Sync the database only if not in production
+if (process.env.NODE_ENV !== 'production') {
+  sequelize.sequelize.sync().then(() => {
+      console.log("Database synced");
+      app.listen(port, () => {
+          console.log(`Server runs on ${port}`);
+      });
   });
-});
+} else {
+  app.listen(port, () => {
+      console.log(`Server runs on ${port}`);
+  });
+}

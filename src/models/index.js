@@ -1,5 +1,5 @@
 // relation files
-
+require('dotenv').config();
 // models/relation.js  
 const sequelize = require('../config/database');
 const DivisiKaryawan = require('./divisiKaryawan');
@@ -57,6 +57,8 @@ const DeskripsiPengeluaran = require('./deskripsiPengeluaran');
 const KategoriPemasukan = require('./kategoriPemasukan');
 const Pemasukan = require('./pemasukan');
 const DeskripsiPemasukan = require('./deskripsiPemasukan');
+const BayarGaji = require('./bayarGaji');
+const RincianGaji = require('./rincianGaji');
 
 
 
@@ -947,19 +949,64 @@ Karyawan.belongsTo(Toko, {
     as: "toko"
 })
 
+KategoriPengeluaran.hasMany(BayarGaji, {
+    foreignKey: "kategori_pengeluaran_id",
+    as: "bayar_gaji"
+})
+
+BayarGaji.belongsTo(KategoriPengeluaran, {
+    foreignKey: "kategori_pengeluaran_id",
+    as: "kategori_pengeluaran"
+})
+
+MetodePembayaran.hasMany(BayarGaji, {
+    foreignKey: "metode_id",
+    as: "bayar_gaji"
+})
+
+BayarGaji.belongsTo(MetodePembayaran, {
+    foreignKey: "metode_id",
+    as: "metode"
+})
+
+BayarGaji.hasMany(RincianGaji, {
+    foreignKey: "bayar_gaji_id",
+    as: "rincian_gaji"
+})
+
+RincianGaji.belongsTo(BayarGaji, {
+    foreignKey: "bayar_gaji_id",
+    as: "bayar_gaji"
+})
+
+Karyawan.hasOne(RincianGaji, {
+    foreignKey: "karyawan_id",
+    as: "rincian_gaji"
+})
+
+RincianGaji.belongsTo(Karyawan, {
+    foreignKey: "karyawan_id",
+    as: "karyawan"
+})
+
 // Sync models with the database  
 const syncDatabase = async () => {
     try {
-        await sequelize.sync({ force: true }); // Use force: true only in development  
-        //Seederrrr
-        await require('./seed')();
-        console.log("Database & tables created!");
+        // Sync only in development environment
+        if (process.env.NODE_ENV === 'development') {
+            await sequelize.sync({ force: true });
+            await require('./seed')();
+            console.log("Database & tables created!");
+        } else {
+            await sequelize.sync();
+            console.log("Database synced without resetting tables.");
+        }
     } catch (error) {
         console.error("Error syncing database:", error);
     }
 };
 
-syncDatabase();
+syncDatabase()
 
 module.exports = {
     sequelize
