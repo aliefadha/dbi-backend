@@ -20,11 +20,11 @@ class LaporanKeuanganController {
   }
  
   static async getAll(req, res) {
-    const { toko_id, startDate, endDate} = req.query;
+    const { toko_id, startDate, endDate, kategori_pemasukan_id, kategori_pengeluaran_id} = req.query;
     try {
       const laporanKeuangans = await (toko_id == 1
-        ? LaporanKeuanganService.getGudang(startDate, endDate)
-        : LaporanKeuanganService.getAll(toko_id, startDate, endDate));
+        ? LaporanKeuanganService.getGudang(startDate, endDate, kategori_pemasukan_id, kategori_pengeluaran_id)
+        : LaporanKeuanganService.getAll(toko_id, startDate, endDate, kategori_pemasukan_id, kategori_pengeluaran_id));
 
       res.status(200).json({
         success: true,

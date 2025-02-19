@@ -56,7 +56,7 @@ class LaporanKeuanganService {
     return kategori;
   }
 
-  static async getAll(toko_id = null, startDate = null, endDate = null) {
+  static async getAll(toko_id = null, startDate = null, endDate = null, kategori_pemasukan_id = null, kategori_pengeluaran_id = null) {
     const whereClause = {
       is_deleted: false
     };
@@ -88,6 +88,9 @@ class LaporanKeuanganService {
             {
               model: KategoriPengeluaran,
               as: 'kategori_pengeluaran',
+              ...(kategori_pengeluaran_id && {
+                where: { kategori_pengeluaran_id: kategori_pengeluaran_id }
+              }),
               attributes: ["kategori_pengeluaran"],
             },
           ]
@@ -203,6 +206,9 @@ class LaporanKeuanganService {
             {
               model: KategoriPemasukan,
               as: 'kategori_pemasukan',
+              ...(kategori_pemasukan_id && {
+                where: { kategori_pemasukan_id : kategori_pemasukan_id }
+              }),
               attributes: ["kategori_pemasukan"],
             },
           ]
@@ -313,10 +319,14 @@ class LaporanKeuanganService {
     ].reduce((total, amount) => total + amount, 0);
 
     const laporan = {
-      pengeluaran: [...transformedPengeluaran, ...transformedPembelian].sort((a, b) =>
-        new Date(a.tanggal) - new Date(b.tanggal)
-      ),
-      pemasukan: [...transformedPemasukan, ...transformedPenjualan],
+      ...((!kategori_pemasukan_id) && {
+        pengeluaran: [...transformedPengeluaran, ...transformedPembelian].sort((a, b) =>
+          new Date(a.tanggal) - new Date(b.tanggal)
+        )
+      }),
+      ...((!kategori_pengeluaran_id) && {
+        pemasukan: [...transformedPemasukan, ...transformedPenjualan]
+      }),
       total_pemasukan: totalPemasukan,
       total_pengeluaran: totalPengeluaran,
       keuntungan: totalPemasukan - totalPengeluaran,
