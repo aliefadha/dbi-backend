@@ -10,4 +10,4 @@ router.get('/pengeluaran/:id', PengeluaranController.getById);
 router.put('/pengeluaran/:id', PengeluaranController.update);  
 router.delete('/pengeluaran/:id', PengeluaranController.delete);  
   
-module.exports = router;  
+module.exports = router;

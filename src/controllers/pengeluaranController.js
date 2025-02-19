@@ -67,8 +67,9 @@ class PengeluaranController {
   }  
 
   static async getByKategori(req, res) {
+    const { startDate, endDate } = req.query; 
     try {
-      const pengeluarans = await PengeluaranService.getByKategori(req.params.kategori_id);
+      const pengeluarans = await PengeluaranService.getByKategori(req.params.kategori_id, startDate, endDate);
       if (!pengeluarans) {
         return res.status(404).json({
           success: false,

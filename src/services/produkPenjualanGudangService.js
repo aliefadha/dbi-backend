@@ -360,7 +360,6 @@ class ProdukPenjualanGudangService {
         ],
         group: ['nama_barang'],
         order: [[sequelize.fn('SUM', sequelize.col('kuantitas')), 'DESC']],
-        limit: 1
       }),
 
       // Get Non-Handmade products
@@ -382,7 +381,6 @@ class ProdukPenjualanGudangService {
         ],
         group: ['nama_barang'],
         order: [[sequelize.fn('SUM', sequelize.col('kuantitas')), 'DESC']],
-        limit: 1
       }),
 
       // Get Raw Materials
@@ -404,7 +402,6 @@ class ProdukPenjualanGudangService {
         ],
         group: ['nama_barang'],
         order: [[sequelize.fn('SUM', sequelize.col('kuantitas')), 'DESC']],
-        limit: 1
       }),
 
       // Get Packaging
@@ -426,40 +423,39 @@ class ProdukPenjualanGudangService {
         ],
         group: ['nama_packaging'],
         order: [[sequelize.fn('SUM', sequelize.col('kuantitas')), 'DESC']],
-        limit: 1
       })
     ]);
 
     // Format the results
     return {
-      handmade: handmade[0] ? {
-        id: handmade[0].barang_handmade_id,
-        image: handmade[0].barang_handmade.image,
-        nama: handmade[0].barang_handmade.nama_barang,
-        total_terjual: parseInt(handmade[0].dataValues.total_terjual),
+      handmade: handmade.map(item => ({
+        id: item.barang_handmade_id,
+        image: item.barang_handmade.image,
+        nama: item.barang_handmade.nama_barang,
+        total_terjual: parseInt(item.dataValues.total_terjual),
         kategori: 'Handmade'
-      } : null,
-      nonhandmade: nonhandmade[0] ? {
-        id: nonhandmade[0].barang_nonhandmade_id,
-        image: nonhandmade[0].barang_nonhandmade.image,
-        nama: nonhandmade[0].barang_nonhandmade.nama_barang,
-        total_terjual: parseInt(nonhandmade[0].dataValues.total_terjual),
+      })),
+      nonhandmade: nonhandmade.map(item => ({
+        id: item.barang_nonhandmade_id,
+        image: item.barang_nonhandmade.image,
+        nama: item.barang_nonhandmade.nama_barang,
+        total_terjual: parseInt(item.dataValues.total_terjual),
         kategori: 'Non-Handmade'
-      } : null,
-      mentah: mentah[0] ? {
-        id: mentah[0].barang_mentah_id,
-        image: mentah[0].barang_mentah.image,
-        nama: mentah[0].barang_mentah.nama_barang,
-        total_terjual: parseInt(mentah[0].dataValues.total_terjual),
+      })),
+      mentah: mentah.map(item => ({
+        id: item.barang_mentah_id,
+        image: item.barang_mentah.image,
+        nama: item.barang_mentah.nama_barang,
+        total_terjual: parseInt(item.dataValues.total_terjual),
         kategori: 'Bahan Mentah'
-      } : null,
-      packaging: packaging[0] ? {
-        id: packaging[0].packaging_id,
-        image: packaging[0].packaging.image,
-        nama: packaging[0].packaging.nama_packaging,
-        total_terjual: parseInt(packaging[0].dataValues.total_terjual),
+      })),
+      packaging: packaging.map(item => ({
+        id: item.packaging_id,
+        image: item.packaging.image,
+        nama: item.packaging.nama_packaging,
+        total_terjual: parseInt(item.dataValues.total_terjual),
         kategori: 'Packaging'
-      } : null
+      }))
     };
   }
 

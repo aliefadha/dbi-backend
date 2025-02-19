@@ -255,6 +255,16 @@ MetodePembayaranGudang.hasMany(PenjualanGudang, {
     as: "metode_pembayaran"
 })
 
+MetodePembayaran.belongsTo(Toko, {
+    foreignKey: "toko_id",
+    as: "toko"
+});
+
+Toko.hasMany(MetodePembayaran, {
+    foreignKey: "toko_id",
+    as: "metode_pembayaran"
+})
+
 PenjualanGudang.belongsTo(MetodePembayaranGudang, {
     foreignKey: "metode_id",
     as: "metode_pembayaran"
@@ -732,6 +742,11 @@ ProdukPenjualan.belongsTo(Penjualan, {
     as: "penjualan",
 })
 
+ProdukPenjualan.belongsTo(Cabang, {
+    foreignKey: "cabang_id",
+    as: "cabang",
+})
+
 BarangHandmade.hasMany(ProdukPenjualan, {
     foreignKey: "barang_handmade_id",
     as: "produk_penjualan",
@@ -792,6 +807,11 @@ Penjualan.belongsTo(Cabang, {
     as: "cabang"
 })
 
+Penjualan.belongsTo(Toko, {
+    foreignKey: "toko_id",
+    as: "toko"
+})
+
 KategoriPengeluaran.hasMany(Pengeluaran, {
     foreignKey: "kategori_pengeluaran_id",
     as: "pengeluaran"
@@ -822,10 +842,24 @@ Cabang.belongsTo(Toko, {
     as: "toko"
 })
 
+Toko.hasMany(Pembelian, {
+    foreignKey: "toko_id",
+    as: "pembelian"
+})
+
+Pembelian.belongsTo(Toko, {
+    foreignKey: "toko_id",
+    as: "toko"
+})
 
 Pengeluaran.hasMany(DeskripsiPengeluaran, {
     foreignKey: "pengeluaran_id",
     as: "deskripsi_pengeluaran"
+})
+
+DeskripsiPengeluaran.belongsTo(Pengeluaran, {
+    foreignKey: "pengeluaran_id",
+    as: "pengeluaran"
 })
 
 Toko.hasMany(DeskripsiPengeluaran, {
@@ -847,6 +881,13 @@ DeskripsiPengeluaran.belongsTo(Cabang, {
     foreignKey: "cabang_id",
     as: "cabang"
 })
+
+
+DeskripsiPengeluaran.belongsTo(KategoriPengeluaran, {
+    foreignKey: "kategori_pengeluaran_id",
+    as: "kategori_pengeluaran"
+})
+
 
 KategoriPemasukan.hasMany(Pemasukan, {
     foreignKey: "kategori_pemasukan_id",
