@@ -29,8 +29,11 @@ app.use('/images-barang-mentah', express.static(path.join(__dirname, 'public/bar
 app.use('/images-toko', express.static(path.join(__dirname, 'public/toko')));
 
 const corsOptions = {
-  origin: ['http://localhost:5173'], 
+  origin: process.env.NODE_ENV === 'development'
+    ? [process.env.DEV_ORIGIN]
+    : [process.env.PROD_ORIGIN],
 };
+
 app.use(cors(corsOptions)); 
 
 const routesCache = {}; // Object to cache routes  
