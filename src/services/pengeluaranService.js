@@ -7,6 +7,9 @@ const MetodePembayaran = require("../models/metodePembayaran");
 const Pengeluaran = require("../models/pengeluaran");
 const Toko = require("../models/toko");
 const DeskripsiPengeluaranService = require("./deskripsiPengeluaranService");
+const RincianGaji = require("../models/rincianGaji");
+const Karyawan = require("../models/karyawan");
+const BayarGaji = require("../models/bayarGaji");
 
 class PengeluaranService {
   static async create(data) {
@@ -74,7 +77,7 @@ class PengeluaranService {
           ]
         }
       ],
-      order: [['tanggal', 'DESC']] // Added sorting by date
+      order: [['tanggal', 'DESC']]
     });
 
     // Rest of the code remains the same
@@ -262,20 +265,68 @@ class PengeluaranService {
         ],
         order: [['tanggal', 'DESC']]
       });
-  
-      return deskripsiPengeluarans.map(item => ({
-        ...item.get({ plain: true }),
-        metode: item.metode?.nama_metode || null,
-        kategori_pengeluaran: item.kategori_pengeluaran.kategori_pengeluaran,
-        deskripsi_pengeluaran: item.deskripsi_pengeluaran.map(d => ({
-          deskripsi_pengeluaran_id: d.deskripsi_pengeluaran_id,
-          pengeluaran_id: d.pengeluaran_id,
-          deskripsi: d.deskripsi,
-          jumlah_pengeluaran: d.jumlah_pengeluaran,
-          toko: d.toko?.nama_toko,
-          cabang: d.cabang?.nama_cabang
-        }))
-      }));
+
+      const gaji = await RincianGaji.findAll({
+        where: {
+          is_deleted: false,
+        },
+        include: [
+          {
+            model: BayarGaji,
+            as: 'bayar_gaji',
+            where: whereClause,
+          },
+          {
+            model: Karyawan,
+            as: 'karyawan',
+            where: {
+              toko_id: id,
+              is_deleted: false,
+            },
+            include: [{
+              model: Toko,
+              as: 'toko'
+            },
+          {
+            model: Cabang,
+            as: 'cabang'
+          }]
+          }
+        ],
+        raw: true
+      })
+
+      console.log(gaji)
+
+      return [
+            ...deskripsiPengeluarans.map(item => ({
+              ...item.get({ plain: true }),
+              metode: item.metode?.nama_metode || null,
+              kategori_pengeluaran: item.kategori_pengeluaran.kategori_pengeluaran,
+              deskripsi_pengeluaran: item.deskripsi_pengeluaran.map(d => ({
+                deskripsi_pengeluaran_id: d.deskripsi_pengeluaran_id,
+                pengeluaran_id: d.pengeluaran_id,
+                deskripsi: d.deskripsi,
+                jumlah_pengeluaran: d.jumlah_pengeluaran,
+                toko: d.toko?.nama_toko,
+                cabang: d.cabang?.nama_cabang
+              }))
+            })),
+            ...gaji.map(item => ({
+              pengeluaran_id: item['bayar_gaji.bayar_gaji_id'],
+              tanggal: item['bayar_gaji.tanggal'],
+              cash_or_non: Boolean(item['bayar_gaji.cash_or_non']),
+              total: item['bayar_gaji.total'],
+              kategori_pengeluaran: "Gaji",
+              metode: item['bayar_gaji.metode.nama_metode'],
+              deskripsi_pengeluaran: [{
+                deskripsi: 'Gaji',
+                jumlah_pengeluaran: item['total_gaji_akhir'],
+                toko: item['karyawan.toko.nama_toko'],
+                cabang: item['karyawan.cabang.nama_cabang'],
+              }]
+            }))
+          ].sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
     }
 
   static async update(id, data) {
