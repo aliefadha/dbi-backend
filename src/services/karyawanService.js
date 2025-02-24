@@ -52,11 +52,19 @@ class KaryawanService {
         ]});
     }
     static async create(data) {
-        if(data.cabangId){
-            const cabangIdFirst = data.cabang_id;
-            data.cabang_id_first = cabangIdFirst;
-        }
-        return await Karyawan.create(data);
+        try {
+            if(data.cabangId){
+                const cabangIdFirst = data.cabang_id;
+                data.cabang_id_first = cabangIdFirst;
+            }
+            const existingKaryawan = await Karyawan.findOne({ where: { email: data.email } });
+            if (existingKaryawan) {
+                throw new Error("Email already exists");
+            }
+            return await Karyawan.create(data);
+        } catch (error) {
+            throw error;
+        }    
     }
     static async update(id, data) {
         const karyawan = await Karyawan.findByPk(id);

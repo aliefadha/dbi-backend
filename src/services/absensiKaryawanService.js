@@ -75,7 +75,7 @@ class AbsensiKaryawanService {
   static async update(id, data) {  
     const absensiKaryawan = await AbsensiKaryawan.findByPk(id);  
     if (!absensiKaryawan) return null;  
-    const karyawanData = await Karyawan.findOne({where: {karyawan_id: data.karyawan_id}});
+    const karyawanData = await Karyawan.findOne({where: {karyawan_id: absensiKaryawan.karyawan_id}});
     if (!karyawanData) {  
         throw new Error("Karyawan not found");  
     } 
