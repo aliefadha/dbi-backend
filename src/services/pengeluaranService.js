@@ -91,59 +91,70 @@ class PengeluaranService {
     }));
   }
 
-  static async getByKategori(id) {
-    const pengeluarans = await Pengeluaran.findAll({
-      where: {
+  static async getByKategori(id, start_date = null, end_date = null) {
+      const whereClause = {
         kategori_pengeluaran_id: id,
         is_deleted: false
-      },
-      attributes: {
-        exclude: ['is_deleted', 'metode_id', 'kategori_pengeluaran_id']
-      },
-      include: [
-        {
-          model: KategoriPengeluaran,
-          as: 'kategori_pengeluaran',
-          attributes: ['kategori_pengeluaran']
+      };
+  
+      if (start_date && end_date) {
+        whereClause.tanggal = {
+          [Op.between]: [start_date, end_date]
+        };
+      }
+  
+      const pengeluarans = await Pengeluaran.findAll({
+        where: whereClause,
+        attributes: {
+          exclude: ['is_deleted', 'metode_id', 'kategori_pengeluaran_id']
         },
-        {
-          model: MetodePembayaran,
-          as: 'metode',
-          attributes: ['nama_metode']
-        },
-        {
-          model: DeskripsiPengeluaran,
-          as: 'deskripsi_pengeluaran',
-          attributes: ['deskripsi_pengeluaran_id', 'deskripsi', 'jumlah_pengeluaran'],
-          include: [
-            {
-              model: Toko,
-              as: 'toko',
-              attributes: ['nama_toko']
-            },
-            {
-              model: Cabang,
-              as: 'cabang',
-              attributes: ['nama_cabang']
-            }
-          ]
-        }
-      ],
-      order: [['tanggal', 'DESC']]
-    });
-
-    return pengeluarans.map(p => ({
-      ...p.get({ plain: true }),
-      kategori_pengeluaran: p.kategori_pengeluaran.kategori_pengeluaran,
-      metode: p.metode.nama_metode,
-      deskripsi_pengeluaran: p.deskripsi_pengeluaran.map(d => ({
-        deskripsi: d.deskripsi,
-        jumlah_pengeluaran: d.jumlah_pengeluaran,
-        toko: d.toko?.nama_toko,
-        cabang: d.cabang?.nama_cabang
-      }))
-    }));
-  }
+        include: [
+          {
+            model: KategoriPengeluaran,
+            as: 'kategori_pengeluaran',
+            attributes: ['kategori_pengeluaran']
+          },
+          {
+            model: MetodePembayaran,
+            as: 'metode',
+            attributes: ['nama_metode']
+          },
+          {
+            model: DeskripsiPengeluaran,
+            as: 'deskripsi_pengeluaran',
+            attributes: ['deskripsi_pengeluaran_id', 'deskripsi', 'jumlah_pengeluaran'],
+            include: [
+              {
+                model: Toko,
+                as: 'toko',
+                attributes: ['nama_toko']
+              },
+              {
+                model: Cabang,
+                as: 'cabang',
+                attributes: ['nama_cabang']
+              }
+            ]
+          }
+        ],
+        order: [['tanggal', 'DESC']]
+      });
+  
+      return pengeluarans.map(pengeluaran => {
+        const plainPengeluaran = pengeluaran.get({ plain: true });
+        return {
+          ...plainPengeluaran,
+          kategori_pengeluaran: plainPengeluaran.kategori_pengeluaran.kategori_pengeluaran,
+          metode: plainPengeluaran.metode.nama_metode,
+          deskripsi_pengeluaran: plainPengeluaran.deskripsi_pengeluaran.map(d => ({
+            deskripsi: d.deskripsi,
+            jumlah_pengeluaran: d.jumlah_pengeluaran,
+            toko: d.toko?.nama_toko,
+            cabang: d.cabang?.nama_cabang
+          }))
+        };
+      });
+    }
 
   static async getById(id) {
     const pengeluaran = await Pengeluaran.findOne({

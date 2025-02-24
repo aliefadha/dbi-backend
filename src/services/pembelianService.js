@@ -26,6 +26,14 @@ class PembelianService {
   }  
   
   static async getAll(bulan, tahun, toko_id) {  
+    // Set default values to current month and year if not provided
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth() + 1; // getMonth() returns 0-11
+    const currentYear = currentDate.getFullYear();
+
+    bulan = bulan || currentMonth;
+    tahun = tahun || currentYear;
+
     const startDate = new Date(tahun, bulan-1, 1);
     const endDate = new Date(tahun, bulan, 0);
     const whereConditions = {
@@ -137,4 +145,4 @@ class PembelianService {
   }  
 }  
   
-module.exports = PembelianService;  
+module.exports = PembelianService;

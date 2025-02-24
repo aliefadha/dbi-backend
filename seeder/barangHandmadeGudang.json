@@ -1,6 +1,6 @@
 [
     {
-      "nama_barang": "Gelang Karet",
+      "nama_barang": "Gelang Karet Handmade",
       "kategori_barang_id": 1,
       "jumlah_minimum_stok": 250,
       "waktu_pengerjaan": 60,
@@ -17,7 +17,7 @@
       ]
     },
     {
-      "nama_barang": "Kalung Manik-Manik",
+      "nama_barang": "Kalung Manik-Manik Handmade",
       "kategori_barang_id": 2,
       "jumlah_minimum_stok": 100,
       "waktu_pengerjaan": 90,

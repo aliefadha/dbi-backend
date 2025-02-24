@@ -68,8 +68,9 @@ class PemasukanController {
   }  
 
   static async getByKategori(req, res) {
+    const { startDate, endDate } = req.query; 
     try {
-      const pemasukans = await PemasukanService.getByKategori(req.params.kategori_id);
+      const pemasukans = await PemasukanService.getByKategori(req.params.kategori_id, startDate, endDate);
       if (!pemasukans) {
         return res.status(404).json({
           success: false,
@@ -95,6 +96,31 @@ class PemasukanController {
     const { startDate, endDate } = req.query; 
     try {
       const pemasukans = await PemasukanService.getByToko(req.params.toko_id, startDate, endDate);
+      if (!pemasukans) {
+        return res.status(404).json({
+          success: false,
+          data: null,
+          message: "not found",
+        });
+      }
+      res.status(200).json({
+        success: true,
+        data: pemasukans,
+        message: "retrieved successfully",
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        data: null,
+        message: error.message,
+      });
+    }
+  }
+
+  static async getByCashOrNon(req, res) {
+    const { startDate, endDate } = req.query; 
+    try {
+      const pemasukans = await PemasukanService.getByCashOrNon(req.params.is_cash, startDate, endDate);
       if (!pemasukans) {
         return res.status(404).json({
           success: false,

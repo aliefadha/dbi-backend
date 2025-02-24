@@ -39,7 +39,7 @@ const PembelianGudang = sequelize.define("pembelian_gudang", {
     type: DataTypes.INTEGER,
     defaultValue: 0,
   },
-  total_penjualan: {
+  total_pembelian: {
     type: DataTypes.INTEGER,
     defaultValue: 0,
   },
