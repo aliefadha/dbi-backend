@@ -137,58 +137,115 @@ class LaporanKeuanganService {
       nest: true
     });
 
-    const transformedPembelian = await Promise.all(data.map(async (pembelian) => {
-      const produk = await ProdukPembelian.findAll({
-        where: {
-          pembelian_id: pembelian.pembelian_id,
-          is_deleted: false
-        },
-        include: [
-          {
-            model: BarangHandmade,
-            as: 'barang_handmade',
-            attributes: ["nama_barang"]
-          },
-          {
-            model: BarangNonHandmade,
-            as: 'barang_non_handmade',
-            attributes: ["nama_barang"]
-          },
-          {
-            model: BarangCustom,
-            as: 'barang_custom',
-            attributes: ["nama_barang"]
-          },
-          {
-            model: Packaging,
-            as: 'packaging',
-            attributes: ["nama_packaging"]
-          },
-          {
-            model: Cabang,
-            as: 'cabang',
-            attributes: ["nama_cabang"]
-          }
-        ],
-        raw: true,
-        nest: true
-      });
+    const gudangData = !toko_id ? await PembelianGudang.findAll({
+      where: {
+        ...whereClause,
+      },
+      attributes: ['pembelian_id', 'tanggal', 'total_pembelian'],
+      raw: true,
+      nest: true
+    }) : [];
 
-      return {
-        pembelian_id: pembelian.pembelian_id,
-        tanggal: pembelian.tanggal,
-        total_pengeluaran: pembelian.total_pembelian,
-        nama_toko: pembelian.toko.nama_toko,
-        produk: produk.map(item => ({
-          nama_barang: item.barang_handmade?.nama_barang ||
-            item.barang_non_handmade?.nama_barang ||
-            item.barang_custom?.nama_barang ||
-            item.packaging?.nama_packaging,
-          nama_cabang: item.cabang?.nama_cabang
-        })),
-        kategori_pengeluaran: "Pembelian"
-      };
-    }));
+    const transformedPembelian = await Promise.all([
+      ...data.map(async (pembelian) => {
+        const produk = await ProdukPembelian.findAll({
+          where: {
+            pembelian_id: pembelian.pembelian_id,
+            is_deleted: false
+          },
+          include: [
+            {
+              model: BarangHandmade,
+              as: 'barang_handmade',
+              attributes: ["nama_barang"]
+            },
+            {
+              model: BarangNonHandmade,
+              as: 'barang_non_handmade',
+              attributes: ["nama_barang"]
+            },
+            {
+              model: BarangCustom,
+              as: 'barang_custom',
+              attributes: ["nama_barang"]
+            },
+            {
+              model: Packaging,
+              as: 'packaging',
+              attributes: ["nama_packaging"]
+            },
+            {
+              model: Cabang,
+              as: 'cabang',
+              attributes: ["nama_cabang"]
+            }
+          ],
+          raw: true,
+          nest: true
+        });
+
+        return {
+          pembelian_id: pembelian.pembelian_id,
+          tanggal: pembelian.tanggal,
+          total_pengeluaran: pembelian.total_pembelian,
+          nama_toko: pembelian.toko.nama_toko,
+          produk: produk.map(item => ({
+            nama_barang: item.barang_handmade?.nama_barang ||
+              item.barang_non_handmade?.nama_barang ||
+              item.barang_custom?.nama_barang ||
+              item.packaging?.nama_packaging,
+            nama_cabang: item.cabang?.nama_cabang
+          })),
+          kategori_pengeluaran: "Pembelian"
+        };
+      }),
+      ...(!toko_id ? gudangData.map(async (pembelian) => {
+        const produk = await ProdukPembelianGudang.findAll({
+          where: {
+            pembelian_id: pembelian.pembelian_id,
+            is_deleted: false
+          },
+          include: [
+            {
+              model: BarangHandmadeGudang,
+              as: 'barang_handmade',
+              attributes: ["nama_barang"]
+            },
+            {
+              model: BarangNonHandmadeGudang,
+              as: 'barang_nonhandmade',
+              attributes: ["nama_barang"]
+            },
+            {
+              model: BarangMentah,
+              as: 'barang_mentah',
+              attributes: ["nama_barang"],
+            },
+            {
+              model: PackagingGudang,
+              as: 'packaging',
+              attributes: ["nama_packaging"]
+            },
+          ],
+          raw: true,
+          nest: true
+        });
+
+        return {
+          pembelian_id: pembelian.pembelian_id,
+          tanggal: pembelian.tanggal,
+          total_pengeluaran: pembelian.total_pembelian,
+          nama_toko: "Gudang",
+          produk: produk.map(item => ({
+            nama_barang: item.barang_handmade?.nama_barang ||
+              item.barang_nonhandmade?.nama_barang ||
+              item.barang_mentah?.nama_barang ||
+              item.packaging?.nama_packaging,
+          })),
+          kategori_pengeluaran: "Pembelian"
+        };
+      }) : [])
+    ]);
 
     const pemasukan = await DeskripsiPemasukan.findAll({
       where: {
@@ -255,58 +312,116 @@ class LaporanKeuanganService {
       nest: true
     });
 
-    const transformedPenjualan = await Promise.all(penjualanData.map(async (penjualan) => {
-      const produk = await ProdukPenjualan.findAll({
-        where: {
-          penjualan_id: penjualan.penjualan_id,
-          is_deleted: false
-        },
-        include: [
-          {
-            model: BarangHandmade,
-            as: 'barang_handmade',
-            attributes: ["nama_barang"]
-          },
-          {
-            model: BarangNonHandmade,
-            as: 'barang_non_handmade',
-            attributes: ["nama_barang"]
-          },
-          {
-            model: BarangCustom,
-            as: 'barang_custom',
-            attributes: ["nama_barang"]
-          },
-          {
-            model: Packaging,
-            as: 'packaging',
-            attributes: ["nama_packaging"]
-          },
-          {
-            model: Cabang,
-            as: 'cabang',
-            attributes: ["nama_cabang"]
-          }
-        ],
-        raw: true,
-        nest: true
-      });
+    const gudangPenjualanData = !toko_id ? await PenjualanGudang.findAll({
+      where: {
+        ...whereClause,
+      },
+      attributes: ['penjualan_id', 'tanggal', 'total_penjualan'],
+      raw: true,
+      nest: true
+    }) : [];
 
-      return {
-        penjualan_id: penjualan.penjualan_id,
-        tanggal: penjualan.tanggal,
-        total_pengeluaran: penjualan.total_penjualan,
-        nama_toko: penjualan.toko.nama_toko,
-        produk: produk.map(item => ({
-          nama_barang: item.barang_handmade?.nama_barang ||
-            item.barang_non_handmade?.nama_barang ||
-            item.barang_custom?.nama_barang ||
-            item.packaging?.nama_packaging,
-          nama_cabang: item.cabang?.nama_cabang
-        })),
-        kategori_pemasukan: "Penjualan"
-      };
-    }));
+    const transformedPenjualan = await Promise.all([
+      ...penjualanData.map(async (penjualan) => {
+        const produk = await ProdukPenjualan.findAll({
+          where: {
+            penjualan_id: penjualan.penjualan_id,
+            is_deleted: false
+          },
+          include: [
+            {
+              model: BarangHandmade,
+              as: 'barang_handmade',
+              attributes: ["nama_barang"]
+            },
+            {
+              model: BarangNonHandmade,
+              as: 'barang_non_handmade',
+              attributes: ["nama_barang"]
+            },
+            {
+              model: BarangCustom,
+              as: 'barang_custom',
+              attributes: ["nama_barang"]
+            },
+            {
+              model: Packaging,
+              as: 'packaging',
+              attributes: ["nama_packaging"]
+            },
+            {
+              model: Cabang,
+              as: 'cabang',
+              attributes: ["nama_cabang"]
+            }
+          ],
+          raw: true,
+          nest: true
+        });
+
+        return {
+          penjualan_id: penjualan.penjualan_id,
+          tanggal: penjualan.tanggal,
+          total_pengeluaran: penjualan.total_penjualan,
+          nama_toko: penjualan.toko.nama_toko,
+          produk: produk.map(item => ({
+            nama_barang: item.barang_handmade?.nama_barang ||
+              item.barang_non_handmade?.nama_barang ||
+              item.barang_custom?.nama_barang ||
+              item.packaging?.nama_packaging,
+          })),
+          kategori_pemasukan: "Penjualan"
+        };
+      }),
+      ...(!toko_id ? gudangPenjualanData.map(async (penjualan) => {
+        const produk = await ProdukPenjualanGudang.findAll({
+          where: {
+            penjualan_id: penjualan.penjualan_id,
+            is_deleted: false
+          },
+          include: [
+            {
+              model: BarangHandmadeGudang,
+              as: 'barang_handmade',
+              attributes: ["nama_barang"]
+            },
+            {
+              model: BarangNonHandmadeGudang,
+              as: 'barang_nonhandmade',
+              attributes: ["nama_barang"]
+            },
+            {
+              model: BarangMentah,
+              as: 'barang_mentah',
+              attributes: ["nama_barang"],
+            },
+            {
+              model: PackagingGudang,
+              as: 'packaging',
+              attributes: ["nama_packaging"]
+            },
+          ],
+          raw: true,
+          nest: true
+        });
+
+        return {
+          penjualan_id: penjualan.penjualan_id,
+          tanggal: penjualan.tanggal,
+          total_pengeluaran: penjualan.total_penjualan,
+          nama_toko: "Gudang",
+          produk: produk.map(item => ({
+            nama_barang: item.barang_handmade?.nama_barang ||
+              item.barang_nonhandmade?.nama_barang ||
+              item.barang_mentah?.nama_barang ||
+              item.packaging?.nama_packaging,
+          })),
+          kategori_pemasukan: "Penjualan"
+        };
+      }) : [])
+    ]);
+
+    
 
     const totalPemasukan = [
       ...transformedPemasukan.map(item => item.jumlah_pemasukan),
@@ -1130,6 +1245,7 @@ class LaporanKeuanganService {
       total_pengeluaran: totalPengeluaran,
     };
   }
+
 }
 
 module.exports = LaporanKeuanganService;

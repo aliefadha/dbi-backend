@@ -81,7 +81,7 @@ class PengeluaranService {
     return pengeluarans.map(p => ({
       ...p.get({ plain: true }),
       kategori_pengeluaran: p.kategori_pengeluaran.kategori_pengeluaran,
-      metode: p.metode.nama_metode,
+      metode: p.metode?.nama_metode || null,
       deskripsi_pengeluaran: p.deskripsi_pengeluaran.map(d => ({
         deskripsi: d.deskripsi,
         jumlah_pengeluaran: d.jumlah_pengeluaran,
@@ -145,7 +145,7 @@ class PengeluaranService {
         return {
           ...plainPengeluaran,
           kategori_pengeluaran: plainPengeluaran.kategori_pengeluaran.kategori_pengeluaran,
-          metode: plainPengeluaran.metode.nama_metode,
+          metode: plainPengeluaran.metode?.nama_metode || null,
           deskripsi_pengeluaran: plainPengeluaran.deskripsi_pengeluaran.map(d => ({
             deskripsi: d.deskripsi,
             jumlah_pengeluaran: d.jumlah_pengeluaran,
@@ -199,7 +199,7 @@ class PengeluaranService {
     return {
       ...plainPengeluaran,
       kategori_pengeluaran: plainPengeluaran.kategori_pengeluaran.kategori_pengeluaran,
-      metode: plainPengeluaran.metode.nama_metode,
+      metode: plainPengeluaran.metode?.nama_metode || null,
       deskripsi_pengeluaran: plainPengeluaran.deskripsi_pengeluaran.map(d => ({
         deskripsi: d.deskripsi,
         jumlah_pengeluaran: d.jumlah_pengeluaran,
@@ -265,7 +265,7 @@ class PengeluaranService {
   
       return deskripsiPengeluarans.map(item => ({
         ...item.get({ plain: true }),
-        metode: item.metode.nama_metode,
+        metode: item.metode?.nama_metode || null,
         kategori_pengeluaran: item.kategori_pengeluaran.kategori_pengeluaran,
         deskripsi_pengeluaran: item.deskripsi_pengeluaran.map(d => ({
           deskripsi_pengeluaran_id: d.deskripsi_pengeluaran_id,
