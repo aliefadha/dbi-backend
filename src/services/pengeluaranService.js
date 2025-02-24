@@ -285,7 +285,11 @@ class PengeluaranService {
             },
             include: [{
               model: Toko,
-              as: 'toko'
+              as: 'toko',
+              where: {
+                toko_id: id,
+                is_deleted: false,
+              },
             },
           {
             model: Cabang,
