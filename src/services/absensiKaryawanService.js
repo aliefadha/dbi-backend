@@ -75,6 +75,22 @@ class AbsensiKaryawanService {
   static async update(id, data) {  
     const absensiKaryawan = await AbsensiKaryawan.findByPk(id);  
     if (!absensiKaryawan) return null;  
+    const karyawanData = await Karyawan.findOne({where: {karyawan_id: data.karyawan_id}});
+    if (!karyawanData) {  
+        throw new Error("Karyawan not found");  
+    } 
+    let gajiPokokPerhari;
+    let gajiPokokPermenit;
+    let gajiPokokPerantar;  
+  
+    if (!karyawanData.waktu_kerja_sebulan_menit) {  
+        gajiPokokPerantar = karyawanData.jumlah_gaji_pokok / karyawanData.waktu_kerja_sebulan_antar;  
+        gajiPokokPerhari = gajiPokokPerantar;
+    } else {  
+        gajiPokokPermenit = karyawanData.jumlah_gaji_pokok / karyawanData.waktu_kerja_sebulan_menit; 
+        gajiPokokPerhari = gajiPokokPermenit * data.total_menit; 
+    }  
+    data.gaji_pokok_perhari = Math.round(gajiPokokPerhari)
   
     Object.assign(absensiKaryawan, data);  
     await absensiKaryawan.save();  
