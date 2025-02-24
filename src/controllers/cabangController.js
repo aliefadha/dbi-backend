@@ -75,7 +75,20 @@ class CabangController {
   
   static async update(req, res) {  
     try {  
-      const cabang = await CabangService.update(req.params.id, req.body);  
+      const pasword = req.body.password;  
+      if (pasword !== req.body.confirmPassword) {  
+        return res.status(400).json({  
+          success: false,  
+          data: null,  
+          message: "password and confirm password not match",  
+        });  
+      }
+      const hashPassword = bcrypt.hashSync(req.body.password, 10);
+      const cabangData = {
+        ...req.body,
+        password: hashPassword
+      }
+      const cabang = await CabangService.update(req.params.id, cabangData);  
       if (!cabang) {  
         return res.status(404).json({  
           success: false,  

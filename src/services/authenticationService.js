@@ -129,6 +129,14 @@ class AuthenticationService {
 
     return response;
   }
+
+  static async update(id, data) {
+    const authentication = await Authentication.findByPk(id);
+    if (!authentication) return null;
+    Object.assign(authentication, data);
+    await authentication.save();
+    return authentication;
+  }
 }  
   
 module.exports = AuthenticationService;  

@@ -37,6 +37,12 @@ class TokoService {
   
   static async update(id, data) {  
     const toko = await Toko.findByPk(id);  
+    const emailToko = await Toko.findOne({
+      where: {
+        email: data.email
+      }
+    })
+    if(emailToko) throw new Error("Email already exists");
     if (!toko) return null;  
   
     Object.assign(toko, data);  
