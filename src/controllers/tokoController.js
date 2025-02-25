@@ -101,15 +101,18 @@ class TokoController {
       }
       const updatedData = { ...req.body };
       
-      if (req.file) {  
-        // Delete the old image file  
-        const oldImagePath = path.join(__dirname, "../public/toko", existingToko.image);  
-        fs.unlink(oldImagePath, (err) => {  
-          if (err) {  
-            console.error("Failed to delete old image:", err);  
-          }  
-        });  
-        updatedData.image = req.file.filename;  
+      if (req.file) {
+        // Check if existingToko.image is not null
+        if (existingToko.image) {
+          // Delete the old image file
+          const oldImagePath = path.join(__dirname, "../public/toko", existingToko.image);
+          fs.unlink(oldImagePath, (err) => {
+            if (err) {
+              console.error("Failed to delete old image:", err);
+            }
+          });
+        }
+        updatedData.image = req.file.filename;
       }
 
       const toko = await TokoService.update(req.params.id, updatedData);  

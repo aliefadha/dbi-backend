@@ -6,6 +6,8 @@ const RincianBiayaCustom = require("../models/rincianBiayaCustom");
 const ProdukPenjualanService = require("./produkPenjualanService");
 const RincianBiayaCustomService = require("./rincianBiayaCustomService");
 const Cabang = require("../models/cabang");
+const Toko = require("../models/toko");
+require('dotenv').config();
   
 class PenjualanService {  
   static async create(data) {  
@@ -107,6 +109,11 @@ class PenjualanService {
       },
       include: [
         {
+          model: Toko,
+          as: "toko",
+          attributes: ["image", "nama_toko"]
+        },
+        {
           model: Cabang,
           as: "cabang",
           attributes: ["nama_cabang"]
@@ -185,31 +192,75 @@ class PenjualanService {
     return true;  
   }  
 
-  static async getInvoice(id) {
-    const penjualan = this.getById(id);
-    if(!penjualan) return null;
-    return penjualan;
+  static async generateInvoiceData(penjualan) {
     // return {
-    //   logoUrl: "/api/placeholder/150/50", // Replace with actual logo URL
-    //   storeType: penjualan.cabang.nama_cabang,
-    //   address: "Jln. Hayam Wuruk Padang", // Replace with actual address
-    //   items: penjualan.produk.map(item => ({
-    //     code: item.kode_produk, // Assuming each product has a 'kode_produk' field
-    //     name: item.nama_produk, // Assuming each product has a 'nama_produk' field
-    //     qty: item.qty, // Assuming each product has a 'qty' field
-    //     price: item.harga // Assuming each product has a 'harga' field
-    //   })),
-    //   totalItems: penjualan.produk.length,
-    //   totalQty: penjualan.produk.reduce((total, item) => total + item.qty, 0),
-    //   subtotal: penjualan.produk.reduce((total, item) => total + (item.qty * item.harga), 0),
-    //   discount: penjualan.diskon || 0, // Assuming 'diskon' is a field in penjualan
-    //   tax: penjualan.pajak || 0, // Assuming 'pajak' is a field in penjualan
-    //   total: penjualan.total, // Assuming 'total' is a field in penjualan
-    //   invoiceNumber: penjualan.nomor_invoice, // Assuming 'nomor_invoice' is a field in penjualan
-    //   date: new Date(penjualan.tanggal).toLocaleDateString('id-ID'), // Assuming 'tanggal' is a field in penjualan
-    //   time: new Date(penjualan.tanggal).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }), // Assuming 'tanggal' is a field in penjualan
-    //   instagram: "@tatitatu" // Replace with actual Instagram handle
+    //   logoUrl: "http://example.com/images-toko/dummy-logo.png", // Dummy logo URL
+    //   storeType: "Dummy Store Type",
+    //   address: "Jln. Dummy Address, Dummy City", // Dummy address
+    //   items: [
+    //     { code: "P001", name: "Product 1", qty: 2, price: 10000 },
+    //     { code: "P002", name: "Product 2", qty: 1, price: 20000 },
+    //     { code: "P003", name: "Product 3", qty: 3, price: 15000 }
+    //   ],
+    //   totalItems: 3,
+    //   totalQty: 6,
+    //   subtotal: 85000,
+    //   discount: 10, // 10% discount
+    //   tax: 8500, // 10% tax on subtotal
+    //   total: 85000 - (85000 * 0.1) + 8500, // Subtotal - Discount + Tax
+    //   invoiceNumber: "INV-0001",
+    //   date: new Date().toLocaleDateString('id-ID'),
+    //   time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+    //   instagram: "@dummy_store"
     // };
+    return {
+    logoUrl: process.env.URL_LOCAL + "/images-toko/" + penjualan.toko.image, // Replace with actual logo URL
+      address: penjualan.cabang.nama_cabang, // Replace with actual address
+      items: penjualan.produk.map(item => {
+        let productName = '';
+        let productCode = '';
+  
+        if (item.barang_handmade) {
+          productName = item.barang_handmade.nama_barang;
+          productCode = item.barang_handmade.barang_handmade_id;
+        } else if (item.barang_non_handmade) {
+          productName = item.barang_non_handmade.nama_barang;
+          productCode = item.barang_non_handmade.barang_non_handmade_id;
+        } else if (item.barang_custom) {
+          productName = item.barang_custom.nama_barang;
+          productCode = item.barang_custom.barang_custom_id;
+        } else if (item.packaging) {
+          productName = item.packaging.nama_barang;
+          productCode = item.packaging.packaging_id;
+        }
+  
+        return {
+          code: productCode,
+          name: productName,
+          qty: item.kuantitas,
+          price: item.harga_satuan
+        };
+      }),
+      totalItems: penjualan.produk.length,
+      totalQty: penjualan.produk.reduce((total, item) => total + item.kuantitas, 0),
+      subtotal: penjualan.produk.reduce((total, item) => total + (item.kuantitas * item.harga_satuan), 0),
+      discount: penjualan.diskon || 0, // Assuming 'diskon' is a field in penjualan
+      tax: penjualan.pajak || 0, // Assuming 'pajak' is a field in penjualan
+      total: penjualan.total, // Assuming 'total' is a field in penjualan
+      invoiceNumber: penjualan.penjualan_id, // Assuming 'nomor_invoice' is a field in penjualan
+      date: new Date(penjualan.tanggal).toLocaleDateString('id-ID'), // Assuming 'tanggal' is a field in penjualan
+      time: new Date(penjualan.tanggal).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }), // Assuming 'tanggal' is a field in penjualan
+      instagram: "@tatitatu" // Replace with actual Instagram handle
+    };
+  }
+
+  static async getInvoice(id) {
+    const penjualan = await this.getById(id);
+    if (!penjualan) {
+      return null;
+    }
+  
+    return this.generateInvoiceData(penjualan);
   }
 }  
   
