@@ -1,8 +1,9 @@
 const express = require('express');  
 const router = express.Router();  
-const AuthenticationController = require('../controllers/authenticationController');  
+const {AuthenticationController, upload} = require('../controllers/authenticationController');  
 
 router.post('/login', AuthenticationController.login); 
-router.put('/authentication/:id', AuthenticationController.update);
+router.get('/authentication/:id', AuthenticationController.getById);
+router.put('/authentication/:id', upload.single("image"), AuthenticationController.update);
   
 module.exports = router;  

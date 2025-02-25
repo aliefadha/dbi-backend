@@ -7,5 +7,6 @@ router.get('/penjualan', PenjualanController.getAll);
 router.get('/penjualan/:id', PenjualanController.getById);  
 router.put('/penjualan/:id', PenjualanController.update);  
 router.delete('/penjualan/:id', PenjualanController.delete);  
+router.get('/penjualan/:id/invoice', PenjualanController.getInvoice);
   
 module.exports = router;  

@@ -7,7 +7,15 @@ const Authentication = sequelize.define("authentication", {
     allowNull: false,
     primaryKey: true,
     autoIncrement: true,
-  }, 
+  },
+  image: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  nama: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
   email: {
     type: DataTypes.STRING,
     unique: true,

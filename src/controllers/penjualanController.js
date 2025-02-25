@@ -113,6 +113,29 @@ class PenjualanController {
       });  
     }  
   }  
-}  
-  
+
+  static async getInvoice(req, res) {  
+    try {  
+      const invoice = await PenjualanService.getInvoice(req.params.id);  
+      if (!invoice) {  
+        return res.status(404).json({  
+          success: false,  
+          data: null,  
+          message: "not found",  
+        });  
+      }  
+      res.status(200).json({  
+        success: true,  
+        data: invoice,  
+        message: "retrieved successfully",  
+      });  
+    } catch (error) {  
+      res.status(500).json({
+        success: false,
+        data: null,
+        message: error.message,
+      });
+    }
+  }  
+}
 module.exports = PenjualanController;  

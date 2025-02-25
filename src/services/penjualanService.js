@@ -184,6 +184,33 @@ class PenjualanService {
     await penjualan.update({ is_deleted: true });  
     return true;  
   }  
+
+  static async getInvoice(id) {
+    const penjualan = this.getById(id);
+    if(!penjualan) return null;
+    return penjualan;
+    // return {
+    //   logoUrl: "/api/placeholder/150/50", // Replace with actual logo URL
+    //   storeType: penjualan.cabang.nama_cabang,
+    //   address: "Jln. Hayam Wuruk Padang", // Replace with actual address
+    //   items: penjualan.produk.map(item => ({
+    //     code: item.kode_produk, // Assuming each product has a 'kode_produk' field
+    //     name: item.nama_produk, // Assuming each product has a 'nama_produk' field
+    //     qty: item.qty, // Assuming each product has a 'qty' field
+    //     price: item.harga // Assuming each product has a 'harga' field
+    //   })),
+    //   totalItems: penjualan.produk.length,
+    //   totalQty: penjualan.produk.reduce((total, item) => total + item.qty, 0),
+    //   subtotal: penjualan.produk.reduce((total, item) => total + (item.qty * item.harga), 0),
+    //   discount: penjualan.diskon || 0, // Assuming 'diskon' is a field in penjualan
+    //   tax: penjualan.pajak || 0, // Assuming 'pajak' is a field in penjualan
+    //   total: penjualan.total, // Assuming 'total' is a field in penjualan
+    //   invoiceNumber: penjualan.nomor_invoice, // Assuming 'nomor_invoice' is a field in penjualan
+    //   date: new Date(penjualan.tanggal).toLocaleDateString('id-ID'), // Assuming 'tanggal' is a field in penjualan
+    //   time: new Date(penjualan.tanggal).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }), // Assuming 'tanggal' is a field in penjualan
+    //   instagram: "@tatitatu" // Replace with actual Instagram handle
+    // };
+  }
 }  
   
 module.exports = PenjualanService;  

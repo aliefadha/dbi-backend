@@ -27,6 +27,7 @@ app.use('/images-packaging-gudang', express.static(path.join(__dirname, 'public/
 app.use('/images-barang-handmade', express.static(path.join(__dirname, 'public/barangHandmade')));
 app.use('/images-barang-mentah', express.static(path.join(__dirname, 'public/barangMentah')));
 app.use('/images-toko', express.static(path.join(__dirname, 'public/toko')));
+app.use('/images-authentication', express.static(path.join(__dirname, 'public/authentication')));
 
 const corsOptions = {
   origin: process.env.NODE_ENV === 'development'
