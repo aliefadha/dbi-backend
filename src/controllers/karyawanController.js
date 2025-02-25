@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const multer = require("multer");
 const path = require("path");
 const fs = require('fs');
+const { compare } = require("bcrypt");
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -214,14 +215,14 @@ class KaryawanController {
             }
             if (req.file) {  
                 // Delete the old image file  
-                const oldImagePath = path.join(__dirname, "../public/karyawan", existingKaryawan.image);  
+                const oldImagePath = path.join(__dirname, "../public/karyawan", user.image);  
                 fs.unlink(oldImagePath, (err) => {  
                     if (err) {  
                         console.error("Failed to delete old image:", err);  
                     }  
                 });  
   
-                updatedData.image = req.file.filename;  
+                karyawanData.image = req.file.filename;  
             }  
             const karyawan = await KaryawanService.update(req.params.id, karyawanData);
             res.status(200).json({
