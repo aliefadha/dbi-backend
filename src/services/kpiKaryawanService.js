@@ -5,8 +5,9 @@ const Kpi = require("../models/kpi");
 const KpiService = require("./kpiService");
 const Cabang = require("../models/cabang");
 const DivisiKaryawan = require("../models/divisiKaryawan");
-// const AbsensiKaryawanService = require("./absensiKaryawanService");
 const DataKaryawanService = require("./dataKaryawanService");
+const AbsensiKaryawanService = require("./absensiKaryawanService");
+const XLSX = require('xlsx');
 
 class KpiKaryawanService {  
   static async create(data) {  
@@ -99,7 +100,22 @@ class KpiKaryawanService {
 
   static async getByKaryawanId(id, bulan, tahun) {      
     return await DataKaryawanService.getByKaryawanId(id, bulan, tahun);
-    }  
+  }
+  
+  static async exportToExcel(bulan, tahun, toko_id, cabang, divisi) {
+    const result = await AbsensiKaryawanService.getAll(bulan, tahun, toko_id, cabang, divisi);
+    const data = result.map((item) => ({
+      nama_karyawan: item.karyawan.nama_karyawan,
+      divisi: item.karyawan.divisi ? item.karyawan.divisi.nama_divisi : '',
+      cabang: item.karyawan.cabang ? item.karyawan.cabang.nama_cabang : '',
+      kpi: `${item.totalPersentaseTercapai}%`, 
+      total_gaji_akhir: `Rp${item.totalGajiAkhir.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`
+    }));
+    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'KPI Karyawan');
+    return workbook;
+  }
 
 
 }  

@@ -2,6 +2,7 @@ const AbsensiKaryawan = require("../models/absensiKaryawan");
 const Karyawan = require("../models/karyawan"); 
 const DivisiKaryawan = require("../models/divisiKaryawan");
 const DataKaryawanService = require("./dataKaryawanService");
+const XLSX = require('xlsx');
 
 class AbsensiKaryawanService {  
   static async create(data) {  
@@ -43,13 +44,21 @@ class AbsensiKaryawanService {
     });
   }
   
-  static async getAll(bulan, tahun, toko_id) {  
+  static async getAll(bulan, tahun, toko_id, cabang, divisi) {  
       const whereConditions = {
           is_deleted: false
       }
 
       if (toko_id) {
           whereConditions.toko_id = toko_id
+      }
+
+      if (cabang) {
+          whereConditions.cabang_id = cabang
+      }
+
+      if (divisi) {
+          whereConditions.divisi_karyawan_id = divisi
       }
       const karyawanList = await Karyawan.findAll({
           where: whereConditions
@@ -152,6 +161,24 @@ class AbsensiKaryawanService {
       }  
 
       return results; 
+  }
+
+  static async exportToExcel(bulan, tahun, toko_id, cabang, divisi) {
+    const result = await this.getAll(bulan, tahun, toko_id, cabang, divisi);
+    const data = result.map((item) => ({
+      nama_karyawan: item.karyawan.nama_karyawan,
+      divisi: item.karyawan.divisi ? item.karyawan.divisi.nama_divisi : '',
+      cabang: item.karyawan.cabang ? item.karyawan.cabang.nama_cabang : '',
+      absen: item.kehadiran,
+      kpi: `${item.totalPersentaseTercapai}%`, 
+      total_gaji_akhir: `Rp${item.totalGajiAkhir.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`
+    }));
+    
+    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Absensi Karyawan');
+
+    return workbook;
   }
 }  
   

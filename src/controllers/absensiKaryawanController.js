@@ -1,6 +1,7 @@
 const AbsensiKaryawanService = require("../services/absensiKaryawanService");  
 const multer = require("multer");
 const path = require("path");
+const XLSX = require('xlsx');
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -38,9 +39,9 @@ class AbsensiKaryawanController {
   
   static async getAll(req, res) {  
     try {  
-      const { toko_id } = req.query;
+      const { toko_id, cabang } = req.query;
       const { bulan, tahun } = req.params;
-      const absensiKaryawans = await AbsensiKaryawanService.getAll(bulan, tahun, toko_id);  
+      const absensiKaryawans = await AbsensiKaryawanService.getAll(bulan, tahun, toko_id, cabang);  
       res.status(200).json({  
         success: true,  
         data: absensiKaryawans,  
@@ -217,6 +218,24 @@ class AbsensiKaryawanController {
         data: null,
         message: error.message,
       });
+    }
+  }
+
+  static async export(req, res) {
+    try {
+      const { bulan, tahun, toko_id, cabang, divisi } = req.query;
+      const workbook = await AbsensiKaryawanService.exportToExcel(bulan, tahun, toko_id, cabang, divisi);
+      res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+      res.setHeader("Content-Disposition", "attachment; filename=absensi_gaji_karyawan.xlsx");
+      const buffer = XLSX.write(workbook, { type: "buffer", bookType: "xlsx" });
+      res.send(buffer);
+    } catch (error) {
+      console.error("Error exporting to Excel:", error);
+      res.status(500).json({
+        success: false,
+        data: null,
+        message: error.message,
+      });                       
     }
   }
 }  

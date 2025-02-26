@@ -1,6 +1,7 @@
 const Karyawan = require("../models/karyawan");
 const DivisiKaryawan = require("../models/divisiKaryawan");
 const Cabang = require("../models/cabang");
+const XLSX = require('xlsx');
 
 class KaryawanService {
     static async getAll(toko_id) {
@@ -84,6 +85,23 @@ class KaryawanService {
     }
     static async delete(id) {
         return await Karyawan.destroy({ where: { karyawan_id: id } });
+    }
+
+    static async exportToExcel(toko_id) {
+        const result = await this.getAll(toko_id);
+        // return result;
+        const data = result.map(karyawan => ({
+            nama_karyawan: karyawan.nama_karyawan,
+            divisi: karyawan.divisi ? karyawan.divisi.nama_divisi : '',
+            nomor_handphone: karyawan.nomor_handphone,
+            email: karyawan.email
+        }));
+
+        const workbook = XLSX.utils.book_new();
+        const worksheet = XLSX.utils.json_to_sheet(data);
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Karyawan');
+
+        return workbook;
     }
 }
 

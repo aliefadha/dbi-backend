@@ -4,6 +4,7 @@ const { AbsensiKaryawanController, upload } = require('../controllers/absensiKar
 
 router.post('/absensi-karyawan', upload.single("image"), AbsensiKaryawanController.create);  
 router.get('/absensi-karyawan', AbsensiKaryawanController.getAllByKaryawan);
+router.get('/absensi-karyawan/export', AbsensiKaryawanController.export);
 router.get('/absensi-karyawan/:bulan/:tahun', AbsensiKaryawanController.getAll);  
 router.get('/absensi-karyawan/:id', AbsensiKaryawanController.getById);  
 router.put('/absensi-karyawan/:id', AbsensiKaryawanController.update);  

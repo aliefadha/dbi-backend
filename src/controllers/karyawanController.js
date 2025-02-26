@@ -4,6 +4,7 @@ const multer = require("multer");
 const path = require("path");
 const fs = require('fs');
 const { compare } = require("bcrypt");
+const XLSX = require('xlsx');
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -232,6 +233,26 @@ class KaryawanController {
             });
         }
         catch (error) {
+            res.status(500).json({
+                success: false,
+                data: null,
+                message: error.message
+            });
+        }
+    }
+
+    static async export(req, res) {
+        try {
+            const { toko_id } = req.query;
+            const workbook = await KaryawanService.exportToExcel(toko_id);
+            res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            res.setHeader('Content-Disposition', 'attachment; filename=karyawan_export.xlsx');
+
+            // Write the workbook to the response stream
+            const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+            res.send(buffer);
+        } catch (error) {
+            console.error('Error exporting to Excel:', error);
             res.status(500).json({
                 success: false,
                 data: null,
