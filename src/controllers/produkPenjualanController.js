@@ -106,6 +106,24 @@ class ProdukPenjualanController {
       });  
     }  
   }  
+
+  static async getAllTerlaris(req, res) {  
+    try {  
+      const { cabang, bulan, tahun} = req.query;
+      const produkTerlaris = await ProdukPenjualanService.getAllTerlaris(cabang, bulan, tahun);  
+      res.status(200).json({  
+        success: true,  
+        data: produkTerlaris,  
+        message: "retrieved successfully",  
+      });  
+    } catch (error) {  
+      res.status(500).json({  
+        success: false,  
+        data: null,  
+        message: error.message,  
+      });  
+    }  
+  }
 }  
   
 module.exports = ProdukPenjualanController;  
