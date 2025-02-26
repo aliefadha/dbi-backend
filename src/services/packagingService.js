@@ -66,7 +66,7 @@ class PackagingService {
   static async delete(id) {  
     const packaging = await Packaging.findByPk(id);  
     if (!packaging) return null;  
-    await packaging.update({ is_deleted: true });  
+    await packaging.destroy();  
     return true;  
   }  
 }  

@@ -82,7 +82,7 @@ watchRoutes(app);
 // Define the login route explicitly
 app.post('/api/login', AuthenticationController.login);
 
-// app.use('/api', checkBlacklist, authenticateToken); 
+app.use('/api', checkBlacklist, authenticateToken); 
 //Error Handling
 app.use(errorHandler);
 

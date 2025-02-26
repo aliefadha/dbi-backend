@@ -188,31 +188,11 @@ class PenjualanService {
   static async delete(id) {  
     const penjualan = await Penjualan.findByPk(id);  
     if (!penjualan) return null;  
-    await penjualan.update({ is_deleted: true });  
+    await penjualan.destroy();  
     return true;  
   }  
 
   static async generateInvoiceData(penjualan) {
-    // return {
-    //   logoUrl: "http://example.com/images-toko/dummy-logo.png", // Dummy logo URL
-    //   storeType: "Dummy Store Type",
-    //   address: "Jln. Dummy Address, Dummy City", // Dummy address
-    //   items: [
-    //     { code: "P001", name: "Product 1", qty: 2, price: 10000 },
-    //     { code: "P002", name: "Product 2", qty: 1, price: 20000 },
-    //     { code: "P003", name: "Product 3", qty: 3, price: 15000 }
-    //   ],
-    //   totalItems: 3,
-    //   totalQty: 6,
-    //   subtotal: 85000,
-    //   discount: 10, // 10% discount
-    //   tax: 8500, // 10% tax on subtotal
-    //   total: 85000 - (85000 * 0.1) + 8500, // Subtotal - Discount + Tax
-    //   invoiceNumber: "INV-0001",
-    //   date: new Date().toLocaleDateString('id-ID'),
-    //   time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
-    //   instagram: "@dummy_store"
-    // };
     return {
     logoUrl: process.env.URL_LOCAL + "/images-toko/" + penjualan.toko.image, // Replace with actual logo URL
       address: penjualan.cabang.nama_cabang, // Replace with actual address
