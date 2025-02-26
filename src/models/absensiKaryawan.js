@@ -20,7 +20,7 @@ const AbsensiKaryawan = sequelize.define("absensi_karyawan", {
         model: Karyawan,
         key: "karyawan_id",
     },
-},
+  },
   tanggal: {
       type: DataTypes.DATE,
       allowNull: false,
@@ -48,6 +48,22 @@ const AbsensiKaryawan = sequelize.define("absensi_karyawan", {
   gaji_pokok_perhari: {
       type: DataTypes.INTEGER,
       allowNull: true,
+  },
+  lng: {
+      type: DataTypes.REAL,
+      allowNull: true,
+  },
+  lat: {
+      type: DataTypes.REAL,
+      allowNull: true,
+  },
+  gmaps: {
+      type: DataTypes.STRING,
+      allowNull: true,
+  },
+  is_deleted: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
   }
 });  
   

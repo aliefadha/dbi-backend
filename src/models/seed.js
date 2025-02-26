@@ -69,24 +69,24 @@ const seedDatabase = async () => {
 
         //Seed data for biaya gudang
         await BiayaGudang.create({
-            total: 5000000,
-            rata_rata: 2500000,
-            total_biaya: 3000000,
-            waktu_kerja: 160,
-            total_modal: 10000000
+            total: 0,
+            rata_rata: 0,
+            total_biaya: 0,
+            waktu_kerja: 0,
+            total_modal: 0
         })
 
         await BiayaOperasionalProduksiGudang.create({
             biaya_gudang_id: 1,
             nama_biaya: "Operasional",
-            total_biaya: 2000000,
+            total_biaya: 0,
             biaya_gudang_id: 1
         })
 
         await BiayaOperasionalStaffGudang.create({
             biaya_gudang_id: 1,
             nama_biaya: "Staff",
-            total_biaya: 1000000,
+            total_biaya: 0,
             biaya_gudang_id: 1
         })
 

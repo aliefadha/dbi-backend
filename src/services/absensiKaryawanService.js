@@ -23,7 +23,11 @@ class AbsensiKaryawanService {
 
     const roundedGajiPokokPerhari = Math.round(gajiPokokPerhari)
   
-    data.gaji_pokok_perhari = roundedGajiPokokPerhari;  
+    data.gaji_pokok_perhari = roundedGajiPokokPerhari; 
+    
+     // Generate Google Maps link
+     const googleMapsLink = `https://www.google.com/maps/place/?q=${data.lat},${data.lng}`;
+     data.gmaps = googleMapsLink;
   
     return await AbsensiKaryawan.create(data); 
   }  
@@ -91,6 +95,10 @@ class AbsensiKaryawanService {
         gajiPokokPerhari = gajiPokokPermenit * data.total_menit; 
     }  
     data.gaji_pokok_perhari = Math.round(gajiPokokPerhari)
+
+     // Generate Google Maps link
+     const googleMapsLink = `https://www.google.com/maps/place/?q=${data.lat},${data.lng}`;
+     data.gmaps = googleMapsLink;
   
     Object.assign(absensiKaryawan, data);  
     await absensiKaryawan.save();  
