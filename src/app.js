@@ -2,9 +2,11 @@ const express = require("express");
 const sequelize = require("./models/index");
 const errorHandler = require("./utils/errorHandler");
 const cors = require('cors');
+const {checkBlacklist, authenticateToken} = require('./config/middleware');
 
 const fs = require('fs');
 const path = require('path');
+const { AuthenticationController } = require("./controllers/authenticationController");
 
 const app = express();
 const port = 3000;
@@ -76,6 +78,11 @@ const watchRoutes = (app) => {
 // Load and watch routes  
 loadRoutes(app);
 watchRoutes(app);
+// Apply the middleware to all routes except the login route
+// Define the login route explicitly
+app.post('/api/login', AuthenticationController.login);
+
+app.use('/api', checkBlacklist, authenticateToken); 
 //Error Handling
 app.use(errorHandler);
 

@@ -99,7 +99,16 @@ class TokoController {
           message: "not found",  
         });  
       }
-      const updatedData = { ...req.body };
+      const pasword = req.body.password;  
+      if (pasword !== req.body.confirmPassword) {  
+        return res.status(400).json({  
+          success: false,  
+          data: null,  
+          message: "password and confirm password not match",  
+        });  
+      }  
+      const hashPassword = bcrypt.hashSync(req.body.password, 10);  
+      const updatedData = { ...req.body, password: hashPassword };
       
       if (req.file) {
         // Check if existingToko.image is not null

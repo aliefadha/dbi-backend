@@ -4,6 +4,7 @@ const multer = require("multer");
 const path = require("path");
 const fs = require('fs');
 const { compare } = require("bcrypt");
+const blacklist = require("../config/blacklist");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -23,6 +24,25 @@ class AuthenticationController {
         success: true,
         data: authentication,
         message: "login successfully",
+      });
+    } catch (error) {
+      res.status(400).json({
+        success: false,
+        data: null,
+        message: error.message,
+      });
+    }
+  }
+
+  static async logout(req, res) {
+    try {
+      const token = req.headers['authorization'].split(' ')[1];
+      console.log(token);
+      blacklist.addToken(token);
+      res.status(200).json({
+        success: true,
+        data: null,
+        message: "logout successfully",
       });
     } catch (error) {
       res.status(400).json({
