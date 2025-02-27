@@ -1,4 +1,5 @@
 const StokBarangService = require("../services/stokBarangService");  
+const XLSX = require("xlsx");
   
 class StokBarangController {  
   static async create(req, res) {  
@@ -107,6 +108,24 @@ class StokBarangController {
       });  
     }  
   }  
+
+  static async export(req, res) {
+    try {
+      const { toko_id, cabang } = req.query;
+      const workbook = await StokBarangService.exportToExcel(toko_id, cabang);
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', 'attachment; filename=stok_barang.xlsx');
+      const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+      res.send(buffer);
+    } catch (error) {
+      console.error('Error exporting to Excel:', error);
+      res.status(500).json({
+        success: false,
+        data: null,
+        message: error.message
+      });
+    }
+  }
 }  
   
 module.exports = StokBarangController;  
