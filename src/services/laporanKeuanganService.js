@@ -23,6 +23,9 @@ const BarangMentah = require("../models/barangMentah");
 const PackagingGudang = require("../models/packagingGudang");
 const ProdukPenjualanGudang = require("../models/produkPenjualanGudang");
 const PenjualanGudang = require("../models/penjualanGudang");
+const RincianGaji = require("../models/rincianGaji");
+const Karyawan = require("../models/karyawan");
+const BayarGaji = require("../models/bayarGaji");
 
 class LaporanKeuanganService {
 
@@ -312,116 +315,101 @@ class LaporanKeuanganService {
       nest: true
     });
 
-    const gudangPenjualanData = !toko_id ? await PenjualanGudang.findAll({
-      where: {
-        ...whereClause,
-      },
-      attributes: ['penjualan_id', 'tanggal', 'total_penjualan'],
-      raw: true,
-      nest: true
-    }) : [];
+    const transformedPenjualan = await Promise.all(penjualanData.map(async (penjualan) => {
+      const produk = await ProdukPenjualan.findAll({
+        where: {
+          penjualan_id: penjualan.penjualan_id,
+          is_deleted: false
+        },
+        include: [
+          {
+            model: BarangHandmade,
+            as: 'barang_handmade',
+            attributes: ["nama_barang"]
+          },
+          {
+            model: BarangNonHandmade,
+            as: 'barang_non_handmade',
+            attributes: ["nama_barang"]
+          },
+          {
+            model: BarangCustom,
+            as: 'barang_custom',
+            attributes: ["nama_barang"]
+          },
+          {
+            model: Packaging,
+            as: 'packaging',
+            attributes: ["nama_packaging"]
+          },
+          {
+            model: Cabang,
+            as: 'cabang',
+            attributes: ["nama_cabang"]
+          }
+        ],
+        raw: true,
+        nest: true
+      });
 
-    const transformedPenjualan = await Promise.all([
-      ...penjualanData.map(async (penjualan) => {
-        const produk = await ProdukPenjualan.findAll({
+      return {
+        penjualan_id: penjualan.penjualan_id,
+        tanggal: penjualan.tanggal,
+        total_pengeluaran: penjualan.total_penjualan,
+        nama_toko: penjualan.toko.nama_toko,
+        produk: produk.map(item => ({
+          nama_barang: item.barang_handmade?.nama_barang ||
+            item.barang_non_handmade?.nama_barang ||
+            item.barang_custom?.nama_barang ||
+            item.packaging?.nama_packaging,
+          nama_cabang: item.cabang?.nama_cabang
+        })),
+        kategori_pemasukan: "Penjualan"
+      };
+    }));
+
+    const gajiData = await RincianGaji.findAll({
+      attributes: ['bayar_gaji_id', 'total_gaji_akhir'],
+      include: [
+        {
+          model: Karyawan,
+          as: 'karyawan',
+          attributes: ["nama_karyawan"],
           where: {
-            penjualan_id: penjualan.penjualan_id,
-            is_deleted: false
+            is_deleted: false,
+            ...(toko_id && { toko_id: toko_id })
           },
           include: [
             {
-              model: BarangHandmade,
-              as: 'barang_handmade',
-              attributes: ["nama_barang"]
-            },
-            {
-              model: BarangNonHandmade,
-              as: 'barang_non_handmade',
-              attributes: ["nama_barang"]
-            },
-            {
-              model: BarangCustom,
-              as: 'barang_custom',
-              attributes: ["nama_barang"]
-            },
-            {
-              model: Packaging,
-              as: 'packaging',
-              attributes: ["nama_packaging"]
+              model: Toko,
+              as: "toko",
+              attributes: ["nama_toko"],
             },
             {
               model: Cabang,
               as: 'cabang',
-              attributes: ["nama_cabang"]
+              attributes: ["nama_cabang"],
             }
-          ],
-          raw: true,
-          nest: true
-        });
+          ]
+        },
+        {
+          model: BayarGaji,
+          as: "bayar_gaji"
+        }
+      ],
+      raw: true,
+      nest: true
+    })
 
-        return {
-          penjualan_id: penjualan.penjualan_id,
-          tanggal: penjualan.tanggal,
-          total_pengeluaran: penjualan.total_penjualan,
-          nama_toko: penjualan.toko.nama_toko,
-          produk: produk.map(item => ({
-            nama_barang: item.barang_handmade?.nama_barang ||
-              item.barang_non_handmade?.nama_barang ||
-              item.barang_custom?.nama_barang ||
-              item.packaging?.nama_packaging,
-          })),
-          kategori_pemasukan: "Penjualan"
-        };
-      }),
-      ...(!toko_id ? gudangPenjualanData.map(async (penjualan) => {
-        const produk = await ProdukPenjualanGudang.findAll({
-          where: {
-            penjualan_id: penjualan.penjualan_id,
-            is_deleted: false
-          },
-          include: [
-            {
-              model: BarangHandmadeGudang,
-              as: 'barang_handmade',
-              attributes: ["nama_barang"]
-            },
-            {
-              model: BarangNonHandmadeGudang,
-              as: 'barang_nonhandmade',
-              attributes: ["nama_barang"]
-            },
-            {
-              model: BarangMentah,
-              as: 'barang_mentah',
-              attributes: ["nama_barang"],
-            },
-            {
-              model: PackagingGudang,
-              as: 'packaging',
-              attributes: ["nama_packaging"]
-            },
-          ],
-          raw: true,
-          nest: true
-        });
-
-        return {
-          penjualan_id: penjualan.penjualan_id,
-          tanggal: penjualan.tanggal,
-          total_pengeluaran: penjualan.total_penjualan,
-          nama_toko: "Gudang",
-          produk: produk.map(item => ({
-            nama_barang: item.barang_handmade?.nama_barang ||
-              item.barang_nonhandmade?.nama_barang ||
-              item.barang_mentah?.nama_barang ||
-              item.packaging?.nama_packaging,
-          })),
-          kategori_pemasukan: "Penjualan"
-        };
-      }) : [])
-    ]);
-
-    
+    const transformedGaji = gajiData.map(item => ({
+      pengeluaran_id: item.bayar_gaji_id,
+      deskripsi: 'Gaji Karyawan',
+      jumlah_pengeluaran: item.total_gaji_akhir,
+      nama_toko: item.karyawan.toko.nama_toko,
+      nama_cabang: item.karyawan.cabang.nama_cabang,
+      kategori_pengeluaran: "Gaji",
+      tanggal: item.bayar_gaji.tanggal
+    }));
 
     const totalPemasukan = [
       ...transformedPemasukan.map(item => item.jumlah_pemasukan),
@@ -434,23 +422,29 @@ class LaporanKeuanganService {
       ...pengeluaran.map(item => item.jumlah_pengeluaran),
       ...(parseInt(kategori_pengeluaran_id) === 1 || (!kategori_pengeluaran_id && !kategori_pemasukan_id)
         ? transformedPembelian.map(item => item.total_pengeluaran)
+        : []),
+      ...(parseInt(kategori_pengeluaran_id) === 2 || (!kategori_pengeluaran_id && !kategori_pemasukan_id)
+        ? transformedGaji.map(item => item.jumlah_pengeluaran)
         : [])
     ].reduce((total, amount) => total + amount, 0);
 
-     const laporan = {
+    const laporan = {
       ...((!kategori_pemasukan_id) && {
         pengeluaran: [
           ...transformedPengeluaran,
-          ...(parseInt(kategori_pengeluaran_id) === 1 || (!kategori_pengeluaran_id && !kategori_pemasukan_id) 
-            ? transformedPembelian 
-            : [])
+          ...(parseInt(kategori_pengeluaran_id) === 1 || (!kategori_pengeluaran_id && !kategori_pemasukan_id)
+            ? transformedPembelian
+            : []),
+          ...(parseInt(kategori_pengeluaran_id) === 2 || (!kategori_pengeluaran_id && !kategori_pemasukan_id)
+            ? transformedGaji
+            : []),
         ].sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal))
       }),
       ...((!kategori_pengeluaran_id) && {
         pemasukan: [...transformedPemasukan,
-          ...(parseInt(kategori_pemasukan_id) === 1 || (!kategori_pengeluaran_id && !kategori_pemasukan_id) 
-            ? transformedPenjualan 
-            : [])
+        ...(parseInt(kategori_pemasukan_id) === 1 || (!kategori_pengeluaran_id && !kategori_pemasukan_id)
+          ? transformedPenjualan
+          : [])
         ].sort((a, b) =>
           new Date(a.tanggal) - new Date(b.tanggal)
         )
@@ -682,6 +676,50 @@ class LaporanKeuanganService {
       };
     }));
 
+    const gajiData = await RincianGaji.findAll({
+      attributes: ['bayar_gaji_id', 'total_gaji_akhir'],
+      include: [
+        {
+          model: BayarGaji,
+          as: "bayar_gaji",
+          attributes: ["tanggal"]
+        },
+        {
+          model: Karyawan,
+          as: 'karyawan',
+          attributes: ["nama_karyawan"],
+          where: {
+            is_deleted: false,
+            toko_id: 1
+          },
+          include: [
+            {
+              model: Toko,
+              as: "toko",
+              attributes: ["nama_toko"],
+            },
+            {
+              model: Cabang,
+              as: 'cabang',
+              attributes: ["nama_cabang"],
+            }
+          ]
+        }
+      ],
+      raw: true,
+      nest: true
+    })
+
+    const transformedGaji = gajiData.map(item => ({
+      pengeluaran_id: item.bayar_gaji_id,
+      deskripsi: 'Gaji Karyawan',
+      jumlah_pengeluaran: item.total_gaji_akhir,
+      nama_toko: item.karyawan.toko.nama_toko,
+      nama_cabang: item.karyawan.cabang.nama_cabang,
+      kategori_pengeluaran: "Gaji",
+      tanggal: item.bayar_gaji.tanggal
+    }));
+
     const totalPemasukan = [
       ...transformedPemasukan.map(item => item.jumlah_pemasukan),
       ...(parseInt(kategori_pemasukan_id) === 1 || (!kategori_pengeluaran_id && !kategori_pemasukan_id)
@@ -693,6 +731,9 @@ class LaporanKeuanganService {
       ...pengeluaran.map(item => item.jumlah_pengeluaran),
       ...(parseInt(kategori_pengeluaran_id) === 1 || (!kategori_pengeluaran_id && !kategori_pemasukan_id)
         ? transformedPembelian.map(item => item.total_pengeluaran)
+        : []),
+      ...(parseInt(kategori_pengeluaran_id) === 2 || (!kategori_pengeluaran_id && !kategori_pemasukan_id)
+        ? transformedGaji.map(item => item.jumlah_pengeluaran)
         : [])
     ].reduce((total, amount) => total + amount, 0);
 
@@ -700,16 +741,19 @@ class LaporanKeuanganService {
       ...((!kategori_pemasukan_id) && {
         pengeluaran: [
           ...transformedPengeluaran,
-          ...(parseInt(kategori_pengeluaran_id) === 1 || (!kategori_pengeluaran_id && !kategori_pemasukan_id) 
-            ? transformedPembelian 
-            : [])
+          ...(parseInt(kategori_pengeluaran_id) === 1 || (!kategori_pengeluaran_id && !kategori_pemasukan_id)
+            ? transformedPembelian
+            : []),
+          ...(parseInt(kategori_pengeluaran_id) === 2 || (!kategori_pengeluaran_id && !kategori_pemasukan_id)
+            ? transformedGaji
+            : []),
         ].sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal))
       }),
       ...((!kategori_pengeluaran_id) && {
         pemasukan: [...transformedPemasukan,
-          ...(parseInt(kategori_pemasukan_id) === 1 || (!kategori_pengeluaran_id && !kategori_pemasukan_id) 
-            ? transformedPenjualan 
-            : [])
+        ...(parseInt(kategori_pemasukan_id) === 1 || (!kategori_pengeluaran_id && !kategori_pemasukan_id)
+          ? transformedPenjualan
+          : [])
         ].sort((a, b) =>
           new Date(a.tanggal) - new Date(b.tanggal)
         )
@@ -1113,13 +1157,57 @@ class LaporanKeuanganService {
       };
     }));
 
+    const gajiData = await RincianGaji.findAll({
+      attributes: ['bayar_gaji_id', 'total_gaji_akhir'],
+      include: [
+        {
+          model: Karyawan,
+          as: 'karyawan',
+          attributes: ["nama_karyawan"],
+          where: {
+            is_deleted: false,
+            ...(toko_id && { toko_id: toko_id })
+          },
+          include: [
+            {
+              model: Toko,
+              as: "toko",
+              attributes: ["nama_toko"],
+            },
+            {
+              model: Cabang,
+              as: 'cabang',
+              attributes: ["nama_cabang"],
+            }
+          ]
+        },
+        {
+          model: BayarGaji,
+          as: "bayar_gaji"
+        }
+      ],
+      raw: true,
+      nest: true
+    })
+
+    const transformedGaji = gajiData.map(item => ({
+      pengeluaran_id: item.bayar_gaji_id,
+      deskripsi: 'Gaji Karyawan',
+      jumlah_pengeluaran: item.total_gaji_akhir,
+      nama_toko: item.karyawan.toko.nama_toko,
+      nama_cabang: item.karyawan.cabang.nama_cabang,
+      kategori_pengeluaran: "Gaji",
+      tanggal: item.bayar_gaji.tanggal
+    }));
+
     const totalPengeluaran = [
       ...pengeluaran.map(item => item.jumlah_pengeluaran),
-      ...transformedPembelian.map(item => item.total_pengeluaran)
+      ...transformedPembelian.map(item => item.total_pengeluaran),
+     ...transformedGaji.map(item => item.jumlah_pengeluaran)
     ].reduce((total, amount) => total + amount, 0);
 
     return {
-      pengeluaran: [...transformedPengeluaran, ...transformedPembelian].sort((a, b) =>
+      pengeluaran: [...transformedPengeluaran, ...transformedPembelian, transformedGaji].sort((a, b) =>
         new Date(b.tanggal) - new Date(a.tanggal)
       ),
       total_pengeluaran: totalPengeluaran,
@@ -1233,13 +1321,58 @@ class LaporanKeuanganService {
       };
     }));
 
+    const gajiData = await RincianGaji.findAll({
+      attributes: ['bayar_gaji_id', 'total_gaji_akhir'],
+      include: [
+        {
+          model: BayarGaji,
+          as: "bayar_gaji",
+          attributes: ["tanggal"]
+        },
+        {
+          model: Karyawan,
+          as: 'karyawan',
+          attributes: ["nama_karyawan"],
+          where: {
+            is_deleted: false,
+            toko_id: 1
+          },
+          include: [
+            {
+              model: Toko,
+              as: "toko",
+              attributes: ["nama_toko"],
+            },
+            {
+              model: Cabang,
+              as: 'cabang',
+              attributes: ["nama_cabang"],
+            }
+          ]
+        }
+      ],
+      raw: true,
+      nest: true
+    })
+
+    const transformedGaji = gajiData.map(item => ({
+      pengeluaran_id: item.bayar_gaji_id,
+      deskripsi: 'Gaji Karyawan',
+      jumlah_pengeluaran: item.total_gaji_akhir,
+      nama_toko: item.karyawan.toko.nama_toko,
+      nama_cabang: item.karyawan.cabang.nama_cabang,
+      kategori_pengeluaran: "Gaji",
+      tanggal: item.bayar_gaji.tanggal
+    }));
+
     const totalPengeluaran = [
       ...pengeluaran.map(item => item.jumlah_pengeluaran),
-      ...transformedPembelian.map(item => item.total_pengeluaran)
+      ...transformedPembelian.map(item => item.total_pengeluaran),
+    ...transformedGaji.map(item => item.jumlah_pengeluaran)
     ].reduce((total, amount) => total + amount, 0);
 
     return {
-      pengeluaran: [...transformedPengeluaran, ...transformedPembelian].sort((a, b) =>
+      pengeluaran: [...transformedPengeluaran, ...transformedPembelian, ...transformedGaji].sort((a, b) =>
         new Date(b.tanggal) - new Date(a.tanggal)
       ),
       total_pengeluaran: totalPengeluaran,
