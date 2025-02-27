@@ -79,7 +79,7 @@ class PemasukanService {
     return pemasukans.map(p => ({
       ...p.get({ plain: true }),
       kategori_pemasukan: p.kategori_pemasukan.kategori_pemasukan,
-      metode: p.metode.nama_metode,
+      metode: p.metode?.nama_metode || null,
       deskripsi_pemasukan: p.deskripsi_pemasukan.map(d => ({
         deskripsi: d.deskripsi,
         jumlah_pemasukan: d.jumlah_pemasukan,
@@ -134,7 +134,7 @@ class PemasukanService {
     return {
       ...plainPemasukan,
       kategori_pemasukan: plainPemasukan.kategori_pemasukan.kategori_pemasukan,
-      metode: plainPemasukan.metode.nama_metode,
+      metode: plainPemasukan.metode?.nama_metode || null,
       deskripsi_pemasukan: plainPemasukan.deskripsi_pemasukan.map(d => ({
         deskripsi: d.deskripsi,
         jumlah_pemasukan: d.jumlah_pemasukan,
@@ -197,7 +197,7 @@ class PemasukanService {
       return {
         ...plainPemasukan,
         kategori_pemasukan: plainPemasukan.kategori_pemasukan.kategori_pemasukan,
-        metode: plainPemasukan.metode.nama_metode,
+        metode: plainPemasukan.metode?.nama_metode || null,
         deskripsi_pemasukan: plainPemasukan.deskripsi_pemasukan.map(d => ({
           deskripsi: d.deskripsi,
           jumlah_pemasukan: d.jumlah_pemasukan,
@@ -264,7 +264,7 @@ class PemasukanService {
 
     return deskripsiPemasukans.map(item => ({
       ...item.get({ plain: true }),
-      metode: item.metode.nama_metode,
+      metode: item.metode?.nama_metode || null,
       kategori_pemasukan: item.kategori_pemasukan.kategori_pemasukan,
       deskripsi_pemasukan: item.deskripsi_pemasukan.map(d => ({
         deskripsi_pemasukan_id: d.deskripsi_pemasukan_id,
@@ -332,7 +332,7 @@ class PemasukanService {
 
     return deskripsiPemasukans.map(item => ({
       ...item.get({ plain: true }),
-      metode: item.metode.nama_metode,
+      metode: item.metode?.nama_metode || null,
       kategori_pemasukan: item.kategori_pemasukan.kategori_pemasukan,
       deskripsi_pemasukan: item.deskripsi_pemasukan.map(d => ({
         deskripsi_pemasukan_id: d.deskripsi_pemasukan_id,
