@@ -2,7 +2,20 @@ const Toko = require("../models/toko");
   
 class TokoService {  
   static async create(data) {  
-    return await Toko.create(data);  
+    try {
+      const exsistingToko = await Toko.findOne({
+        where: {
+          email: data.email
+        }
+      })
+      if (exsistingToko) {
+        throw new Error("Email already exists");
+      }
+      const toko = await Toko.create(data);
+      return toko;
+    } catch (error) {
+      throw error;
+    }
   }  
   
   static async getAll() {  
@@ -24,6 +37,12 @@ class TokoService {
   
   static async update(id, data) {  
     const toko = await Toko.findByPk(id);  
+    // const emailToko = await Toko.findOne({
+    //   where: {
+    //     email: data.email
+    //   }
+    // })
+    // if(emailToko) throw new Error("Email already exists");
     if (!toko) return null;  
   
     Object.assign(toko, data);  

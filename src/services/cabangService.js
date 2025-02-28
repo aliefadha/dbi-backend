@@ -6,6 +6,14 @@ class CabangService {
   static async create(data) {  
     const transaction = await sequelize.transaction();
     try {
+      const existingCabang = await Cabang.findOne({
+        where: {
+          email: data.email
+        }
+      })
+      if (existingCabang) {
+        throw new Error("Email already exists");
+      }
       const cabang = await Cabang.create(data, { transaction });
       const months = [
         'January', 'February', 'March', 'April', 'May', 'June',

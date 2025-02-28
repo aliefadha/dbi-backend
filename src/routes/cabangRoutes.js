@@ -7,5 +7,6 @@ router.get('/cabang', CabangController.getAll);
 router.get('/cabang/:id', CabangController.getById);  
 router.put('/cabang/:id', CabangController.update);  
 router.delete('/cabang/:id', CabangController.delete);  
+router.put('/cabang-user/:id', CabangController.updateByUserId);
   
 module.exports = router;  

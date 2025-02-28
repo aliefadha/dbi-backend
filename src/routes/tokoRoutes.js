@@ -7,5 +7,6 @@ router.get('/toko', TokoController.getAll);
 router.get('/toko/:id', TokoController.getById);  
 router.put('/toko/:id', upload.single("image"), TokoController.update);  
 router.delete('/toko/:id', TokoController.delete);  
+router.put('/toko-user/:id', upload.single("image"), TokoController.updateByUserId);
   
 module.exports = router;  

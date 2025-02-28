@@ -1,12 +1,27 @@
 const Catatan = require("../models/catatan");  
-  
+const { Op } = require("sequelize");
 class CatatanService {  
   static async create(data) {  
     return await Catatan.create(data);  
   }  
   
-  static async getAll() {  
-    return await Catatan.findAll();  
+  static async getAll(bulan, tahun) {
+    const startDate = new Date(tahun, bulan-1, 1);
+    const endDate = new Date(tahun, bulan, 0); 
+    const whereConditions = {
+      is_deleted: false,
+      createdAt: {
+        [Op.between]: [startDate, endDate]
+      }
+    } 
+    return await Catatan.findAll(
+      {
+        where: whereConditions,
+        attributes: {
+          exclude: ["is_deleted"]
+        }
+      }
+    );  
   }  
   
   static async getById(id) {  

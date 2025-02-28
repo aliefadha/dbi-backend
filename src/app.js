@@ -2,9 +2,11 @@ const express = require("express");
 const sequelize = require("./models/index");
 const errorHandler = require("./utils/errorHandler");
 const cors = require('cors');
+const {checkBlacklist, authenticateToken} = require('./config/middleware');
 
 const fs = require('fs');
 const path = require('path');
+const { AuthenticationController } = require("./controllers/authenticationController");
 
 const app = express();
 const port = 3000;
@@ -27,6 +29,7 @@ app.use('/images-packaging-gudang', express.static(path.join(__dirname, 'public/
 app.use('/images-barang-handmade', express.static(path.join(__dirname, 'public/barangHandmade')));
 app.use('/images-barang-mentah', express.static(path.join(__dirname, 'public/barangMentah')));
 app.use('/images-toko', express.static(path.join(__dirname, 'public/toko')));
+app.use('/images-authentication', express.static(path.join(__dirname, 'public/authentication')));
 
 const corsOptions = {
   origin: process.env.NODE_ENV === 'development'
@@ -75,6 +78,11 @@ const watchRoutes = (app) => {
 // Load and watch routes  
 loadRoutes(app);
 watchRoutes(app);
+// Apply the middleware to all routes except the login route
+// Define the login route explicitly
+app.post('/api/login', AuthenticationController.login);
+
+app.use('/api', checkBlacklist, authenticateToken); 
 //Error Handling
 app.use(errorHandler);
 

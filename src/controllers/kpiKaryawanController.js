@@ -1,5 +1,6 @@
 const KpiKaryawanService = require("../services/kpiKaryawanService");  
-  
+const XLSX = require("xlsx");
+
 class KpiKaryawanController {  
   static async create(req, res) {  
     try {  
@@ -126,6 +127,24 @@ class KpiKaryawanController {
         message: "retrieved successfully",
       });
     } catch (error) {
+      res.status(500).json({
+        success: false,
+        data: null,
+        message: error.message,
+      });
+    }
+  }
+
+  static async export(req, res) {
+    try {
+      const { bulan, tahun, toko_id, cabang, divisi } = req.query;
+      const workbook = await KpiKaryawanService.exportToExcel(bulan, tahun, toko_id, cabang, divisi);
+      res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+      res.setHeader("Content-Disposition", "attachment; filename=kpi_karyawan.xlsx");
+      const buffer = XLSX.write(workbook, { type: "buffer", bookType: "xlsx" });
+      res.send(buffer);
+    } catch (error) {
+      console.error("Error exporting to Excel:", error);
       res.status(500).json({
         success: false,
         data: null,

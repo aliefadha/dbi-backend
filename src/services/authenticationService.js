@@ -13,7 +13,7 @@ class AuthenticationService {
       let roleName = "Owner";
       let user = await Authentication.findOne({where: {email: email}});
       if(!user) throw new Error("Invalid email or password");
-      let valid = compare(password, user.password);
+      let valid = await compare(password, user.password); // Await the comparison
       if(!valid) throw new Error("Invalid email or password");
       
       return this.generateToken(user.authentication_id, null, role, user.email, roleName);
@@ -22,7 +22,7 @@ class AuthenticationService {
       let roleName = "Finance";
       let user = await Authentication.findOne({where: {email: email}});
       if(!user) throw new Error("Invalid email or password");
-      let valid = compare(password, user.password);
+      let valid = await compare(password, user.password); // Await the comparison
       if(!valid) throw new Error("Invalid email or password");
       
       return this.generateToken(user.authentication_id, null, role, user.email, roleName);
@@ -31,7 +31,7 @@ class AuthenticationService {
       let roleName = "Manager";
       let user = await Authentication.findOne({where: {email: email}});
       if(!user) throw new Error("Invalid email or password");
-      let valid = compare(password, user.password);
+      let valid = await compare(password, user.password); // Await the comparison
       if(!valid) throw new Error("Invalid email or password");
       
       return this.generateToken(user.authentication_id, null, role, user.email, roleName);
@@ -40,7 +40,7 @@ class AuthenticationService {
       let roleName = "SPV";
       let user = await Toko.findOne({where: {email: email}});
       if(!user) throw new Error("Invalid email or password");
-      let valid = compare(password, user.password);
+      let valid = await compare(password, user.password); // Await the comparison
       if(!valid) throw new Error("Invalid email or password");
       
       return this.generateToken(user.toko_id, null, role, user.email, roleName);
@@ -49,7 +49,7 @@ class AuthenticationService {
       let roleName = "Head Gudang";
       let user = await Toko.findOne({where: {email: email}});
       if(!user) throw new Error("Invalid email or password");
-      let valid = compare(password, user.password);
+      let valid = await compare(password, user.password); // Await the comparison
       if(!valid) throw new Error("Invalid email or password");
       
       return this.generateToken(user.toko_id, null, role, user.email, roleName);
@@ -58,7 +58,7 @@ class AuthenticationService {
       let roleName = "Admin Gudang";
       let user = await Cabang.findOne({where: {email: email}});
       if(!user) throw new Error("Invalid email or password");
-      let valid = compare(password, user.password);
+      let valid = await compare(password, user.password); // Await the comparison
       if(!valid) throw new Error("Invalid email or password");
       
       return this.generateToken(user.cabang_id, null, role, user.email, roleName);
@@ -67,7 +67,7 @@ class AuthenticationService {
       const roleName = "Kasir";
       let user = await Cabang.findOne({where: {email: email}});
       if(!user) throw new Error("Invalid email or password");
-      let valid = compare(password, user.password);
+      let valid = await compare(password, user.password); // Await the comparison
       if(!valid) throw new Error("Invalid email or password");
       
       return this.generateToken(user.cabang_id, user.toko_id, role, user.email, roleName);
@@ -76,7 +76,7 @@ class AuthenticationService {
       const roleName = "Karyawan Umum";
       let user = await Karyawan.findOne({where: {email: email}});
       if(!user) throw new Error("Invalid email or password");
-      let valid = compare(password, user.password);
+      let valid = await compare(password, user.password); // Await the comparison
       if(!valid) throw new Error("Invalid email or password");
 
       return this.generateToken(user.karyawan_id, user.toko_id, role, user.email, roleName);
@@ -85,23 +85,23 @@ class AuthenticationService {
       const roleName = "Karyawan Produksi";
       let user = await Karyawan.findOne({where: {email: email}});
       if(!user) throw new Error("Invalid email or password");
-      let valid = compare(password, user.password);
+      let valid = await compare(password, user.password); // Await the comparison
       if(!valid) throw new Error("Invalid email or password");
 
-      return this.generateToken(user.karyawan_id, user.toko_id, user.email, roleName);
+      return this.generateToken(user.karyawan_id, user.toko_id, role, user.email, roleName);
     }
     else if (role == 11) {
       const roleName = "Karyawan Transportasi";
       let user = await Karyawan.findOne({where: {email: email}});
       if(!user) throw new Error("Invalid email or password");
-      let valid = compare(password, user.password);
+      let valid = await compare(password, user.password); // Await the comparison
       if(!valid) throw new Error("Invalid email or password");
 
       return this.generateToken(user.karyawan_id, user.toko_id, role, user.email, roleName);
     }
   }
   
-  static async generateToken(userId,toko_id, roleId, userEmail, roleName) {
+  static async generateToken(userId, toko_id, roleId, userEmail, roleName) {
     const payload = {
         userId: userId,
         roleId: roleId,
@@ -112,7 +112,6 @@ class AuthenticationService {
     if (toko_id) {
         payload.tokoId = toko_id;
     }
-    // console.log(`JWT_SECRET_KEY: ${process.env.JWT_SECRET_KEY}`);
     const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, { expiresIn: '1d' });
 
     const response = {
@@ -129,6 +128,18 @@ class AuthenticationService {
 
     return response;
   }
+
+  static async getById(id) {
+    return await Authentication.findOne({ where: { authentication_id: id } });
+  }
+
+  static async update(id, data) {
+    const authentication = await Authentication.findByPk(id);
+    if (!authentication) return null;
+    Object.assign(authentication, data);
+    await authentication.save();
+    return authentication;
+  }
 }  
   
-module.exports = AuthenticationService;  
+module.exports = AuthenticationService;

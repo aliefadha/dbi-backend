@@ -75,7 +75,7 @@ const ProdukPenjualan = sequelize.define("produk_penjualan", {
     defaultValue: false
   }
 },{
-  timestamps: false
+  timestamps: true
 });  
   
 module.exports = ProdukPenjualan;  

@@ -113,6 +113,168 @@ class PenjualanController {
       });  
     }  
   }  
-}  
-  
+
+  static async getInvoice(req, res) {  
+    try {  
+      const invoiceData = await PenjualanService.getInvoice(req.params.id);  
+      if (!invoiceData) {  
+        return res.status(404).json({  
+          success: false,  
+          data: null,  
+          message: "not found",  
+        });  
+      }  
+      // return res.status(200).send(invoiceData);
+      const invoiceHtml = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+          <style>
+              body {
+                  font-family: 'Courier New', Courier, monospace;
+                  font-size: 12px;
+                  width: 270px;
+                  margin: 10px auto;
+                  padding: 5px;
+              }
+              .receipt-container {
+                  width: 100%;
+                  white-space: pre-line;
+              }
+              .header {
+                  text-align: center;
+                  margin-bottom: 5px;
+              }
+              .store-logo {
+                  width: 150px;
+                  height: auto;
+                  margin: 0 auto 2px;
+                  display: block;
+              }
+              .divider {
+                  overflow: hidden;
+                  white-space: nowrap;
+                  margin: 4px 0;
+                  letter-spacing: 1px;
+              }
+              .items {
+                  margin: 4px 0;
+              }
+              .item-line {
+                  display: flex;
+                  justify-content: space-between;
+                  margin: 1px 0;
+              }
+              .item-code-name {
+                  flex: 1;
+              }
+              .item-qty {
+                  width: 30px;
+                  text-align: right;
+                  padding-right: 10px;
+              }
+              .item-price {
+                  width: 60px;
+                  text-align: right;
+              }
+              .totals {
+                  margin: 4px 0;
+              }
+              .total-line {
+                  display: flex;
+                  justify-content: flex-end;
+                  margin: 1px 0;
+                  gap: 20px;
+              }
+              .total-label {
+                  text-align: right;
+              }
+              .total-value {
+                  width: 60px;
+                  text-align: right;
+              }
+              .footer {
+                  text-align: center;
+                  margin-top: 4px;
+                  font-size: 11px;
+                  line-height: 1.2;
+              }
+              .store-info {
+                  line-height: 1.2;
+              }
+          </style>
+      </head>
+      <body onload="window.print()">
+          <div class="receipt-container">
+              <div class="header">
+                  <img src="${invoiceData.logoUrl}" alt="Store Logo" class="store-logo">
+                  <div class="store-info">
+                      <div>${invoiceData.address}</div>
+                  </div>
+              </div>
+
+              <div class="divider">--------------------------------</div>
+
+              <div class="items">
+                  ${invoiceData.items.map(item => `
+                      <div class="item-line">
+                          <span class="item-code-name">${item.code}- ${item.name}</span>
+                          <span class="item-qty">x ${item.qty}</span>
+                          <span class="item-price">Rp${item.price ? item.price.toLocaleString() : '0'}</span>
+                      </div>
+                  `).join('')}
+              </div>
+
+              <div class="divider">--------------------------------</div>
+
+              <div class="totals">
+                  <div class="total-line">
+                      <span class="total-label">Total Item</span>
+                      <span class="total-value">${invoiceData.totalItems}</span>
+                  </div>
+                  <div class="total-line">
+                      <span class="total-label">Qty</span>
+                      <span class="total-value">${invoiceData.totalQty}</span>
+                  </div>
+                  <div class="total-line">
+                      <span class="total-label">Subtotal</span>
+                      <span class="total-value">Rp${invoiceData.subtotal ? invoiceData.subtotal.toLocaleString() : '0'}</span>
+                  </div>
+                  <div class="total-line">
+                      <span class="total-label">Diskon Keseluruhan</span>
+                      <span class="total-value">${invoiceData.discount}%</span>
+                  </div>
+                  <div class="total-line">
+                      <span class="total-label">Pajak</span>
+                      <span class="total-value">Rp${invoiceData.tax ? invoiceData.tax.toLocaleString() : '0'}</span>
+                  </div>
+                  <div class="total-line">
+                      <span class="total-label">Total Penjualan</span>
+                      <span class="total-value">Rp${invoiceData.total ? invoiceData.total.toLocaleString() : '0'}</span>
+                  </div>
+              </div>
+
+              <div class="divider">--------------------------------</div>
+
+              <div class="footer">
+                  <div>${invoiceData.invoiceNumber} - ${invoiceData.date} - ${invoiceData.time}</div>
+                  <div>Terimakasih Telah Berbelanja di Tatitatu!</div>
+                  <div>Follow Us On Instagram ${invoiceData.instagram}</div>
+              </div>
+          </div>
+      </body>
+      </html>
+    `;
+
+    res.type('html');
+    res.send(invoiceHtml);
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      data: null,
+      message: error.message,
+    });
+  }
+  }  
+}
 module.exports = PenjualanController;  

@@ -2,6 +2,7 @@ const AbsensiKaryawan = require("../models/absensiKaryawan");
 const Karyawan = require("../models/karyawan"); 
 const DivisiKaryawan = require("../models/divisiKaryawan");
 const DataKaryawanService = require("./dataKaryawanService");
+const XLSX = require('xlsx');
 
 class AbsensiKaryawanService {  
   static async create(data) {  
@@ -19,11 +20,19 @@ class AbsensiKaryawanService {
     } else {  
         gajiPokokPermenit = karyawanData.jumlah_gaji_pokok / karyawanData.waktu_kerja_sebulan_menit; 
         gajiPokokPerhari = gajiPokokPermenit * data.total_menit; 
+        const tanggalAbsen = new Date(data.tanggal); // Assuming data.tanggal_absen is provided in the data
+        if (tanggalAbsen.getDay() === 6) { // 6 represents Saturday
+            gajiPokokPerhari -= 60 * gajiPokokPermenit; // Subtract 60 minutes worth of pay
+        }
     }  
 
     const roundedGajiPokokPerhari = Math.round(gajiPokokPerhari)
   
-    data.gaji_pokok_perhari = roundedGajiPokokPerhari;  
+    data.gaji_pokok_perhari = roundedGajiPokokPerhari; 
+    
+     // Generate Google Maps link
+     const googleMapsLink = `https://www.google.com/maps/place/?q=${data.lat},${data.lng}`;
+     data.gmaps = googleMapsLink;
   
     return await AbsensiKaryawan.create(data); 
   }  
@@ -39,13 +48,21 @@ class AbsensiKaryawanService {
     });
   }
   
-  static async getAll(bulan, tahun, toko_id) {  
+  static async getAll(bulan, tahun, toko_id, cabang, divisi) {  
       const whereConditions = {
           is_deleted: false
       }
 
       if (toko_id) {
           whereConditions.toko_id = toko_id
+      }
+
+      if (cabang) {
+          whereConditions.cabang_id = cabang
+      }
+
+      if (divisi) {
+          whereConditions.divisi_karyawan_id = divisi
       }
       const karyawanList = await Karyawan.findAll({
           where: whereConditions
@@ -75,6 +92,26 @@ class AbsensiKaryawanService {
   static async update(id, data) {  
     const absensiKaryawan = await AbsensiKaryawan.findByPk(id);  
     if (!absensiKaryawan) return null;  
+    const karyawanData = await Karyawan.findOne({where: {karyawan_id: absensiKaryawan.karyawan_id}});
+    if (!karyawanData) {  
+        throw new Error("Karyawan not found");  
+    } 
+    let gajiPokokPerhari;
+    let gajiPokokPermenit;
+    let gajiPokokPerantar;  
+  
+    if (!karyawanData.waktu_kerja_sebulan_menit) {  
+        gajiPokokPerantar = karyawanData.jumlah_gaji_pokok / karyawanData.waktu_kerja_sebulan_antar;  
+        gajiPokokPerhari = gajiPokokPerantar;
+    } else {  
+        gajiPokokPermenit = karyawanData.jumlah_gaji_pokok / karyawanData.waktu_kerja_sebulan_menit; 
+        gajiPokokPerhari = gajiPokokPermenit * data.total_menit; 
+    }  
+    data.gaji_pokok_perhari = Math.round(gajiPokokPerhari)
+
+     // Generate Google Maps link
+     const googleMapsLink = `https://www.google.com/maps/place/?q=${data.lat},${data.lng}`;
+     data.gmaps = googleMapsLink;
   
     Object.assign(absensiKaryawan, data);  
     await absensiKaryawan.save();  
@@ -128,6 +165,24 @@ class AbsensiKaryawanService {
       }  
 
       return results; 
+  }
+
+  static async exportToExcel(bulan, tahun, toko_id, cabang, divisi) {
+    const result = await this.getAll(bulan, tahun, toko_id, cabang, divisi);
+    const data = result.map((item) => ({
+      nama_karyawan: item.karyawan.nama_karyawan,
+      divisi: item.karyawan.divisi ? item.karyawan.divisi.nama_divisi : '',
+      cabang: item.karyawan.cabang ? item.karyawan.cabang.nama_cabang : '',
+      absen: item.kehadiran,
+      kpi: `${item.totalPersentaseTercapai}%`, 
+      total_gaji_akhir: `Rp${item.totalGajiAkhir.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`
+    }));
+    
+    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Absensi Karyawan');
+
+    return workbook;
   }
 }  
   

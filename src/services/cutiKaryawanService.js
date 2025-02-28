@@ -7,10 +7,13 @@ class CutiKaryawanService {
   static async create(data) {  
     const tanggalMulai = new Date(data.tanggal_mulai);  
     const tanggalSelesai = new Date(data.tanggal_selesai);  
-    const jumlahHari = (tanggalSelesai - tanggalMulai) / (1000 * 60 * 60 * 24);  
+
+    // Calculate the number of days between the two dates, inclusive
+    const jumlahHari = (tanggalSelesai - tanggalMulai) / (1000 * 60 * 60 * 24) + 1;  
+
     data.jumlah_cuti = jumlahHari;
     return await CutiKaryawan.create(data);  
-  }  
+  }
   
   static async getAll(bulan, tahun, toko_id) {  
     const whereConditions = {  

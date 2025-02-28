@@ -3,6 +3,8 @@ const bcrypt = require("bcrypt");
 const multer = require("multer");
 const path = require("path");
 const fs = require('fs');
+const { compare } = require("bcrypt");
+const XLSX = require('xlsx');
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -147,6 +149,110 @@ class KaryawanController {
                 message: "Karyawan deleted successfully"
             });
         } catch (error) {
+            res.status(500).json({
+                success: false,
+                data: null,
+                message: error.message
+            });
+        }
+    }
+
+    static async getByUserId(req, res) {
+        try {
+            const karyawan = await KaryawanService.getByUserId(req.params.id);
+            if (!karyawan) {
+                return res.status(404).json({
+                    success: false,
+                    data: null,
+                    message: "Karyawan not found"
+                });
+            }
+            res.status(200).json({
+                success: true,
+                data: karyawan,
+                message: "retrieved successfully"
+            });
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                data: null,
+                message: error.message
+            });
+        }
+    }
+
+    static async updateByUserId(req, res) {
+        try {
+            let user = await KaryawanService.getByUserId(req.params.id);
+            if (!user) {
+                return res.status(404).json({
+                    success: false,
+                    data: null,
+                    message: "Karyawan not found"
+                });
+            }
+            const oldPassword = req.body.old_password;
+            let valid = await compare(oldPassword, user.password);
+            if (!valid) {
+                return res.status(400).json({
+                    success: false,
+                    data: null,
+                    message: "old password not match",
+                });
+            }
+            const pasword = req.body.password;
+            if (pasword !== req.body.confirm_password) {
+                return res.status(400).json({
+                    success: false,
+                    data: null,
+                    message: "password and confirm password not match",
+                });
+            }
+            const hashPassword = bcrypt.hashSync(req.body.password, 10);
+            const karyawanData = {
+                ...req.body,
+                image: req.file.filename,
+                password: hashPassword
+            }
+            if (req.file) {  
+                // Delete the old image file  
+                const oldImagePath = path.join(__dirname, "../public/karyawan", user.image);  
+                fs.unlink(oldImagePath, (err) => {  
+                    if (err) {  
+                        console.error("Failed to delete old image:", err);  
+                    }  
+                });  
+  
+                karyawanData.image = req.file.filename;  
+            }  
+            const karyawan = await KaryawanService.update(req.params.id, karyawanData);
+            res.status(200).json({
+                success: true,
+                data: karyawan,
+                message: "Karyawan updated successfully"
+            });
+        }
+        catch (error) {
+            res.status(500).json({
+                success: false,
+                data: null,
+                message: error.message
+            });
+        }
+    }
+
+    static async export(req, res) {
+        try {
+            const { toko_id } = req.query;
+            const workbook = await KaryawanService.exportToExcel(toko_id);
+            res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            res.setHeader('Content-Disposition', 'attachment; filename=karyawan_export.xlsx');
+
+            // Write the workbook to the response stream
+            const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+            res.send(buffer);
+        } catch (error) {
+            console.error('Error exporting to Excel:', error);
             res.status(500).json({
                 success: false,
                 data: null,

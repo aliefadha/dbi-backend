@@ -20,8 +20,8 @@ class TargetBulananKasirController {
   
   static async getAll(req, res) {  
     try {  
-      const { cabang } = req.query;
-      const targetBulananKasirs = await TargetBulananKasirService.getAll(cabang);  
+      const { cabang, tahun } = req.query;
+      const targetBulananKasirs = await TargetBulananKasirService.getAll(cabang, tahun);  
       res.status(200).json({  
         success: true,  
         data: targetBulananKasirs,  

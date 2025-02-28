@@ -6,6 +6,8 @@ const KategoriBarang = require("../models/kategoriBarang");
 const Packaging = require("../models/packaging");
 const ProdukPenjualan = require("../models/produkPenjualan");  
 const StokBarang = require("../models/stokBarang");
+const { Op } = require("sequelize");
+const sequelize = require("../config/database");
   
 class ProdukPenjualanService {  
   static async create(data) {  
@@ -262,6 +264,133 @@ class ProdukPenjualanService {
       ]
     });
     return produk;
+  }
+
+  static async getAllTerlaris(cabang, bulan, tahun) {
+    const startDate = new Date(tahun, bulan-1, 1);
+    const endDate = new Date(tahun, bulan, 0);
+
+    const whereConditions = {
+      is_deleted: false,
+    }
+
+    if (startDate && endDate) {
+      whereConditions.createdAt = {
+        [Op.between]: [startDate, endDate]
+      }
+    }
+
+    if (cabang) {
+      whereConditions.cabang_id = cabang;
+    }
+
+    console.log('Where conditions:', whereConditions);
+
+    const [handmade, nonhandmade, custom, packaging] = await Promise.all([
+      ProdukPenjualan.findAll({
+        attributes: [
+          'barang_handmade_id',
+          [sequelize.fn('SUM', sequelize.col('kuantitas')), 'total_terjual']
+        ],
+        where: {
+          ...whereConditions,
+          barang_handmade_id: { [Op.not]: null }
+        },
+        include: [
+          {
+            model: BarangHandmade,
+            as: "barang_handmade",
+            attributes: ['nama_barang', 'image']
+          }],
+        group: ['nama_barang']
+      }),
+      ProdukPenjualan.findAll({
+        attributes: [
+          'barang_non_handmade_id',
+          [sequelize.fn('SUM', sequelize.col('kuantitas')), 'total_terjual']
+        ],
+        where: {
+          ...whereConditions,
+          barang_non_handmade_id: { [Op.not]: null }
+        },
+        include: [
+          {
+            model: BarangNonHandmade,
+            as: "barang_non_handmade",
+            attributes: ['nama_barang', 'image']
+          }],
+        group: ['nama_barang']
+      }),
+      ProdukPenjualan.findAll({
+        attributes: [
+          'barang_custom_id',
+          [sequelize.fn('SUM', sequelize.col('kuantitas')), 'total_terjual']
+        ],
+        where: {
+          ...whereConditions,
+          barang_custom_id: { [Op.not]: null }
+        },
+        include: [
+          {
+            model: BarangCustom,
+            as: "barang_custom",
+            attributes: ['nama_barang', 'image']
+          }],
+        group: ['nama_barang']
+      }),
+      ProdukPenjualan.findAll({
+        attributes: [
+          'packaging_id',
+          [sequelize.fn('SUM', sequelize.col('kuantitas')), 'total_terjual']
+        ],
+        where: {
+          ...whereConditions,
+          packaging_id: { [Op.not]: null }
+        },
+        include: [
+          {
+            model: Packaging,
+            as: "packaging",
+            attributes: ['nama_packaging', 'image']
+          }],
+        group: ['nama_packaging']
+      })
+    ]);
+
+    const allProducts = [
+      ...handmade.map((product) => ({
+        id: product.barang_handmade_id,
+        name: product.barang_handmade.nama_barang,
+        image: product.barang_handmade.image,
+        total_terjual: parseInt(product.dataValues.total_terjual),
+        kategori: "Handmade",
+      })),
+      ...nonhandmade.map((product) => ({
+        id: product.barang_non_handmade_id,
+        name: product.barang_non_handmade.nama_barang,
+        image: product.barang_non_handmade.image,
+        total_terjual: parseInt(product.dataValues.total_terjual),
+        kategori: "Non Handmade",
+      })),
+      ...custom.map((product) => ({
+        id: product.barang_custom_id,
+        name: product.barang_custom.nama_barang,
+        image: product.barang_custom.image,
+        total_terjual: parseInt(product.dataValues.total_terjual),
+        kategori: "Custom",
+      })),
+      ...packaging.map((product) => ({
+        id: product.packaging_id,
+        name: product.packaging.nama_packaging,
+        image: product.packaging.image,
+        total_terjual: parseInt(product.dataValues.total_terjual),
+        kategori: "Packaging",
+      })),
+    ];
+
+    return allProducts
+      .sort((a, b) => b.total_terjual - a.total_terjual)
+      .slice(0, 10);
   }
 }  
 
