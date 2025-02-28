@@ -10,7 +10,8 @@ class PackagingGudangService {
     return await PackagingGudang.findAll({
       where: {
         is_deleted: false
-      }
+      },
+      order: [['createdAt', 'DESC']]
     });  
   }  
   

@@ -38,7 +38,7 @@ const CutiKaryawan = sequelize.define("cuti_karyawan", {
       allowNull: true,
   },
 },{
-    timestamps: false,
+    timestamps: true,
 });  
   
 module.exports = CutiKaryawan;  

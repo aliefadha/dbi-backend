@@ -61,7 +61,7 @@ const BarangCustom = sequelize.define("barang_custom", {
     defaultValue: false
   }
 },{
-  timestamps: false
+  timestamps: true
 });  
   
 module.exports = BarangCustom;  

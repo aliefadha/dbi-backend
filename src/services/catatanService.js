@@ -19,7 +19,8 @@ class CatatanService {
         where: whereConditions,
         attributes: {
           exclude: ["is_deleted"]
-        }
+        },
+        order: [['createdAt', 'DESC']]
       }
     );  
   }  

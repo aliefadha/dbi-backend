@@ -69,7 +69,7 @@ const Packaging = sequelize.define("packaging", {
     defaultValue: false
   }
 },{
-  timestamps: false
+  timestamps: true
 });  
   
 module.exports = Packaging;  

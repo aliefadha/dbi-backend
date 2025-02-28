@@ -44,7 +44,8 @@ class AbsensiKaryawanService {
       },
       attributes: {
         exclude: ['createdAt', 'updatedAt', 'gaji_pokok_perhari']
-      }
+      },
+      order: [['createdAt', 'DESC']]
     });
   }
   

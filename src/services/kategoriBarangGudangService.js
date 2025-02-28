@@ -10,7 +10,8 @@ class KategoriBarangGudangService {
     return await KategoriBarangGudang.findAll({
       where: {
         is_deleted: false
-      }
+      },
+      order: [["createdAt", "DESC"]]
     });
   }
 

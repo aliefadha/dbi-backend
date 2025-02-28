@@ -43,7 +43,7 @@ const BarangNonHandmade = sequelize.define("barang_non_handmade", {
     defaultValue: false
   }
 },{
-  timestamps: false
+  timestamps: true
 });  
   
 module.exports = BarangNonHandmade;  

@@ -37,7 +37,8 @@ class CutiKaryawanService {
             tanggal_selesai: {
               [Op.gte]: startDate,
             },
-          }
+          },
+          order: [['createdAt', 'DESC']]
         }, 
         {
           model: DivisiKaryawan,

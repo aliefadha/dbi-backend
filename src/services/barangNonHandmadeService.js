@@ -101,7 +101,8 @@ class BarangNonHandmadeService {
             }
           ]
         }
-      ]
+      ],
+      order: [["createdAt", "DESC"]]
     });  
   }  
   

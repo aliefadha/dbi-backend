@@ -130,7 +130,8 @@ class BarangHandmadeGudangService {
           },
           attributes: ["nama_biaya", "jumlah_biaya"]
         }
-      ]
+      ],
+      order: [['createdAt', 'DESC']]
     });  
   }  
   

@@ -36,6 +36,10 @@ const Karyawan = sequelize.define("karyawans", {
             key: "divisi_karyawan_id",
         },
     },
+    jenis_karyawan: {
+        type: DataTypes.ENUM("Umum", "Produksi", "Transportasi"),
+        allowNull: true,
+    },
     toko_id: {
         type: DataTypes.INTEGER,
         references: {
@@ -82,7 +86,7 @@ const Karyawan = sequelize.define("karyawans", {
         defaultValue: false,
     },
 }, {
-    timestamps: false,
+    timestamps: true,
 });
 
 
