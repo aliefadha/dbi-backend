@@ -260,6 +260,24 @@ class KaryawanController {
             });
         }
     }
+
+    static async getTerbaik(req, res) {
+        try {
+            const { toko_id, bulan, tahun } = req.query;
+            const karyawan = await KaryawanService.getTerbaik(toko_id, bulan, tahun);
+            res.status(200).json({
+                success: true,
+                data: karyawan,
+                message: "retrieved successfully"
+            });
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                data: null,
+                message: error.message
+            });
+        }
+    }
 }
 
 module.exports = {KaryawanController, upload};

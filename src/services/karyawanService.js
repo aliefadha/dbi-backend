@@ -2,6 +2,7 @@ const Karyawan = require("../models/karyawan");
 const DivisiKaryawan = require("../models/divisiKaryawan");
 const Cabang = require("../models/cabang");
 const XLSX = require('xlsx');
+const AbsensiKaryawanService = require("./absensiKaryawanService");
 
 class KaryawanService {
     static async getAll(toko_id) {
@@ -103,6 +104,18 @@ class KaryawanService {
 
         return workbook;
     }
+
+    static async getTerbaik(toko_id, bulan, tahun) {
+        const result = await AbsensiKaryawanService.getAll(bulan, tahun, toko_id);
+        const data = result.map((item) => ({
+            karyawan_id: item.karyawan.karyawan_id,
+            nama_karyawan: item.karyawan.nama_karyawan,
+            Image: item.karyawan.image,
+            kpi: item.totalPersentaseTercapai
+        }))
+        return data.sort((a, b) => b.totalPersentaseTercapai - a.totalPersentaseTercapai);
+    }
+
 }
 
 module.exports = KaryawanService;
