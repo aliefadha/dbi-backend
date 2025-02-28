@@ -78,6 +78,13 @@ class LaporanKeuanganService {
       pengeluaranWhereClause.toko_id = toko_id;
     }
 
+    const namaGudang = await Toko.findOne({
+      where: {
+        toko_id: 1
+      },
+      attributes: ["nama_toko"]
+    });
+
     const pengeluaran = await DeskripsiPengeluaran.findAll({
       where: pengeluaranWhereClause,
       attributes: ['pengeluaran_id', 'deskripsi', 'jumlah_pengeluaran',],
@@ -238,7 +245,7 @@ class LaporanKeuanganService {
           pembelian_id: pembelian.pembelian_id,
           tanggal: pembelian.tanggal,
           total_pengeluaran: pembelian.total_pembelian,
-          nama_toko: "Gudang",
+          nama_toko: namaGudang,
           produk: produk.map(item => ({
             nama_barang: item.barang_handmade?.nama_barang ||
               item.barang_nonhandmade?.nama_barang ||
@@ -298,6 +305,15 @@ class LaporanKeuanganService {
       tanggal: item.pemasukan.tanggal
     }));
 
+    const penjualanGudangData = !toko_id? await PenjualanGudang.findAll({
+      where: {
+       ...whereClause,
+      },
+      attributes: ['penjualan_id', 'tanggal', 'total_penjualan'],
+      raw: true,
+      nest: true
+    }) : [];
+
     const penjualanData = await Penjualan.findAll({
       where: {
         ...whereClause,
@@ -315,58 +331,106 @@ class LaporanKeuanganService {
       nest: true
     });
 
-    const transformedPenjualan = await Promise.all(penjualanData.map(async (penjualan) => {
-      const produk = await ProdukPenjualan.findAll({
-        where: {
-          penjualan_id: penjualan.penjualan_id,
-          is_deleted: false
-        },
-        include: [
-          {
-            model: BarangHandmade,
-            as: 'barang_handmade',
-            attributes: ["nama_barang"]
+    const transformedPenjualan = await Promise.all([
+      ...penjualanData.map(async (penjualan) => {
+        const produk = await ProdukPenjualan.findAll({
+          where: {
+            penjualan_id: penjualan.penjualan_id,
+            is_deleted: false
           },
-          {
-            model: BarangNonHandmade,
-            as: 'barang_non_handmade',
-            attributes: ["nama_barang"]
-          },
-          {
-            model: BarangCustom,
-            as: 'barang_custom',
-            attributes: ["nama_barang"]
-          },
-          {
-            model: Packaging,
-            as: 'packaging',
-            attributes: ["nama_packaging"]
-          },
-          {
-            model: Cabang,
-            as: 'cabang',
-            attributes: ["nama_cabang"]
-          }
-        ],
-        raw: true,
-        nest: true
-      });
+          include: [
+            {
+              model: BarangHandmade,
+              as: 'barang_handmade',
+              attributes: ["nama_barang"]
+            },
+            {
+              model: BarangNonHandmade,
+              as: 'barang_non_handmade',
+              attributes: ["nama_barang"]
+            },
+            {
+              model: BarangCustom,
+              as: 'barang_custom',
+              attributes: ["nama_barang"]
+            },
+            {
+              model: Packaging,
+              as: 'packaging',
+              attributes: ["nama_packaging"]
+            },
+            {
+              model: Cabang,
+              as: 'cabang',
+              attributes: ["nama_cabang"]
+            }
+          ],
+          raw: true,
+          nest: true
+        });
 
-      return {
-        penjualan_id: penjualan.penjualan_id,
-        tanggal: penjualan.tanggal,
-        total_pengeluaran: penjualan.total_penjualan,
-        nama_toko: penjualan.toko.nama_toko,
-        produk: produk.map(item => ({
-          nama_barang: item.barang_handmade?.nama_barang ||
-            item.barang_non_handmade?.nama_barang ||
-            item.barang_custom?.nama_barang ||
-            item.packaging?.nama_packaging,
-          nama_cabang: item.cabang?.nama_cabang
-        })),
-        kategori_pemasukan: "Penjualan"
-      };
-    }));
+        return {
+          penjualan_id: penjualan.penjualan_id,
+          tanggal: penjualan.tanggal,
+          total_pemasukan: penjualan.total_penjualan,
+          nama_toko: penjualan.toko.nama_toko,
+          produk: produk.map(item => ({
+            nama_barang: item.barang_handmade?.nama_barang ||
+              item.barang_non_handmade?.nama_barang ||
+              item.barang_custom?.nama_barang ||
+              item.packaging?.nama_packaging,
+            nama_cabang: item.cabang?.nama_cabang
+          })),
+          kategori_pemasukan: "Penjualan"
+        };
+      }),
+      ...(!toko_id ? penjualanGudangData.map(async (penjualan) => {
+        const produk = await ProdukPenjualanGudang.findAll({
+          where: {
+            penjualan_id: penjualan.penjualan_id,
+            is_deleted: false
+          },
+          include: [
+            {
+              model: BarangHandmadeGudang,
+              as: 'barang_handmade',
+              attributes: ["nama_barang"]
+            },
+            {
+              model: BarangNonHandmadeGudang,
+              as: 'barang_nonhandmade',
+              attributes: ["nama_barang"]
+            },
+            {
+              model: BarangMentah,
+              as: 'barang_mentah',
+              attributes: ["nama_barang"],
+            },
+            {
+              model: PackagingGudang,
+              as: 'packaging',
+              attributes: ["nama_packaging"]
+            },
+          ],
+          raw: true,
+          nest: true
+        });
+
+        return {
+          penjualan_id: penjualan.penjualan_id,
+          tanggal: penjualan.tanggal,
+          total_pemasukan: penjualan.total_penjualan,
+          nama_toko: namaGudang,
+          produk: produk.map(item => ({
+            nama_barang: item.barang_handmade?.nama_barang ||
+              item.barang_nonhandmade?.nama_barang ||
+              item.barang_mentah?.nama_barang ||
+              item.packaging?.nama_packaging,
+          })),
+          kategori_pemasukan: "Penjualan"
+        };
+      }) : [])
+    ]);
 
     const gajiData = await RincianGaji.findAll({
       attributes: ['bayar_gaji_id', 'total_gaji_akhir'],
@@ -411,10 +475,12 @@ class LaporanKeuanganService {
       tanggal: item.bayar_gaji.tanggal
     }));
 
+    
+
     const totalPemasukan = [
       ...transformedPemasukan.map(item => item.jumlah_pemasukan),
       ...(parseInt(kategori_pemasukan_id) === 1 || (!kategori_pengeluaran_id && !kategori_pemasukan_id)
-        ? transformedPenjualan.map(item => item.total_pengeluaran)
+        ? transformedPenjualan.map(item => item.total_pemasukan)
         : [])
     ].reduce((total, amount) => total + amount, 0);
 
@@ -449,16 +515,12 @@ class LaporanKeuanganService {
           new Date(a.tanggal) - new Date(b.tanggal)
         )
       }),
-      total_pemasukan: [
-        ...transformedPemasukan.map(item => item.jumlah_pemasukan),
-        ...transformedPenjualan.map(item => item.total_pengeluaran)
-      ].reduce((total, amount) => total + amount, 0),
-      total_pengeluaran: [
-        ...pengeluaran.map(item => item.jumlah_pengeluaran),
-        ...transformedPembelian.map(item => item.total_pengeluaran)
-      ].reduce((total, amount) => total + amount, 0),
+      total_pemasukan: totalPemasukan,
+      total_pengeluaran: totalPengeluaran,
       keuntungan: totalPemasukan - totalPengeluaran,
-      produk_terjual: transformedPenjualan.reduce((total, item) => total + item.produk.length, 0),
+      produk_terjual: (parseInt(kategori_pemasukan_id) === 1 || (!kategori_pengeluaran_id && !kategori_pemasukan_id)
+        ? transformedPenjualan.reduce((total, item) => total + item.produk.length, 0)
+        : 0),
     }
     return laporan;
   }
@@ -737,7 +799,7 @@ class LaporanKeuanganService {
         : [])
     ].reduce((total, amount) => total + amount, 0);
 
-    const laporan = {
+   const laporan = {
       ...((!kategori_pemasukan_id) && {
         pengeluaran: [
           ...transformedPengeluaran,
@@ -761,7 +823,9 @@ class LaporanKeuanganService {
       total_pemasukan: totalPemasukan,
       total_pengeluaran: totalPengeluaran,
       keuntungan: totalPemasukan - totalPengeluaran,
-      produk_terjual: transformedPenjualan.reduce((total, item) => total + item.produk.length, 0),
+      produk_terjual: (parseInt(kategori_pemasukan_id) === 1 || (!kategori_pengeluaran_id && !kategori_pemasukan_id)
+        ? transformedPenjualan.reduce((total, item) => total + item.produk.length, 0)
+        : 0),
     }
 
     return laporan
