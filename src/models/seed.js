@@ -92,7 +92,7 @@ const seedDatabase = async () => {
 
         //Seed for kategori pengeluaran
         await KategoriPengeluaran.create({ kategori_pengeluaran: "Pembelian" })
-        await KategoriPengeluaran.create({ kategori_pengeluaran: "Beban Listrik" })
+        await KategoriPengeluaran.create({ kategori_pengeluaran: "Gaji" })
 
         //Seed for kategori pemasukan
         await KategoriPemasukan.create({ kategori_pemasukan: "Penjualan" })
