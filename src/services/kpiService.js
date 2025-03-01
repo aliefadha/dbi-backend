@@ -40,7 +40,8 @@ class KpiService {
       whereConditions.toko_id = toko_id
     }
     return await Kpi.findAll({
-      where: whereConditions
+      where: whereConditions,
+      order: [['createdAt', 'DESC']]
     });  
   }  
   

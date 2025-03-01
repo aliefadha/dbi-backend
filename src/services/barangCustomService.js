@@ -22,7 +22,8 @@ class BarangCustomService {
       include: [
         { model: JenisBarang, as: "jenis_barang" },
         { model: KategoriBarang, as: "kategori" },
-      ]
+      ],
+      order: [['createdAt', 'DESC']]
     });  
   }  
   

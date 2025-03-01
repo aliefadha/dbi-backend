@@ -30,7 +30,7 @@ const BarangMentah = sequelize.define("barang_mentah", {
     defaultValue: false
   }
 },{
-  timestamps: false
+  timestamps: true
 });  
   
 module.exports = BarangMentah;  

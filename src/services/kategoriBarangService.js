@@ -32,7 +32,8 @@ class KategoriBarangService {
             whereConditions.toko_id = toko_id
         }
         return await KategoriBarang.findAll({
-            where: whereConditions
+            where: whereConditions,
+            order: [['createdAt', 'DESC']]
         });
     }
 

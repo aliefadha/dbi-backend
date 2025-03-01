@@ -20,8 +20,8 @@ const upload = multer({ storage: storage });
 class KaryawanController {
     static async getAll(req, res) {
         try {
-            const { toko_id } = req.query;
-            const karyawan = await KaryawanService.getAll(toko_id);
+            const { toko_id, divisi } = req.query;
+            const karyawan = await KaryawanService.getAll(toko_id, divisi);
             res.status(200).json({
                 success: true,
                 data: karyawan,
@@ -243,8 +243,8 @@ class KaryawanController {
 
     static async export(req, res) {
         try {
-            const { toko_id } = req.query;
-            const workbook = await KaryawanService.exportToExcel(toko_id);
+            const { toko_id, divisi } = req.query;
+            const workbook = await KaryawanService.exportToExcel(toko_id, divisi);
             res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
             res.setHeader('Content-Disposition', 'attachment; filename=karyawan_export.xlsx');
 
@@ -253,6 +253,24 @@ class KaryawanController {
             res.send(buffer);
         } catch (error) {
             console.error('Error exporting to Excel:', error);
+            res.status(500).json({
+                success: false,
+                data: null,
+                message: error.message
+            });
+        }
+    }
+
+    static async getTerbaik(req, res) {
+        try {
+            const { toko_id, bulan, tahun } = req.query;
+            const karyawan = await KaryawanService.getTerbaik(toko_id, bulan, tahun);
+            res.status(200).json({
+                success: true,
+                data: karyawan,
+                message: "retrieved successfully"
+            });
+        } catch (error) {
             res.status(500).json({
                 success: false,
                 data: null,

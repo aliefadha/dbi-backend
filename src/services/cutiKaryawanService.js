@@ -24,6 +24,7 @@ class CutiKaryawanService {
     }
     const startDate = new Date(tahun, bulan - 1, 1);
     const endDate = new Date(tahun, bulan, 0);
+    endDate.setHours(23, 59, 59, 999);
     return await Karyawan.findAll({
       where: whereConditions,
       include: [
@@ -37,7 +38,8 @@ class CutiKaryawanService {
             tanggal_selesai: {
               [Op.gte]: startDate,
             },
-          }
+          },
+          order: [['createdAt', 'DESC']]
         }, 
         {
           model: DivisiKaryawan,

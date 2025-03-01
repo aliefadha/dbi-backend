@@ -42,7 +42,7 @@ const PackagingGudang = sequelize.define("packaging_gudang", {
     defaultValue: false
   }
 }, {
-  timestamps: false
+  timestamps: true
 });
 
 module.exports = PackagingGudang;  

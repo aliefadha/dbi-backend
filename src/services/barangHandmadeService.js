@@ -104,7 +104,8 @@ class BarangHandmadeService {
             }
           ]
         }
-      ]
+      ],
+      order: [["created_at", "DESC"]]
     });
   }
   

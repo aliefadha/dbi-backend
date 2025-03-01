@@ -9,7 +9,8 @@ class BarangMentahService {
     return await BarangMentah.findAll({
       where: {
         is_deleted: false
-      }
+      },
+      order: [['createdAt', 'DESC']]
     });  
   }  
   

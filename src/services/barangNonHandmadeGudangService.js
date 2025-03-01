@@ -110,7 +110,8 @@ class BarangNonHandmadeGudangService {
           },
           attributes: ["nama_biaya", "jumlah_biaya"]
         }
-      ]
+      ],
+      order: [["createdAt", "DESC"]]
     });  
   }  
   

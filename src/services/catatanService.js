@@ -1,5 +1,6 @@
 const Catatan = require("../models/catatan");  
 const { Op } = require("sequelize");
+const XLSX = require('xlsx');
 class CatatanService {  
   static async create(data) {  
     return await Catatan.create(data);  
@@ -8,9 +9,10 @@ class CatatanService {
   static async getAll(bulan, tahun) {
     const startDate = new Date(tahun, bulan-1, 1);
     const endDate = new Date(tahun, bulan, 0); 
+    endDate.setHours(23, 59, 59, 999);
     const whereConditions = {
       is_deleted: false,
-      createdAt: {
+      tanggal: {
         [Op.between]: [startDate, endDate]
       }
     } 
@@ -19,7 +21,8 @@ class CatatanService {
         where: whereConditions,
         attributes: {
           exclude: ["is_deleted"]
-        }
+        },
+        order: [['createdAt', 'DESC']]
       }
     );  
   }  
@@ -44,6 +47,21 @@ class CatatanService {
     await catatan.update({ is_deleted: true });  
     return true;  
   }  
+
+  static async exportToExcel(bulan, tahun) {
+    const catatan = await this.getAll(bulan, tahun);
+
+    const data = catatan.map((item) => ({
+      tanggal: item.tanggal,
+      nama: item.nama,
+      judul: item.judul,
+      isi: item.isi,
+    }));
+    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    XLSX.utils.book_append_sheet(workbook, worksheet, "catatan");
+    return workbook;
+  }
 }  
   
 module.exports = CatatanService;  

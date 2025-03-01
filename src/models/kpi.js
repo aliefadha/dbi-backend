@@ -42,7 +42,7 @@ const Kpi = sequelize.define("kpi", {
         defaultValue: false
     }
 }, {  
-    timestamps: false,
+    timestamps: true,
 });  
   
 module.exports = Kpi;  
