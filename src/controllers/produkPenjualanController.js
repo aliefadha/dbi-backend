@@ -1,3 +1,4 @@
+const ProdukPenjualanGudangService = require("../services/produkPenjualanGudangService");
 const ProdukPenjualanService = require("../services/produkPenjualanService");  
   
 class ProdukPenjualanController {  
@@ -124,6 +125,27 @@ class ProdukPenjualanController {
       });  
     }  
   }
+
+  static async getAllTerlarisByToko(req, res) {
+      try {  
+        const { toko_id, startDate, endDate } = req.query;
+        const produkTerlaris = toko_id == 1 
+          ? await ProdukPenjualanGudangService.getAllTerlaris(startDate, endDate)
+          : await ProdukPenjualanService.getAllTerlarisByToko(toko_id, startDate, endDate);
+        
+        res.status(200).json({  
+          success: true,  
+          data: produkTerlaris,  
+          message: "retrieved successfully",  
+        });  
+      } catch (error) {  
+        res.status(500).json({  
+          success: false,  
+          data: null,  
+          message: error.message,  
+        });  
+      } 
+    }
 }  
   
-module.exports = ProdukPenjualanController;  
+module.exports = ProdukPenjualanController;
