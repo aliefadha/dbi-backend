@@ -38,6 +38,7 @@ const Karyawan = sequelize.define("karyawans", {
     },
     jenis_karyawan: {
         type: DataTypes.ENUM("Umum", "Produksi", "Transportasi"),
+        defaultValue: "Umum",
         allowNull: true,
     },
     toko_id: {

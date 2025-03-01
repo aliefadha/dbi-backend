@@ -49,18 +49,16 @@ class CatatanService {
   }  
 
   static async exportToExcel(bulan, tahun) {
-    const startDate = new Date(tahun, bulan-1, 1);
-    const endDate = new Date(tahun, bulan, 0); 
-    endDate.setHours(23, 59, 59, 999);
-    const whereConditions = {
-      is_deleted: false,
-      tanggal: {
-        [Op.between]: [startDate, endDate]
-      }
-    } 
-    const catatan = await Catatan.findAll({ where: whereConditions });
+    const catatan = await this.getAll(bulan, tahun);
+
+    const data = catatan.map((item) => ({
+      tanggal: item.tanggal,
+      nama: item.nama,
+      judul: item.judul,
+      isi: item.isi,
+    }));
     const workbook = XLSX.utils.book_new();
-    const worksheet = XLSX.utils.json_to_sheet(catatan);
+    const worksheet = XLSX.utils.json_to_sheet(data);
     XLSX.utils.book_append_sheet(workbook, worksheet, "catatan");
     return workbook;
   }
