@@ -12,7 +12,7 @@ class DataKaryawanService {
     static async getListAbsensiByKaryawan(id, bulan, tahun) {
         const startDate = new Date(tahun, bulan - 1, 1);
         const endDate = new Date(tahun, bulan, 0);
-    
+        endDate.setHours(23, 59, 59, 999);
         const absensiRecord = await AbsensiKaryawan.findAll({
           where: {
             karyawan_id: id,
@@ -40,7 +40,7 @@ class DataKaryawanService {
     static async getDataAbsensiByKaryawan(id, bulan, tahun) {
         const startDate = new Date(tahun, bulan - 1, 1);
         const endDate = new Date(tahun, bulan, 0);
-
+        endDate.setHours(23, 59, 59, 999);
         const karyawan = await Karyawan.findOne({
         where: {karyawan_id: id},
         include: [
@@ -131,7 +131,7 @@ class DataKaryawanService {
     static async getByKaryawanId(id, bulan, tahun){
         const startDate = new Date(tahun, bulan - 1, 1);      
         const endDate = new Date(tahun, bulan, 0);      
-    
+        endDate.setHours(23, 59, 59, 999);
         const kpiKaryawanRecords = await KpiKaryawan.findAll({      
             where: {      
                 karyawan_id: id,      

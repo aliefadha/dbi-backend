@@ -1,5 +1,5 @@
 const CatatanService = require("../services/catatanService");  
-  
+const XLSX = require('xlsx');
 class CatatanController {  
   static async create(req, res) {  
     try {  
@@ -107,6 +107,24 @@ class CatatanController {
       });  
     }  
   }  
+
+  static async export(req, res){
+    try {
+      const { bulan, tahun } = req.query;
+      const workbook = await CatatanService.exportToExcel(bulan, tahun);
+      res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+      res.setHeader("Content-Disposition", "attachment; filename=catatan.xlsx");
+      const buffer = XLSX.write(workbook, { type: "buffer", bookType: "xlsx" });
+      res.send(buffer);
+    } catch (error) {
+      console.error("Error exporting to Excel:", error);  
+      res.status(500).json({
+        success: false,
+        data: null,
+        message: error.message
+      })
+    }
+  }
 }  
   
 module.exports = CatatanController;  

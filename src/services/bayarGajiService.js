@@ -34,7 +34,7 @@ class BayarGajiService {
   static async getAll(bulan, tahun) {
     const startDate = new Date(tahun, bulan-1, 1);
     const endDate = new Date(tahun, bulan, 0);
-
+    endDate.setHours(23, 59, 59, 999);
     const whereConditions = {
       is_deleted: false,
       tanggal: {
