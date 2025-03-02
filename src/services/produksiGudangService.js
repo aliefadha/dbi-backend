@@ -21,7 +21,8 @@ class ProduksiGudangService {
         tanggal,
         karyawan_id,
         lng,
-        lat
+        lat,
+        gmaps: `https://www.google.com/maps/place/?q=${lat},${lng}`
       }, { transaction });
 
       if (produk && produk.length > 0) {
@@ -208,7 +209,7 @@ class ProduksiGudangService {
           gaji_pokok_perhari: gajiPokokPerhari,
           lng: produksiGudang.lng,
           lat: produksiGudang.lat,
-          gmaps: `https://www.google.com/maps/place/?q=${produksiGudang.lat},${produksiGudang.lng}`
+          gmaps: produksiGudang.gmaps
         }, { transaction });
 
         await produksiGudang.update({
