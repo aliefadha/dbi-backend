@@ -10,6 +10,7 @@ const DeskripsiPengeluaranService = require("./deskripsiPengeluaranService");
 const RincianGaji = require("../models/rincianGaji");
 const Karyawan = require("../models/karyawan");
 const BayarGaji = require("../models/bayarGaji");
+const XLSX = require('xlsx');
 
 class PengeluaranService {
   static async create(data) {
@@ -417,6 +418,27 @@ class PengeluaranService {
     await DeskripsiPengeluaranService.delete(id);
     await pengeluaran.destroy();
     return true;
+  }
+
+  static async exportToExcel(startDate, endDate) {
+    const result = await this.getAll(startDate, endDate);
+
+    const data = result.map(item => ({
+      nomor: item.pengeluaran_id,
+      tanggal: item.tanggal,
+      deskripsi_pengeluaran: item.deskripsi_pengeluaran
+        .map(d => d.deskripsi)
+        .join(', '),
+      kategori_pengeluaran: item.kategori_pengeluaran,
+      cash_or_non: item.metode ?? "Cash",
+      pengeluaran: item.total
+    }));
+
+    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Pengeluaran');
+
+    return workbook;
   }
 }
 

@@ -394,11 +394,12 @@ class PemasukanService {
     const data = result.map(item => ({
       nomor: item.pemasukan_id,
       tanggal: item.tanggal,
-      kategori_pemasukan: item.kategori_pemasukan,
-      cash_or_non: item.metode,
       deskripsi_pemasukan: item.deskripsi_pemasukan
       .map(d => d.deskripsi)
       .join(', '),
+      kategori_pemasukan: item.kategori_pemasukan,
+      cash_or_non: item.metode ?? "Cash",
+      pemasukan: item.total
     }));
 
     const workbook = XLSX.utils.book_new();

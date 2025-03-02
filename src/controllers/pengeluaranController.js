@@ -1,6 +1,6 @@
 const CustomIdGenerateService = require("../services/customIdGenerateService");
 const PengeluaranService = require("../services/pengeluaranService");  
-  
+const XLSX = require('xlsx');
 class PengeluaranController {  
   static async create(req, res) {  
     try {  
@@ -163,6 +163,24 @@ class PengeluaranController {
       });  
     }  
   }  
+
+  static async export(req, res) {  
+    try {  
+      const { startDate, endDate } = req.query;  
+      const workbook = await PengeluaranService.exportToExcel(startDate, endDate);  
+      res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");  
+      res.setHeader("Content-Disposition", "attachment; filename=pengeluaran.xlsx");  
+      const buffer = XLSX.write(workbook, { type: "buffer", bookType: "xlsx" });  
+      res.send(buffer);  
+    } catch (error) {  
+      console.error("Error exporting to Excel:", error);  
+      res.status(500).json({  
+        success: false,  
+        data: null,  
+        message: error.message,  
+      });  
+    }  
+  }
 }  
   
 module.exports = PengeluaranController;
