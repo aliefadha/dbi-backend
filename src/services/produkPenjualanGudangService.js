@@ -426,37 +426,40 @@ class ProdukPenjualanGudangService {
       })
     ]);
 
-    // Format the results
-    return {
-      handmade: handmade.map(item => ({
+    const allProducts = [
+      ...handmade.map(item => ({
         id: item.barang_handmade_id,
+        name: item.barang_handmade.nama_barang,
         image: item.barang_handmade.image,
-        nama: item.barang_handmade.nama_barang,
         total_terjual: parseInt(item.dataValues.total_terjual),
         kategori: 'Handmade'
       })),
-      nonhandmade: nonhandmade.map(item => ({
+      ...nonhandmade.map(item => ({
         id: item.barang_nonhandmade_id,
+        name: item.barang_nonhandmade.nama_barang,
         image: item.barang_nonhandmade.image,
-        nama: item.barang_nonhandmade.nama_barang,
         total_terjual: parseInt(item.dataValues.total_terjual),
-        kategori: 'Non-Handmade'
+        kategori: 'Non Handmade'
       })),
-      mentah: mentah.map(item => ({
+      ...mentah.map(item => ({
         id: item.barang_mentah_id,
+        name: item.barang_mentah.nama_barang,
         image: item.barang_mentah.image,
-        nama: item.barang_mentah.nama_barang,
         total_terjual: parseInt(item.dataValues.total_terjual),
         kategori: 'Bahan Mentah'
       })),
-      packaging: packaging.map(item => ({
+      ...packaging.map(item => ({
         id: item.packaging_id,
+        name: item.packaging.nama_packaging,
         image: item.packaging.image,
-        nama: item.packaging.nama_packaging,
         total_terjual: parseInt(item.dataValues.total_terjual),
         kategori: 'Packaging'
       }))
-    };
+    ];
+
+    return allProducts
+      .sort((a, b) => b.total_terjual - a.total_terjual)
+      .slice(0, 10);
   }
 
   static async getTopTenTerlaris(startDate, endDate) {

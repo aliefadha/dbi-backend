@@ -233,6 +233,31 @@ class TokoController {
       });  
     }
   }
+
+  static async tokoTerlaris(req, res) {
+    try {
+      const {startDate, endDate} = req.query;
+      const tokoId = await TokoService.tokoTerlaris(startDate, endDate);
+      if (!tokoId) {
+        return res.status(404).json({
+          success: false,
+          data: null,
+          message: "Toko not found",
+        });
+      }
+      res.status(200).json({
+        success: true,
+        data: tokoId,
+        message: "Toko terlaris retrieved successfully",
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        data: null,
+        message: error.message,
+      });
+    }
+  }
 }  
   
 module.exports = {TokoController, upload};  
