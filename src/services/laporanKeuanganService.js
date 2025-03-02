@@ -458,6 +458,14 @@ class LaporanKeuanganService {
         },
         {
           model: BayarGaji,
+          where: {
+            is_deleted: false,
+            ...(startDate && endDate && {
+              tanggal: {
+                [Op.between]: [startDate, endDate]
+              }
+            })
+          },
           as: "bayar_gaji"
         }
       ],
@@ -744,7 +752,8 @@ class LaporanKeuanganService {
         {
           model: BayarGaji,
           as: "bayar_gaji",
-          attributes: ["tanggal"]
+          attributes: ["tanggal"],
+          where: whereClause
         },
         {
           model: Karyawan,

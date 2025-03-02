@@ -82,9 +82,7 @@ class PengeluaranService {
     });
 
     const gaji = await BayarGaji.findAll({
-      where: {
-        is_deleted: false
-      },
+      where: whereClause,
       include: [
         {
           model: RincianGaji,
@@ -94,21 +92,21 @@ class PengeluaranService {
           },
           include: [
             {
-            model: Karyawan,
-            as: 'karyawan',
-            include: [{
-              model: Toko,
-              as: 'toko',
-              where: {
-                is_deleted: false
+              model: Karyawan,
+              as: 'karyawan',
+              include: [{
+                model: Toko,
+                as: 'toko',
+                where: {
+                  is_deleted: false
+                },
               },
+              {
+                model: Cabang,
+                as: 'cabang'
+              }]
             },
-            {
-              model: Cabang,
-              as: 'cabang'
-            }]
-          },
-        ]
+          ]
         }
       ],
       raw: true
@@ -140,7 +138,7 @@ class PengeluaranService {
           cabang: item['rincian_gaji.karyawan.cabang.nama_cabang'],
         }]
       }))
-    ].sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));``
+    ].sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal)); ``
   }
 
   static async getByKategori(id, start_date = null, end_date = null) {

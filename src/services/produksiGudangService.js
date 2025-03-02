@@ -1,3 +1,4 @@
+const { Op } = require("sequelize");
 const { sequelize } = require("../models");
 const AbsensiKaryawan = require("../models/absensiKaryawan");
 const BarangHandmadeGudang = require("../models/barangHandmadeGudang");
@@ -42,11 +43,20 @@ class ProduksiGudangService {
     }
   }
 
-  static async getAll() {
+  static async getAll(startDate, endDate) {
+    
+    const whereClause = {
+      is_deleted: false
+    };
+
+    if (startDate && endDate) {
+      whereClause.tanggal = {
+        [Op.between]: [startDate, endDate]
+      };
+    }
+
     return await ProduksiGudang.findAll({
-      where: {
-        is_deleted: false
-      },
+      where: whereClause,
       include: [
         {
           model: BarangProduksiGudang,
