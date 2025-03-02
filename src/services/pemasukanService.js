@@ -7,7 +7,7 @@ const MetodePembayaran = require("../models/metodePembayaran");
 const DeskripsiPemasukan = require("../models/deskripsiPemasukan");
 const Toko = require("../models/toko");
 const Cabang = require("../models/cabang");
-  
+const XLSX = require('xlsx');
 class PemasukanService {  
   static async create(data) {  
     const transaction = await sequelize.transaction();
@@ -387,6 +387,26 @@ class PemasukanService {
     await pemasukan.destroy();  
     return true;  
   }  
+
+  static async exportToExcel(startDate, endDate) {
+    const result = await this.getAll(startDate, endDate);
+
+    const data = result.map(item => ({
+      nomor: item.pemasukan_id,
+      tanggal: item.tanggal,
+      kategori_pemasukan: item.kategori_pemasukan,
+      cash_or_non: item.metode,
+      deskripsi_pemasukan: item.deskripsi_pemasukan
+      .map(d => d.deskripsi)
+      .join(', '),
+    }));
+
+    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Pemasukan');
+
+    return workbook;
+  }
 }  
   
 module.exports = PemasukanService;

@@ -117,7 +117,9 @@ class KaryawanService {
             Image: item.karyawan.image,
             kpi: item.totalPersentaseTercapai
         }))
-        return data.sort((a, b) => b.totalPersentaseTercapai - a.totalPersentaseTercapai);
+        return data
+            .sort((a, b) => b.totalPersentaseTercapai - a.totalPersentaseTercapai)
+            .slice(0, 10);
     }
 
 }
