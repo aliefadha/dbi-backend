@@ -41,6 +41,14 @@ const ProduksiGudang = sequelize.define("produksi_gudang", {
     type: DataTypes.INTEGER,
     defaultValue: 0,
   },
+  lng: {
+    type: DataTypes.REAL,
+    allowNull: true,
+  },
+  lat: {
+      type: DataTypes.REAL,
+      allowNull: true,
+  },
   is_deleted: {
     type: DataTypes.BOOLEAN,
     defaultValue: false

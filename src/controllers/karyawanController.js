@@ -94,8 +94,8 @@ class KaryawanController {
                     message: "Karyawan not found"  
                 });  
             }  
-  
-            const updatedData = { ...req.body };  
+            const hashPassword = bcrypt.hashSync(req.body.password, 10);
+            const updatedData = { ...req.body, password: hashPassword };  
   
             // Check if a new file is uploaded  
             if (req.file) {  
