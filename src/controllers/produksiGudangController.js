@@ -38,7 +38,8 @@ class ProduksiGudangController {
   
   static async getAll(req, res) {  
     try {  
-      const produksiGudangs = await ProduksiGudangService.getAll();  
+      const { startDate, endDate } = req.query;
+      const produksiGudangs = await ProduksiGudangService.getAll(startDate, endDate);  
       res.status(200).json({  
         success: true,  
         data: produksiGudangs,  
