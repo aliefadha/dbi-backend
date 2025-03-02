@@ -6,7 +6,8 @@ const KategoriBarangGudang = require("../models/kategoriBarangGudang");
 const Packaging = require("../models/packaging");
 const PackagingGudang = require("../models/packagingGudang");
 const StokBarangGudang = require("../models/stokBarangGudang");  
-  
+const XLSX = require("xlsx");
+
 class StokBarangGudangService {  
   static async create(data) {  
     return await StokBarangGudang.create(data);  
@@ -148,6 +149,22 @@ class StokBarangGudangService {
     await stokBarangGudang.update({ is_deleted: true });  
     return true;  
   }  
+
+  static async exportToExcel() {
+    const result = await this.getAll();
+    // console.log(result);
+    const data = result.map((item) => ({
+      ID: item.barang.barang_handmade_id || item.barang.barang_nonhandmade_id || item.barang.barang_mentah_id || item.barang.packaging_id,
+      NamaBarang: item.barang.nama_barang || item.barang.nama_packaging,
+      Jenis: item.barang.jenis ? item.barang.jenis.nama_jenis_barang : '',
+      Kategori: item.barang.kategori ? item.barang.kategori.nama_kategori_barang : '',
+      Stok: item.jumlah_stok
+    }))
+    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Stok Barang');
+    return workbook;
+  }
 }  
   
 module.exports = StokBarangGudangService;  

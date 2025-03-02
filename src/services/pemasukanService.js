@@ -383,7 +383,8 @@ class PemasukanService {
   static async delete(id) {  
     const pemasukan = await Pemasukan.findByPk(id);  
     if (!pemasukan) return null;  
-    await pemasukan.update({ is_deleted: true });  
+    await DeskripsiPemasukanService.delete(id);
+    await pemasukan.destroy();  
     return true;  
   }  
 }  

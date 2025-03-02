@@ -89,10 +89,11 @@ class DeskripsiPengeluaranService {
   }
   
   static async delete(id) {  
-    const deskripsiPengeluaran = await DeskripsiPengeluaran.findByPk(id);  
-    if (!deskripsiPengeluaran) return null;  
-    await deskripsiPengeluaran.update({ is_deleted: true });  
-    return true;  
+    return await DeskripsiPengeluaran.destroy({
+      where: {
+        pengeluaran_id: id
+      }
+    })
   }  
 }  
   

@@ -414,7 +414,8 @@ class PengeluaranService {
   static async delete(id) {
     const pengeluaran = await Pengeluaran.findByPk(id);
     if (!pengeluaran) return null;
-    await pengeluaran.update({ is_deleted: true });
+    await DeskripsiPengeluaranService.delete(id);
+    await pengeluaran.destroy();
     return true;
   }
 }
