@@ -112,6 +112,7 @@ class PengeluaranService {
       ],
       raw: true
     })
+
     return [
       ...pengeluarans.map(p => ({
         ...p.get({ plain: true }),
@@ -125,7 +126,7 @@ class PengeluaranService {
         }))
       })),
       ...gaji.map(item => ({
-        pengeluaran_id: item['bayar_gaji.bayar_gaji_id'],
+        pengeluaran_id: item['bayar_gaji_id'],
         tanggal: item['bayar_gaji.tanggal'],
         cash_or_non: Boolean(item['bayar_gaji.cash_or_non']),
         total: item['bayar_gaji.total'],
