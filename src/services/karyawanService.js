@@ -109,8 +109,8 @@ class KaryawanService {
         return workbook;
     }
 
-    static async getTerbaik(toko_id, bulan, tahun) {
-        const result = await AbsensiKaryawanService.getAll(bulan, tahun, toko_id);
+    static async getTerbaik(toko_id, cabang, bulan, tahun) {
+        const result = await AbsensiKaryawanService.getAll(bulan, cabang, tahun, toko_id);
         const data = result.map((item) => ({
             karyawan_id: item.karyawan.karyawan_id,
             nama_karyawan: item.karyawan.nama_karyawan,

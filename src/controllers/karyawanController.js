@@ -263,8 +263,8 @@ class KaryawanController {
 
     static async getTerbaik(req, res) {
         try {
-            const { toko_id, bulan, tahun } = req.query;
-            const karyawan = await KaryawanService.getTerbaik(toko_id, bulan, tahun);
+            const { toko_id, cabang, bulan, tahun } = req.query;
+            const karyawan = await KaryawanService.getTerbaik(toko_id, cabang, bulan, tahun);
             res.status(200).json({
                 success: true,
                 data: karyawan,
