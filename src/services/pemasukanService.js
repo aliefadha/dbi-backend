@@ -399,7 +399,7 @@ class PemasukanService {
       .join(', '),
       kategori_pemasukan: item.kategori_pemasukan,
       cash_or_non: item.metode ?? "Cash",
-      pemasukan: item.total
+      pemasukan: `Rp${item.total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`
     }));
 
     const workbook = XLSX.utils.book_new();

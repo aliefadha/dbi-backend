@@ -26,6 +26,7 @@ const PenjualanGudang = require("../models/penjualanGudang");
 const RincianGaji = require("../models/rincianGaji");
 const Karyawan = require("../models/karyawan");
 const BayarGaji = require("../models/bayarGaji");
+const XLSX = require('xlsx');
 
 class LaporanKeuanganService {
 
@@ -1450,6 +1451,67 @@ class LaporanKeuanganService {
       ),
       total_pengeluaran: totalPengeluaran,
     };
+  }
+
+  static async exportToExcel(toko_id, startDate, endDate, kategori_pemasukan_id, kategori_pengeluaran_id) {
+    const result = await (toko_id == 1 ? this.getGudang(startDate, endDate, kategori_pemasukan_id, kategori_pengeluaran_id) : this.getAll(toko_id, startDate, endDate, kategori_pemasukan_id, kategori_pengeluaran_id));
+
+    // Fungsi untuk format ke Rupiah
+    const formatRupiah = (angka) => {
+        if (angka === undefined || angka === null) return "Rp 0"; // Handle undefined/null
+        return `Rp ${Number(angka).toLocaleString("id-ID")}`;
+    };
+
+    // Prepare the summary row (Keuntungan, Pemasukan, Pengeluaran, Produk Terjual) dalam format Rp
+    const summaryRow = [
+      ["Keuntungan", formatRupiah(result.keuntungan), 
+       "Pemasukan", formatRupiah(result.total_pemasukan), 
+       "Pengeluaran", formatRupiah(result.total_pengeluaran), 
+       "Produk Terjual", result.produk_terjual]
+    ];
+
+    // Prepare the table headers
+    const headers = [
+        ["Nomor", "Tanggal", "Deskripsi", "Toko", "Kategori", "Total"]
+    ];
+
+    // Format pemasukan data dengan Rupiah
+    const pemasukanData = result.pemasukan.map(item => [
+        item.pemasukan_id ?? item.penjualan_id,
+        item.tanggal,
+        item.deskripsi ?? item.produk.map(produk => produk.nama_barang).join(", "),
+        item.nama_toko ?? "-",
+        item.kategori_pemasukan,
+        formatRupiah(item.jumlah_pemasukan ?? item.total_pemasukan) // Konversi ke format Rp
+    ]);
+  
+    // Format pengeluaran data dengan Rupiah
+    const pengeluaranData = result.pengeluaran.map(item => [
+        item.pengeluaran_id ?? item.pembelian_id,
+        item.tanggal,
+        item.deskripsi ?? item.produk.map(produk => produk.nama_barang).join(", "),
+        item.nama_toko ?? "-",
+        item.kategori_pengeluaran,
+        formatRupiah(item.jumlah_pengeluaran ?? item.total_pengeluaran) // Konversi ke format Rp
+    ]);
+
+    // Combine data for the final Excel sheet
+    const finalData = [
+        ...summaryRow,   // Add summary row
+        [],              // Empty row for spacing
+        ...headers,      // Add table headers
+        ...pemasukanData, // Add pemasukan data
+        ...pengeluaranData // Add pengeluaran data
+    ];
+
+    // Create a new workbook and worksheet
+    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.aoa_to_sheet(finalData); // Convert array to worksheet
+
+    // Append worksheet to workbook
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Laporan Keuangan');
+
+    return workbook;
   }
 
 }

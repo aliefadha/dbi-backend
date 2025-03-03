@@ -1,5 +1,5 @@
 const LaporanKeuanganService = require("../services/laporanKeuanganService");
-
+const XLSX = require('xlsx');
 class LaporanKeuanganController {
 
   static async getKategori(req, res) {
@@ -73,6 +73,24 @@ class LaporanKeuanganController {
         message: "retrieved successfully",
       });
     } catch (error) {
+      res.status(500).json({
+        success: false,
+        data: null,
+        message: error.message,
+      });
+    }
+  }
+
+  static async export(req, res) {
+    try {
+      const { toko_id, startDate, endDate, kategori_pemasukan_id, kategori_pengeluaran_id } = req.query;
+      const workbook = await LaporanKeuanganService.exportToExcel(toko_id, startDate, endDate, kategori_pemasukan_id, kategori_pengeluaran_id);
+      res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+      res.setHeader("Content-Disposition", "attachment; filename=laporan_keuangan.xlsx");
+      const buffer = XLSX.write(workbook, { type: "buffer", bookType: "xlsx" });
+      res.send(buffer);
+    } catch (error) {
+      console.error("Error exporting to Excel:", error);
       res.status(500).json({
         success: false,
         data: null,
