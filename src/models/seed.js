@@ -131,9 +131,9 @@ const seedDatabase = async () => {
         // await Penjualan.create({ nama_pembeli: "Pembeli", metode_pembayaran_id: 1, sub_total: 10, diskon: 10, pajak: 10, total_penjualan: 10 })
 
         // Authentication
-        await Authentication.create({ email: "owner@gmail.com", nama: "Owner", password: hashPassword });
-        await Authentication.create({ email: "finance@gmail.com", nama: "Finance", password: hashPassword });
-        await Authentication.create({ email: "manager@gmail.com", nama: "Manager", password: hashPassword });
+        await Authentication.create({ image:"", email: "owner@gmail.com", nama: "Owner", password: hashPassword });
+        await Authentication.create({ image:"", email: "finance@gmail.com", nama: "Finance", password: hashPassword });
+        await Authentication.create({ image:"", email: "manager@gmail.com", nama: "Manager", password: hashPassword });
 
          // Seed data for KategoriBarang  
          await KategoriBarang.create({ kategori_barang_id: 1, toko_id: 1, nama_kategori_barang: "Gelang" });

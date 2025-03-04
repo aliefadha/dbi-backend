@@ -37,19 +37,22 @@ class TokoService {
   }
 
   static async update(id, data) {
-    const toko = await Toko.findByPk(id);
-    // const emailToko = await Toko.findOne({
-    //   where: {
-    //     email: data.email
-    //   }
-    // })
-    // if(emailToko) throw new Error("Email already exists");
-    if (!toko) return null;
-
-    Object.assign(toko, data);
-    await toko.save();
-
-    return toko;
+    try {
+      const toko = await Toko.findByPk(id);
+      if (!toko) return null;
+      if (data.email) {
+        const existingUser = await Toko.findOne({ where: { email: data.email } });
+        if (existingUser && existingUser.toko_id != id) {
+          throw new Error('Email already exists');
+        }
+      }
+      Object.assign(toko, data);
+      await toko.save();
+  
+      return toko;
+    } catch (error) {
+      throw error;
+    }
   }
 
   static async delete(id) {

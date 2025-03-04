@@ -54,13 +54,22 @@ class CabangService {
   }  
   
   static async update(id, data) {  
-    const cabang = await Cabang.findByPk(id);  
-    if (!cabang) return null;  
-  
-    Object.assign(cabang, data);  
-    await cabang.save();  
-  
-    return cabang;  
+    try {
+      const cabang = await Cabang.findByPk(id);  
+      if (!cabang) return null;  
+      if (data.email) {
+        const existingCabang = await Cabang.findOne({ where: { email: data.email } });
+        if (existingCabang && existingCabang.cabang_id != id) {
+          throw new Error('Email already exists');
+        }
+      }
+      Object.assign(cabang, data);  
+      await cabang.save();  
+    
+      return cabang;  
+    } catch (error) {
+      throw error;
+    }
   }  
   
   static async delete(id) {  

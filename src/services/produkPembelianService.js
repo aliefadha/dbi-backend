@@ -286,7 +286,7 @@ class ProdukPembelianService {
   static async delete(id) {  
     const produkPembelian = await ProdukPembelian.findByPk(id);  
     if (!produkPembelian) return null;  
-    await produkPembelian.update({ is_deleted: true });  
+    await produkPembelian.destroy();  
     return true;  
   }  
 }  

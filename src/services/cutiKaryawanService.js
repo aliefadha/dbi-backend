@@ -22,11 +22,15 @@ class CutiKaryawanService {
     if (toko_id) {  
       whereConditions.toko_id = toko_id;  
     }
+    console.log(whereConditions);
     const startDate = new Date(tahun, bulan - 1, 1);
     const endDate = new Date(tahun, bulan, 0);
     endDate.setHours(23, 59, 59, 999);
     return await Karyawan.findAll({
       where: whereConditions,
+      attributes: [
+        "karyawan_id","nama_karyawan"
+      ],
       include: [
         {
           model: CutiKaryawan,
@@ -38,6 +42,10 @@ class CutiKaryawanService {
             tanggal_selesai: {
               [Op.gte]: startDate,
             },
+           
+          },
+          attributes: {
+            exclude: ["is_deleted", "createdAt", "updatedAt"]
           },
           order: [['createdAt', 'DESC']]
         }, 

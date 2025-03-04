@@ -80,13 +80,23 @@ class KaryawanService {
         }    
     }
     static async update(id, data) {
-        const karyawan = await Karyawan.findByPk(id);
-        if (!karyawan) return null;
-
-        Object.assign(karyawan, data);
-        await karyawan.save();
-
-        return karyawan;
+        try {
+            const karyawan = await Karyawan.findByPk(id);
+            if (!karyawan) return null;
+            if (data.email) {
+                const existingUser = await Karyawan.findOne({ where: { email: data.email } });
+                if (existingUser && existingUser.karyawan_id != id) {
+                    throw new Error('Email already exists');
+                }
+            }
+            Object.assign(karyawan, data);
+            await karyawan.save();
+    
+            return karyawan;
+        }
+        catch (error) {
+            throw error;
+        }
     }
     static async delete(id) {
         return await Karyawan.destroy({ where: { karyawan_id: id } });
@@ -109,15 +119,17 @@ class KaryawanService {
         return workbook;
     }
 
-    static async getTerbaik(toko_id, bulan, tahun) {
-        const result = await AbsensiKaryawanService.getAll(bulan, tahun, toko_id);
+    static async getTerbaik(toko_id, cabang, bulan, tahun) {
+        const result = await AbsensiKaryawanService.getAll(bulan, cabang, tahun, toko_id);
         const data = result.map((item) => ({
             karyawan_id: item.karyawan.karyawan_id,
             nama_karyawan: item.karyawan.nama_karyawan,
             Image: item.karyawan.image,
             kpi: item.totalPersentaseTercapai
         }))
-        return data.sort((a, b) => b.totalPersentaseTercapai - a.totalPersentaseTercapai);
+        return data
+            .sort((a, b) => b.totalPersentaseTercapai - a.totalPersentaseTercapai)
+            .slice(0, 10);
     }
 
 }

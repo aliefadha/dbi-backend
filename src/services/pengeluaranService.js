@@ -10,6 +10,7 @@ const DeskripsiPengeluaranService = require("./deskripsiPengeluaranService");
 const RincianGaji = require("../models/rincianGaji");
 const Karyawan = require("../models/karyawan");
 const BayarGaji = require("../models/bayarGaji");
+const XLSX = require('xlsx');
 
 class PengeluaranService {
   static async create(data) {
@@ -31,7 +32,7 @@ class PengeluaranService {
     }
   }
 
-  static async getAll(start_date = null, end_date = null) {
+  static async getAll(start_date = null, end_date = null, kategori_pengeluaran_id, cash_or_non) {
     const whereClause = {
       is_deleted: false
     };
@@ -41,6 +42,14 @@ class PengeluaranService {
       whereClause.tanggal = {
         [Op.between]: [start_date, end_date]
       };
+    }
+
+    if (kategori_pengeluaran_id) {
+      whereClause.kategori_pengeluaran_id = kategori_pengeluaran_id;
+    }
+
+    if (cash_or_non) {
+      whereClause.cash_or_non = cash_or_non;
     }
 
     const pengeluarans = await Pengeluaran.findAll({
@@ -84,6 +93,11 @@ class PengeluaranService {
       where: whereClause,
       include: [
         {
+          model: KategoriPengeluaran,
+          as: 'kategori_pengeluaran',
+          attributes: ['kategori_pengeluaran']
+        },
+        {
           model: RincianGaji,
           as: 'rincian_gaji',
           where: {
@@ -125,11 +139,11 @@ class PengeluaranService {
       })),
       ...gaji.map(item => ({
         pengeluaran_id: item['bayar_gaji_id'],
-        tanggal: item['bayar_gaji.tanggal'],
-        cash_or_non: Boolean(item['bayar_gaji.cash_or_non']),
-        total: item['bayar_gaji.total'],
-        kategori_pengeluaran: "Gaji",
-        metode: item['bayar_gaji.metode.nama_metode'],
+        tanggal: item['tanggal'],
+        cash_or_non: Boolean(item['cash_or_non']),
+        total: item['total'],
+        kategori_pengeluaran: item['kategori_pengeluaran.kategori_pengeluaran'],
+        metode: item['metode.nama_metode'],
         deskripsi_pengeluaran: [{
           deskripsi: 'Gaji',
           jumlah_pengeluaran: item['rincian_gaji.total_gaji_akhir'],
@@ -321,6 +335,13 @@ class PengeluaranService {
           model: BayarGaji,
           as: 'bayar_gaji',
           where: whereClause,
+          include: [
+            {
+              model: KategoriPengeluaran,
+              as: 'kategori_pengeluaran',
+              attributes: ['kategori_pengeluaran']
+            },
+          ]
         },
         {
           model: Karyawan,
@@ -364,7 +385,7 @@ class PengeluaranService {
         tanggal: item['bayar_gaji.tanggal'],
         cash_or_non: Boolean(item['bayar_gaji.cash_or_non']),
         total: item['bayar_gaji.total'],
-        kategori_pengeluaran: "Gaji",
+        kategori_pengeluaran: item['bayar_gaji.kategori_pengeluaran.kategori_pengeluaran'],
         metode: item['bayar_gaji.metode.nama_metode'],
         deskripsi_pengeluaran: [{
           deskripsi: 'Gaji',
@@ -412,8 +433,30 @@ class PengeluaranService {
   static async delete(id) {
     const pengeluaran = await Pengeluaran.findByPk(id);
     if (!pengeluaran) return null;
-    await pengeluaran.update({ is_deleted: true });
+    await DeskripsiPengeluaranService.delete(id);
+    await pengeluaran.destroy();
     return true;
+  }
+
+  static async exportToExcel(startDate, endDate, kategori_pengeluaran_id, cash_or_non) {
+    const result = await this.getAll(startDate, endDate, kategori_pengeluaran_id, cash_or_non);
+
+    const data = result.map(item => ({
+      nomor: item.pengeluaran_id,
+      tanggal: item.tanggal,
+      deskripsi_pengeluaran: item.deskripsi_pengeluaran
+        .map(d => d.deskripsi)
+        .join(', '),
+      kategori_pengeluaran: item.kategori_pengeluaran,
+      cash_or_non: item.metode ?? "Cash",
+      pengeluaran: `Rp${item.total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`
+    }));
+
+    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Pengeluaran');
+
+    return workbook;
   }
 }
 

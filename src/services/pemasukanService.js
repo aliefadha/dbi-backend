@@ -7,7 +7,7 @@ const MetodePembayaran = require("../models/metodePembayaran");
 const DeskripsiPemasukan = require("../models/deskripsiPemasukan");
 const Toko = require("../models/toko");
 const Cabang = require("../models/cabang");
-  
+const XLSX = require('xlsx');
 class PemasukanService {  
   static async create(data) {  
     const transaction = await sequelize.transaction();
@@ -28,7 +28,7 @@ class PemasukanService {
     }
   }  
   
-  static async getAll(start_date = null, end_date = null) {  
+  static async getAll(start_date = null, end_date = null, kategori_pemasukan_id, cash_or_non) {  
     const whereClause = {
       is_deleted: false
     };
@@ -37,6 +37,14 @@ class PemasukanService {
       whereClause.tanggal = {
         [Op.between]: [start_date, end_date]
       };
+    }
+
+    if (kategori_pemasukan_id) {
+      whereClause.kategori_pemasukan_id = kategori_pemasukan_id;
+    }
+
+    if (cash_or_non) {
+      whereClause.cash_or_non = cash_or_non;
     }
 
     const pemasukans = await Pemasukan.findAll({
@@ -383,9 +391,31 @@ class PemasukanService {
   static async delete(id) {  
     const pemasukan = await Pemasukan.findByPk(id);  
     if (!pemasukan) return null;  
-    await pemasukan.update({ is_deleted: true });  
+    await DeskripsiPemasukanService.delete(id);
+    await pemasukan.destroy();  
     return true;  
   }  
+
+  static async exportToExcel(startDate, endDate, kategori_pemasukan_id, cash_or_non) {
+    const result = await this.getAll(startDate, endDate, kategori_pemasukan_id, cash_or_non);
+
+    const data = result.map(item => ({
+      nomor: item.pemasukan_id,
+      tanggal: item.tanggal,
+      deskripsi_pemasukan: item.deskripsi_pemasukan
+      .map(d => d.deskripsi)
+      .join(', '),
+      kategori_pemasukan: item.kategori_pemasukan,
+      cash_or_non: item.metode ?? "Cash",
+      pemasukan: `Rp${item.total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`
+    }));
+
+    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Pemasukan');
+
+    return workbook;
+  }
 }  
   
 module.exports = PemasukanService;

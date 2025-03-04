@@ -204,13 +204,15 @@ class TokoController {
       }  
       if (req.file) {  
         // Delete the old image file  
-        const oldImagePath = path.join(__dirname, "../public/toko", user.image);  
-        fs.unlink(oldImagePath, (err) => {  
-          if (err) {  
-            console.error("Failed to delete old image:", err);  
-          }  
-        });  
-        tokoData.image = req.file.filename;  
+        if (user.image) {  
+          const oldImagePath = path.join(__dirname, "../public/toko", user.image);  
+          fs.unlink(oldImagePath, (err) => {  
+            if (err) {  
+              console.error("Failed to delete old image:", err);  
+            }  
+          });  
+        }  
+        tokoData.image = req.file.filename; 
       }
       const toko = await TokoService.update(req.params.id, tokoData);  
       if (!toko) {  

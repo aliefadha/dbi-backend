@@ -92,10 +92,11 @@ class DeskripsiPemasukanService {
   }
   
   static async delete(id) {  
-    const deskripsiPemasukan = await DeskripsiPemasukan.findByPk(id);  
-    if (!deskripsiPemasukan) return null;  
-    await deskripsiPemasukan.update({ is_deleted: true });  
-    return true;  
+    return await DeskripsiPemasukan.destroy({
+      where: {
+        pemasukan_id: id
+      }
+    }) 
   }  
 }  
   

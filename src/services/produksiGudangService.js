@@ -13,14 +13,17 @@ class ProduksiGudangService {
   static async create(data) {
     const transaction = await sequelize.transaction();
     try {
-      const { jumlah_produksi, total_menit, image, tanggal, karyawan_id, produk } = data;
+      const { jumlah_produksi, total_menit, image, tanggal, karyawan_id, produk, lng, lat } = data;
 
       const produksi = await ProduksiGudang.create({
         jumlah_produksi,
         total_menit,
         image,
         tanggal,
-        karyawan_id
+        karyawan_id,
+        lng,
+        lat,
+        gmaps: `https://www.google.com/maps/place/?q=${lat},${lng}`
       }, { transaction });
 
       if (produk && produk.length > 0) {
@@ -214,6 +217,9 @@ class ProduksiGudangService {
           total_menit: produksiGudang.total_menit,
           status: status,
           gaji_pokok_perhari: gajiPokokPerhari,
+          lng: produksiGudang.lng,
+          lat: produksiGudang.lat,
+          gmaps: produksiGudang.gmaps
         }, { transaction });
 
         await produksiGudang.update({

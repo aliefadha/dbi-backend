@@ -29,6 +29,7 @@ app.use('/images-packaging-gudang', express.static(path.join(__dirname, 'public/
 app.use('/images-barang-handmade', express.static(path.join(__dirname, 'public/barangHandmade')));
 app.use('/images-barang-mentah', express.static(path.join(__dirname, 'public/barangMentah')));
 app.use('/images-toko', express.static(path.join(__dirname, 'public/toko')));
+app.use('/images-produksi-gudang', express.static(path.join(__dirname, 'public/produksiGudang')));
 app.use('/images-authentication', express.static(path.join(__dirname, 'public/authentication')));
 
 const corsOptions = {
@@ -82,7 +83,7 @@ watchRoutes(app);
 // Define the login route explicitly
 app.post('/api/login', AuthenticationController.login);
 
-app.use('/api', checkBlacklist, authenticateToken); 
+// app.use('/api', checkBlacklist, authenticateToken); 
 //Error Handling
 app.use(errorHandler);
 

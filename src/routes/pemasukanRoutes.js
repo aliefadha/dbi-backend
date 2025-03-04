@@ -4,6 +4,7 @@ const PemasukanController = require('../controllers/pemasukanController');
 
 router.post('/pemasukan', PemasukanController.create);  
 router.get('/pemasukan', PemasukanController.getAll);
+router.get('/pemasukan/export', PemasukanController.export);
 router.get('/pemasukan/kategori/:kategori_id', PemasukanController.getByKategori);
 router.get('/pemasukan/toko/:toko_id', PemasukanController.getByToko);
 router.get('/pemasukan/cash/:is_cash', PemasukanController.getByCashOrNon);

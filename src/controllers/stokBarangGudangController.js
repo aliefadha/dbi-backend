@@ -1,5 +1,5 @@
 const StokBarangGudangService = require("../services/stokBarangGudangService");  
-  
+const XLSX = require('xlsx');
 class StokBarangGudangController {  
   static async create(req, res) {  
     try {  
@@ -20,7 +20,8 @@ class StokBarangGudangController {
   
   static async getAll(req, res) {  
     try {  
-      const stokBarangGudangs = await StokBarangGudangService.getAll();  
+      const { kategori_barang_id, jenis_barang_id } = req.query;
+      const stokBarangGudangs = await StokBarangGudangService.getAll(kategori_barang_id, jenis_barang_id);  
       res.status(200).json({  
         success: true,  
         data: stokBarangGudangs,  
@@ -106,6 +107,24 @@ class StokBarangGudangController {
       });  
     }  
   }  
+
+  static async export(req, res) {
+    try {
+      const { kategori_barang_id, jenis_barang_id } = req.query;
+      const workbook = await StokBarangGudangService.exportToExcel(kategori_barang_id, jenis_barang_id);
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', 'attachment; filename=stok_barang_gudang.xlsx');
+      const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+      res.send(buffer);
+    } catch (error) {
+      console.error('Error exporting to Excel:', error);
+      res.status(500).json({
+        success: false,
+        data: null,
+        message: error.message
+      });
+    }
+  }
 }  
   
 module.exports = StokBarangGudangController;  

@@ -94,8 +94,8 @@ class KaryawanController {
                     message: "Karyawan not found"  
                 });  
             }  
-  
-            const updatedData = { ...req.body };  
+            const hashPassword = bcrypt.hashSync(req.body.password, 10);
+            const updatedData = { ...req.body, password: hashPassword };  
   
             // Check if a new file is uploaded  
             if (req.file) {  
@@ -211,7 +211,6 @@ class KaryawanController {
             const hashPassword = bcrypt.hashSync(req.body.password, 10);
             const karyawanData = {
                 ...req.body,
-                image: req.file.filename,
                 password: hashPassword
             }
             if (req.file) {  
@@ -263,8 +262,8 @@ class KaryawanController {
 
     static async getTerbaik(req, res) {
         try {
-            const { toko_id, bulan, tahun } = req.query;
-            const karyawan = await KaryawanService.getTerbaik(toko_id, bulan, tahun);
+            const { toko_id, cabang, bulan, tahun } = req.query;
+            const karyawan = await KaryawanService.getTerbaik(toko_id, cabang, bulan, tahun);
             res.status(200).json({
                 success: true,
                 data: karyawan,

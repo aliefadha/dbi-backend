@@ -4,6 +4,7 @@ const PengeluaranController = require('../controllers/pengeluaranController');
 
 router.post('/pengeluaran', PengeluaranController.create);  
 router.get('/pengeluaran', PengeluaranController.getAll);  
+router.get('/pengeluaran/export', PengeluaranController.export);
 router.get('/pengeluaran/kategori/:kategori_id', PengeluaranController.getByKategori);
 router.get('/pengeluaran/toko/:toko_id', PengeluaranController.getByToko);
 router.get('/pengeluaran/:id', PengeluaranController.getById);  
