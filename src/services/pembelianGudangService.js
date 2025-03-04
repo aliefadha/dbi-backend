@@ -49,7 +49,8 @@ class PembelianGudangService {
           as: "metode_pembelian",
           attributes: ["nama_metode"],
         }
-      ]
+      ],
+      order: [["tanggal", "DESC"]]
     });
 
     const transformedData = await Promise.all(data.map(async (pembelian) => {
