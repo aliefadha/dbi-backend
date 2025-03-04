@@ -238,15 +238,20 @@ class TokoController {
 
   static async tokoTerlaris(req, res) {
     try {
-      const {startDate, endDate} = req.query;
-      const tokoId = await TokoService.tokoTerlaris(startDate, endDate);
-      if (!tokoId) {
-        return res.status(404).json({
-          success: false,
-          data: null,
-          message: "Toko not found",
-        });
+      const {toko_id, startDate, endDate} = req.query;
+      
+      if (toko_id) {
+        const existingToko = await TokoService.getById(toko_id);
+        if (!existingToko) {
+          return res.status(404).json({
+            success: false,
+            data: null,
+            message: "Toko not found",
+          });
+        }
       }
+
+      const tokoId = await TokoService.tokoTerlaris(toko_id, startDate, endDate);
       res.status(200).json({
         success: true,
         data: tokoId,
@@ -262,4 +267,4 @@ class TokoController {
   }
 }  
   
-module.exports = {TokoController, upload};  
+module.exports = {TokoController, upload};

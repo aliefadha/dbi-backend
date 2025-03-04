@@ -1,3 +1,4 @@
+const CabangService = require("../services/cabangService");
 const LaporanKeuanganService = require("../services/laporanKeuanganService");
 const XLSX = require('xlsx');
 class LaporanKeuanganController {
@@ -20,12 +21,15 @@ class LaporanKeuanganController {
   }
  
   static async getAll(req, res) {
-    const { toko_id, startDate, endDate, kategori_pemasukan_id, kategori_pengeluaran_id} = req.query;
+    const { toko_id, cabang_id, startDate, endDate, kategori_pemasukan_id, kategori_pengeluaran_id} = req.query;
     try {
+      if (toko_id && cabang_id) {
+        await CabangService.cabangCheck(toko_id, cabang_id);
+      }
+
       const laporanKeuangans = await (toko_id == 1
         ? LaporanKeuanganService.getGudang(startDate, endDate, kategori_pemasukan_id, kategori_pengeluaran_id)
-        : LaporanKeuanganService.getAll(toko_id, startDate, endDate, kategori_pemasukan_id, kategori_pengeluaran_id));
-
+        : LaporanKeuanganService.getAll(toko_id, cabang_id, startDate, endDate, kategori_pemasukan_id, kategori_pengeluaran_id));
       res.status(200).json({
         success: true,
         data: laporanKeuangans,
@@ -42,11 +46,15 @@ class LaporanKeuanganController {
   }
 
   static async getPemasukan(req, res) {
-    const { toko_id, startDate, endDate } = req.query;
+    const { toko_id, cabang_id, startDate, endDate } = req.query;
     try {
+      if (toko_id && cabang_id) {
+        await CabangService.cabangCheck(toko_id, cabang_id);
+      }
+
       const laporanKeuangans = await (toko_id == 1
        ? LaporanKeuanganService.getPemasukanGudang(startDate, endDate)
-       : LaporanKeuanganService.getAllPemasukan(toko_id, startDate, endDate));
+       : LaporanKeuanganService.getAllPemasukan(toko_id, cabang_id, startDate, endDate));
       res.status(200).json({
         success: true,
         data: laporanKeuangans,
@@ -62,11 +70,15 @@ class LaporanKeuanganController {
   }
 
   static async getPengeluaran(req, res) {
-    const { toko_id, startDate, endDate } = req.query;
+    const { toko_id, cabang_id, startDate, endDate } = req.query;
     try {
+      if (toko_id && cabang_id) {
+        await CabangService.cabangCheck(toko_id, cabang_id);
+      }
+
       const laporanKeuangans = await (toko_id == 1
       ? LaporanKeuanganService.getPengeluaranGudang(startDate, endDate)
-      : LaporanKeuanganService.getAllPengeluaran(toko_id, startDate, endDate));
+      : LaporanKeuanganService.getAllPengeluaran(toko_id, cabang_id, startDate, endDate));
       res.status(200).json({
         success: true,
         data: laporanKeuangans,

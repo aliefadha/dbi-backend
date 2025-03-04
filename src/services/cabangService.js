@@ -77,7 +77,21 @@ class CabangService {
     if (!cabang) return null;  
     await cabang.destroy();  
     return true;  
-  }  
-}  
+  }
   
+  static async cabangCheck(cabang_id, toko_id) {
+    const cabang = await Cabang.findOne({
+      where: {
+        toko_id: toko_id,
+        cabang_id: cabang_id,
+        is_deleted: false
+      }
+    })
+    if (!cabang) {
+      throw new Error("Cabang not found");
+    }
+    return cabang;
+  }
+
+}  
 module.exports = CabangService;  
