@@ -66,7 +66,7 @@ class KaryawanService {
     }
     static async create(data) {
         try {
-            if(data.cabangId){
+            if(data.cabang_id){
                 const cabangIdFirst = data.cabang_id;
                 data.cabang_id_first = cabangIdFirst;
             }
@@ -120,7 +120,7 @@ class KaryawanService {
     }
 
     static async getTerbaik(toko_id, cabang, bulan, tahun) {
-        const result = await AbsensiKaryawanService.getAll(bulan, cabang, tahun, toko_id);
+        const result = await AbsensiKaryawanService.getAll(bulan, tahun, toko_id, cabang);
         const data = result.map((item) => ({
             karyawan_id: item.karyawan.karyawan_id,
             nama_karyawan: item.karyawan.nama_karyawan,
