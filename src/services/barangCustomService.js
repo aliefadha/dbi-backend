@@ -52,9 +52,9 @@ class BarangCustomService {
   
   static async delete(id) {  
     const barangCustom = await BarangCustom.findByPk(id);  
-    if (!barangCustom) return null;  
-    await barangCustom.destroy();  
-    return true;  
+    if (!barangCustom) return null;
+    await barangCustom.update({ is_deleted: true }); 
+    return true;    
   }  
 }  
   
