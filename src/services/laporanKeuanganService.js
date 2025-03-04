@@ -1476,6 +1476,7 @@ class LaporanKeuanganService {
     ];
 
     // Format pemasukan data dengan Rupiah
+    if(result.pemasukan == null) result.pemasukan = [];
     const pemasukanData = result.pemasukan.map(item => [
         item.pemasukan_id ?? item.penjualan_id,
         item.tanggal,
@@ -1486,6 +1487,7 @@ class LaporanKeuanganService {
     ]);
   
     // Format pengeluaran data dengan Rupiah
+    if(result.pengeluaran == null) result.pengeluaran = [];
     const pengeluaranData = result.pengeluaran.map(item => [
         item.pengeluaran_id ?? item.pembelian_id,
         item.tanggal,
