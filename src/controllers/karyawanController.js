@@ -211,7 +211,6 @@ class KaryawanController {
             const hashPassword = bcrypt.hashSync(req.body.password, 10);
             const karyawanData = {
                 ...req.body,
-                image: req.file.filename,
                 password: hashPassword
             }
             if (req.file) {  

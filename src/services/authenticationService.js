@@ -137,11 +137,23 @@ class AuthenticationService {
   }
 
   static async update(id, data) {
-    const authentication = await Authentication.findByPk(id);
-    if (!authentication) return null;
-    Object.assign(authentication, data);
-    await authentication.save();
-    return authentication;
+    try {
+        const authentication = await Authentication.findByPk(id);
+        if (!authentication) return null;
+        if (data.email) {
+            const existingUser = await Authentication.findOne({ where: { email: data.email } });
+            // return existingUser;
+            if (existingUser && existingUser.authentication_id != id) {
+                throw new Error('Email already exists');
+            }
+        }
+
+        Object.assign(authentication, data);
+        await authentication.save();
+        return authentication;
+    } catch (error) {
+        throw error;
+    }
   }
 }  
   

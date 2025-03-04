@@ -85,12 +85,14 @@ class AuthenticationController {
         password: hashPassword
       }
       if (req.file) {
-        const oldImage = path.join(__dirname, "../public/authentication/" + user.image);
-        fs.unlink(oldImage, (err) => {
-          if (err) {
-            console.log("Failed to delete old image:", err);
-          }
-        });
+        if(user.image!==null) {
+          const oldImage = path.join(__dirname, "../public/authentication/" + user.image);
+          fs.unlink(oldImage, (err) => {
+            if (err) {
+              console.log("Failed to delete old image:", err);
+            }
+          }); 
+        }
         authData.image = req.file.filename;
       }
       const authentication = await AuthenticationService.update(req.params.id, authData);

@@ -80,13 +80,23 @@ class KaryawanService {
         }    
     }
     static async update(id, data) {
-        const karyawan = await Karyawan.findByPk(id);
-        if (!karyawan) return null;
-
-        Object.assign(karyawan, data);
-        await karyawan.save();
-
-        return karyawan;
+        try {
+            const karyawan = await Karyawan.findByPk(id);
+            if (!karyawan) return null;
+            if (data.email) {
+                const existingUser = await Karyawan.findOne({ where: { email: data.email } });
+                if (existingUser && existingUser.karyawan_id != id) {
+                    throw new Error('Email already exists');
+                }
+            }
+            Object.assign(karyawan, data);
+            await karyawan.save();
+    
+            return karyawan;
+        }
+        catch (error) {
+            throw error;
+        }
     }
     static async delete(id) {
         return await Karyawan.destroy({ where: { karyawan_id: id } });
