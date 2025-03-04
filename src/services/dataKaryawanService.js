@@ -113,7 +113,8 @@ class DataKaryawanService {
         const totalGajiAkhir = totalGajiPokok + totalBonusDiterima;
 
         const roundedTotalPersentaseTercapai = parseFloat(totalPersentaseTercapai.toFixed(2));
-        const roundedTotalGajiAkhir = Math.round(totalGajiAkhir);
+        const roundedTotalGajiAkhir = Math.round(totalGajiAkhir / 1000) * 1000;
+        const roundedTotalBonusDiterima = Math.round(totalBonusDiterima / 1000) * 1000;    
 
         return {  
             karyawan,  
@@ -123,7 +124,7 @@ class DataKaryawanService {
             totalGajiPokok,
             totalMenit,
             totalPersentaseTercapai: roundedTotalPersentaseTercapai,
-            totalBonusDiterima,
+            totalBonusDiterima: roundedTotalBonusDiterima,
             totalGajiAkhir: roundedTotalGajiAkhir
         };
     }
@@ -197,15 +198,15 @@ class DataKaryawanService {
             if (kpi.waktu === 'Harian') {  
                 tidakTercapai = Math.max(0, totalDaysInMonth - tercapai);
                 persentaseTercapai = (kpi.persentase / totalDaysInMonth) * tercapai;  
-                bonusDiterima = (persentaseTercapai / kpi.persentase) * bonus; // Adjusted bonus calculation  
+                bonusDiterima = (persentaseTercapai / 100) * bonus; // Adjusted bonus calculation  
             } else if (kpi.waktu === 'Mingguan') {  
                 tidakTercapai = Math.max(0, 4 - tercapai);  
                 persentaseTercapai = (kpi.persentase / 4) * tercapai;  
-                bonusDiterima = (persentaseTercapai / kpi.persentase) * bonus; // Adjusted bonus calculation  
+                bonusDiterima = (persentaseTercapai / 100) * bonus; // Adjusted bonus calculation  
             } else if (kpi.waktu === 'Bulanan') {  
                 tidakTercapai = Math.max(0, 1 - tercapai);  
                 persentaseTercapai = (kpi.persentase / 1) * tercapai;  
-                bonusDiterima = (persentaseTercapai / kpi.persentase) * bonus; // Adjusted bonus calculation  
+                bonusDiterima = (persentaseTercapai / 100) * bonus; // Adjusted bonus calculation  
             }  
     
             // Store the calculated values back into the kpi object  
@@ -223,8 +224,8 @@ class DataKaryawanService {
         const result = Object.values(groupedKpi);  
         return {    
             result,    
-            totalPersentaseTercapai,    
-            totalBonusDiterima,    
+            totalPersentaseTercapai: parseFloat(totalPersentaseTercapai.toFixed(2)),    
+            totalBonusDiterima: Math.round(totalBonusDiterima / 1000) * 1000, 
         };    
     }
 
