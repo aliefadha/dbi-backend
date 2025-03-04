@@ -146,6 +146,27 @@ class ProdukPenjualanController {
         });  
       } 
     }
+
+    static async getAllTerlarisByCabang(req, res) {
+      try {  
+        const { cabang_id, startDate, endDate } = req.query;
+        const produkTerlaris = cabang_id == 1 
+          ? await ProdukPenjualanGudangService.getAllTerlaris(startDate, endDate)
+          : await ProdukPenjualanService.getAllTerlarisByCabang(cabang_id, startDate, endDate);
+        
+        res.status(200).json({  
+          success: true,  
+          data: produkTerlaris,  
+          message: "retrieved successfully",  
+        });  
+      } catch (error) {  
+        res.status(500).json({  
+          success: false,  
+          data: null,  
+          message: error.message,  
+        });  
+      } 
+    }
 }  
   
 module.exports = ProdukPenjualanController;

@@ -140,9 +140,8 @@ class PembelianService {
   
   static async delete(id) {  
     const pembelian = await Pembelian.findByPk(id);  
-    if (!pembelian) return null;  
-    await ProdukPembelianService.delete(id);
-    await pembelian.destroy();  
+    if (!pembelian) return null;
+    await pembelian.update({ is_deleted: true }); 
     return true;  
   }  
 }  

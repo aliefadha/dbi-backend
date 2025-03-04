@@ -1,3 +1,4 @@
+const Cabang = require("../models/cabang");
 const Toko = require("../models/toko");
 const LaporanKeuanganService = require("./laporanKeuanganService");
 
@@ -62,48 +63,112 @@ class TokoService {
     return true;
   }
 
-  static async tokoTerlaris(startDate, endDate) {
-    const tokoId = await Toko.findAll({
-      attributes: ['toko_id', 'nama_toko'],
-      where: {
-        is_deleted: false
-      },
-      raw: true,
-    });
+  static async tokoTerlaris(toko_id = null, startDate, endDate) {
+    let tokoId;
+    
+    if (!toko_id) {
+      tokoId = await Toko.findAll({
+        attributes: ['toko_id', 'nama_toko'],
+        where: {
+          is_deleted: false
+        },
+        raw: true,
+      });
+    } else {
+      tokoId = await Toko.findAll({
+        attributes: ['toko_id', 'nama_toko'],
+        where: {
+          toko_id: toko_id,
+          is_deleted: false
+        },
+        raw: true,
+      });
+    }
 
-    const tokoIdArray = tokoId.map(item => ({ toko_id: item.toko_id, nama_toko: item.nama_toko }));
+    if (!tokoId || tokoId.length === 0) {
+      throw new Error("No toko found");
+    }
+
     const laporanPerToko = await Promise.all(
-      tokoIdArray.map(async (toko) => {
-        const laporan = toko.toko_id === 1 
-          ? await LaporanKeuanganService.getGudang(startDate, endDate)
-          : await LaporanKeuanganService.getAll(toko.toko_id, startDate, endDate);
+      tokoId.map(async (toko) => {
+        if (toko.toko_id === 1) {
+          const laporan = await LaporanKeuanganService.getGudang(startDate, endDate);
+          return {
+            toko_id: toko.toko_id,
+            nama_toko: toko.nama_toko,
+            keuntungan: laporan.keuntungan,
+            total_pemasukan: laporan.total_pemasukan,
+            total_pengeluaran: laporan.total_pengeluaran,
+            produk_terjual: laporan.produk_terjual
+          };
+        } else {
+          const cabangList = await Cabang.findAll({
+            where: {
+              toko_id: toko.toko_id,
+              is_deleted: false
+            },
+            raw: true
+          });
 
-        return {
-          toko_id: toko.toko_id,
-          nama_toko: toko.nama_toko,
-          keuntungan: laporan.keuntungan,
-          total_pemasukan: laporan.total_pemasukan,
-          total_pengeluaran: laporan.total_pengeluaran,
-          produk_terjual: laporan.produk_terjual
-        };
+          const cabangReports = await Promise.all(
+            cabangList.map(async (cabang) => {
+              const laporan = await LaporanKeuanganService.getAll(toko.toko_id, cabang.cabang_id, startDate, endDate);
+              return {
+                cabang_id: cabang.cabang_id,
+                nama_cabang: cabang.nama_cabang,
+                keuntungan: laporan.keuntungan,
+                total_pemasukan: laporan.total_pemasukan,
+                total_pengeluaran: laporan.total_pengeluaran,
+                produk_terjual: laporan.produk_terjual
+              };
+            })
+          );
+          
+          const totalKeuntungan = cabangReports.reduce((sum, curr) => sum + (curr.keuntungan || 0), 0);
+          const totalPemasukan = cabangReports.reduce((sum, curr) => sum + (curr.total_pemasukan || 0), 0);
+          const totalPengeluaran = cabangReports.reduce((sum, curr) => sum + (curr.total_pengeluaran || 0), 0);
+          const totalProduk = cabangReports.reduce((sum, curr) => sum + (curr.produk_terjual || 0), 0);
+
+          return {
+            toko_id: toko.toko_id,
+            nama_toko: toko.nama_toko,
+            keuntungan: totalKeuntungan,
+            total_pemasukan: totalPemasukan,
+            total_pengeluaran: totalPengeluaran,
+            produk_terjual: totalProduk,
+            cabang: cabangReports
+          };
+        }
       })
     );
 
     // Get top performer for each category
-    const topPemasukan = laporanPerToko.reduce((max, curr) =>
-      curr.total_pemasukan > max.total_pemasukan ? curr : max
+    const allData = toko_id ? 
+      laporanPerToko[0]?.cabang || [] : 
+      laporanPerToko;
+
+    const topPemasukan = allData.reduce((max, curr) =>
+      curr.total_pemasukan > max.total_pemasukan ? curr : max, allData[0]
     );
-    const topKeuntungan = laporanPerToko.reduce((max, curr) =>
-      curr.keuntungan > max.keuntungan ? curr : max
+    const topKeuntungan = allData.reduce((max, curr) =>
+      curr.keuntungan > max.keuntungan ? curr : max, allData[0]
     );
-    const topPengeluaran = laporanPerToko.reduce((max, curr) =>
-      curr.total_pengeluaran > max.total_pengeluaran ? curr : max
+    const topPengeluaran = allData.reduce((max, curr) =>
+      curr.total_pengeluaran > max.total_pengeluaran ? curr : max, allData[0]
     );
-    const topProduk = laporanPerToko.reduce((max, curr) =>
-      curr.produk_terjual > max.produk_terjual ? curr : max
+    const topProduk = allData.reduce((max, curr) =>
+      curr.produk_terjual > max.produk_terjual ? curr : max, allData[0]
     );
 
-    return {
+    return toko_id ? {
+      toko: laporanPerToko[0],
+      cabang_terlaris: {
+        pemasukan_tertinggi: topPemasukan,
+        keuntungan_tertinggi: topKeuntungan,
+        pengeluaran_tertinggi: topPengeluaran,
+        penjualan_terbanyak: topProduk
+      }
+    } : {
       toko: laporanPerToko,
       toko_terlaris: {
         pemasukan_tertinggi: topPemasukan,

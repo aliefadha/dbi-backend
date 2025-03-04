@@ -60,7 +60,7 @@ class LaporanKeuanganService {
     return kategori;
   }
 
-  static async getAll(toko_id = null, startDate = null, endDate = null, kategori_pemasukan_id = null, kategori_pengeluaran_id = null) {
+  static async getAll(toko_id = null, cabang_id = null, startDate = null, endDate = null, kategori_pemasukan_id = null, kategori_pengeluaran_id = null) {
     const whereClause = {
       is_deleted: false
     };
@@ -114,7 +114,12 @@ class LaporanKeuanganService {
         {
           model: Cabang,
           as: 'cabang',
-          attributes: ["nama_cabang"]
+          attributes: ["nama_cabang"],
+          ...(cabang_id && {
+            where: {
+              cabang_id: cabang_id
+            }
+          })
         },
       ],
       raw: true,
@@ -188,7 +193,12 @@ class LaporanKeuanganService {
             {
               model: Cabang,
               as: 'cabang',
-              attributes: ["nama_cabang"]
+              attributes: ["nama_cabang"],
+              ...(cabang_id && {
+                where: {
+                  cabang_id: cabang_id
+                }
+              })
             }
           ],
           raw: true,
@@ -289,7 +299,12 @@ class LaporanKeuanganService {
         {
           model: Cabang,
           as: 'cabang',
-          attributes: ["nama_cabang"]
+          attributes: ["nama_cabang"],
+          ...(cabang_id && {
+            where: {
+              cabang_id: cabang_id
+            }
+          })
         },
       ],
       raw: true,
@@ -363,7 +378,12 @@ class LaporanKeuanganService {
             {
               model: Cabang,
               as: 'cabang',
-              attributes: ["nama_cabang"]
+              attributes: ["nama_cabang"],
+              ...(cabang_id && {
+                where: {
+                  cabang_id: cabang_id
+                }
+              })
             }
           ],
           raw: true,
@@ -454,6 +474,11 @@ class LaporanKeuanganService {
               model: Cabang,
               as: 'cabang',
               attributes: ["nama_cabang"],
+              ...(cabang_id && {
+                where: {
+                  cabang_id: cabang_id
+                }
+              })
             }
           ]
         },
@@ -841,7 +866,7 @@ class LaporanKeuanganService {
     return laporan
   }
 
-  static async getAllPemasukan(toko_id = null, startDate = null, endDate = null) {
+  static async getAllPemasukan(toko_id = null, cabang_id = null, startDate = null, endDate = null) {
     const whereClause = {
       is_deleted: false
     };
@@ -880,7 +905,10 @@ class LaporanKeuanganService {
         {
           model: Cabang,
           as: 'cabang',
-          attributes: ["nama_cabang"]
+          attributes: ["nama_cabang"],
+          ...(cabang_id && {
+            where: { cabang_id: cabang_id }
+          })
         },
       ],
       raw: true,
@@ -944,7 +972,10 @@ class LaporanKeuanganService {
           {
             model: Cabang,
             as: 'cabang',
-            attributes: ["nama_cabang"]
+            attributes: ["nama_cabang"],
+            ...(cabang_id && {
+              where: { cabang_id: cabang_id }
+            })
           }
         ],
         raw: true,
@@ -1100,7 +1131,7 @@ class LaporanKeuanganService {
     };
   }
 
-  static async getAllPengeluaran(toko_id = null, startDate = null, endDate = null) {
+  static async getAllPengeluaran(toko_id = null, cabang_id = null, startDate = null, endDate = null) {
     const whereClause = {
       is_deleted: false
     };
@@ -1144,7 +1175,10 @@ class LaporanKeuanganService {
         {
           model: Cabang,
           as: 'cabang',
-          attributes: ["nama_cabang"]
+          attributes: ["nama_cabang"],
+          ...(cabang_id && {
+            where: { cabang_id: cabang_id }
+          })
         },
       ],
       raw: true,
@@ -1208,7 +1242,10 @@ class LaporanKeuanganService {
           {
             model: Cabang,
             as: 'cabang',
-            attributes: ["nama_cabang"]
+            attributes: ["nama_cabang"],
+            ...(cabang_id && {
+              where: { cabang_id: cabang_id }
+            })
           }
         ],
         raw: true,
@@ -1252,6 +1289,9 @@ class LaporanKeuanganService {
               model: Cabang,
               as: 'cabang',
               attributes: ["nama_cabang"],
+              ...(cabang_id && {
+                where: { cabang_id: cabang_id }
+              })
             }
           ]
         },
@@ -1281,7 +1321,7 @@ class LaporanKeuanganService {
     ].reduce((total, amount) => total + amount, 0);
 
     return {
-      pengeluaran: [...transformedPengeluaran, ...transformedPembelian, transformedGaji].sort((a, b) =>
+      pengeluaran: [...transformedPengeluaran, ...transformedPembelian, ...transformedGaji].sort((a, b) =>
         new Date(b.tanggal) - new Date(a.tanggal)
       ),
       total_pengeluaran: totalPengeluaran,
