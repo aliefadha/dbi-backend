@@ -28,7 +28,7 @@ class PemasukanService {
     }
   }  
   
-  static async getAll(start_date = null, end_date = null) {  
+  static async getAll(start_date = null, end_date = null, kategori_pemasukan_id, cash_or_non) {  
     const whereClause = {
       is_deleted: false
     };
@@ -37,6 +37,14 @@ class PemasukanService {
       whereClause.tanggal = {
         [Op.between]: [start_date, end_date]
       };
+    }
+
+    if (kategori_pemasukan_id) {
+      whereClause.kategori_pemasukan_id = kategori_pemasukan_id;
+    }
+
+    if (cash_or_non) {
+      whereClause.cash_or_non = cash_or_non;
     }
 
     const pemasukans = await Pemasukan.findAll({
@@ -388,8 +396,8 @@ class PemasukanService {
     return true;  
   }  
 
-  static async exportToExcel(startDate, endDate) {
-    const result = await this.getAll(startDate, endDate);
+  static async exportToExcel(startDate, endDate, kategori_pemasukan_id, cash_or_non) {
+    const result = await this.getAll(startDate, endDate, kategori_pemasukan_id, cash_or_non);
 
     const data = result.map(item => ({
       nomor: item.pemasukan_id,

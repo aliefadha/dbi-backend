@@ -25,9 +25,9 @@ class PengeluaranController {
   }  
   
   static async getAll(req, res) { 
-    const { startDate, endDate } = req.query; 
+    const { startDate, endDate, kategori_pengeluaran_id, cash_or_non } = req.query; 
     try {  
-      const pengeluarans = await PengeluaranService.getAll(startDate, endDate);  
+      const pengeluarans = await PengeluaranService.getAll(startDate, endDate, kategori_pengeluaran_id, cash_or_non);  
       res.status(200).json({  
         success: true,  
         data: pengeluarans,  
@@ -166,8 +166,8 @@ class PengeluaranController {
 
   static async export(req, res) {  
     try {  
-      const { startDate, endDate } = req.query;  
-      const workbook = await PengeluaranService.exportToExcel(startDate, endDate);  
+      const { startDate, endDate, kategori_pengeluaran_id, cash_or_non } = req.query;  
+      const workbook = await PengeluaranService.exportToExcel(startDate, endDate, kategori_pengeluaran_id, cash_or_non);  
       res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");  
       res.setHeader("Content-Disposition", "attachment; filename=pengeluaran.xlsx");  
       const buffer = XLSX.write(workbook, { type: "buffer", bookType: "xlsx" });  
