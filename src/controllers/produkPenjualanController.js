@@ -167,6 +167,76 @@ class ProdukPenjualanController {
         });  
       } 
     }
+
+    static async getToptenByToko(req, res) {
+      try {
+        const { toko_id, startDate, endDate } = req.query;
+
+        if(toko_id == 1){
+          const produkTopten = await ProdukPenjualanGudangService.getTopTenTerlaris(
+            startDate? new Date(startDate) : null,
+            endDate? new Date(endDate) : null
+          );
+          return res.status(200).json({
+            success: true,
+            data: produkTopten,
+            message: "retrieved successfully",
+          });
+        }
+
+        const produkTopten = await ProdukPenjualanService.getTopTenTerlarisByToko(
+          toko_id,
+          startDate? new Date(startDate) : null,
+          endDate? new Date(endDate) : null
+        );
+        res.status(200).json({
+          success: true,
+          data: produkTopten,
+          message: "retrieved successfully",
+        });
+      } catch (error) {
+        res.status(500).json({
+          success: false,
+          data: null,
+          message: error.message,
+        });
+      }
+    }
+
+    static async getToptenByCabang(req, res) {
+      try {
+        const { cabang_id, startDate, endDate } = req.query;
+
+        if(cabang_id == 1){
+          const produkTopten = await ProdukPenjualanGudangService.getTopTenTerlaris(
+            startDate? new Date(startDate) : null,
+            endDate? new Date(endDate) : null
+          );
+          return res.status(200).json({
+            success: true,
+            data: produkTopten,
+            message: "retrieved successfully",
+          });
+        }
+
+        const produkTopten = await ProdukPenjualanService.getTopTenTerlarisByCabang(
+          cabang_id,
+          startDate? new Date(startDate) : null,
+          endDate? new Date(endDate) : null
+        );
+        res.status(200).json({
+          success: true,
+          data: produkTopten,
+          message: "retrieved successfully",
+        });
+      } catch (error) {
+        res.status(500).json({
+          success: false,
+          data: null,
+          message: error.message,
+        });
+      }
+    }
 }  
   
 module.exports = ProdukPenjualanController;

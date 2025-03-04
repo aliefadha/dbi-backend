@@ -6,9 +6,11 @@ router.post('/produk-penjualan', ProdukPenjualanController.create);
 router.get('/produk-penjualan', ProdukPenjualanController.getAll);  
 router.get('/produk-penjualan/toko/terlaris', ProdukPenjualanController.getAllTerlarisByToko);
 router.get('/produk-penjualan/cabang/terlaris', ProdukPenjualanController.getAllTerlarisByCabang);
+router.get('/produk-penjualan/toko/topten', ProdukPenjualanController.getToptenByToko);
+router.get('/produk-penjualan/cabang/topten', ProdukPenjualanController.getToptenByCabang);
 router.get('/produk-penjualan/terlaris', ProdukPenjualanController.getAllTerlaris);
 router.get('/produk-penjualan/:id', ProdukPenjualanController.getById);  
 router.put('/produk-penjualan/:id', ProdukPenjualanController.update);  
 router.delete('/produk-penjualan/:id', ProdukPenjualanController.delete);  
-  
+
 module.exports = router;  
