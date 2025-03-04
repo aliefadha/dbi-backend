@@ -13,7 +13,21 @@ class StokBarangGudangService {
     return await StokBarangGudang.create(data);  
   }  
   
-  static async getAll() {  
+  static async getAll(kategori_barang_id, jenis_barang_id) {  
+    const whereConditionsHandmade = {
+      is_deleted: false,
+    }
+    const whereConditionsNonHandmade = {
+      is_deleted: false,
+    }
+    if (kategori_barang_id) {
+      whereConditionsHandmade.kategori_barang_id = kategori_barang_id
+      whereConditionsNonHandmade.kategori_barang_id = kategori_barang_id
+    }
+    if (jenis_barang_id) {
+      whereConditionsHandmade.jenis_barang_id = jenis_barang_id
+      whereConditionsNonHandmade.jenis_barang_id = jenis_barang_id
+    }
     const stokBarangGudangList = await StokBarangGudang.findAll({
       where: {
         is_deleted: false
@@ -26,16 +40,20 @@ class StokBarangGudangService {
           model: BarangNonHandmadeGudang,
           as: "barang_nonhandmade",
           attributes: ["image", "barang_nonhandmade_id", "nama_barang", "harga_jual", "is_deleted"],
+          required: false,
+          where: whereConditionsNonHandmade,
           include: [
             {
               model: KategoriBarangGudang,
               as: "kategori",
-              attributes: ["nama_kategori_barang", "is_deleted"]
+              attributes: ["nama_kategori_barang", "is_deleted"],
+              required: false,
             },
             {
               model: JenisBarangGudang,
               as: "jenis",
-              attributes: ["nama_jenis_barang", "is_deleted"]
+              attributes: ["nama_jenis_barang", "is_deleted"],
+              required: false,
             }
           ]
         },
@@ -43,16 +61,20 @@ class StokBarangGudangService {
           model: BarangHandmadeGudang,
           as: "barang_handmade",
           attributes: ["image", "barang_handmade_id", "nama_barang", "harga_jual", "is_deleted"],
+          required: false,
+          where: whereConditionsHandmade,
           include: [
             {
               model: KategoriBarangGudang,
               as: "kategori",
-              attributes: ["nama_kategori_barang", "is_deleted"]
+              attributes: ["nama_kategori_barang", "is_deleted"],
+              required: false,
             },
             {
               model: JenisBarangGudang,
               as: "jenis",
-              attributes: ["nama_jenis_barang", "is_deleted"]
+              attributes: ["nama_jenis_barang", "is_deleted"],
+              required: false,
             }
           ]
         },
@@ -86,7 +108,9 @@ class StokBarangGudangService {
         barang,  
       };  
     });  
-    return response;  
+    const filteredResponse = response.filter(item => item.barang !== null);
+
+    return filteredResponse;
   }  
   
   static async getById(id) {  
@@ -150,8 +174,8 @@ class StokBarangGudangService {
     return true;  
   }  
 
-  static async exportToExcel() {
-    const result = await this.getAll();
+  static async exportToExcel(kategori_barang_id, jenis_barang_id) {
+    const result = await this.getAll(kategori_barang_id, jenis_barang_id);
     // console.log(result);
     const data = result.map((item) => ({
       ID: item.barang.barang_handmade_id || item.barang.barang_nonhandmade_id || item.barang.barang_mentah_id || item.barang.packaging_id,
