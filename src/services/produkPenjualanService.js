@@ -185,10 +185,24 @@ class ProdukPenjualanService {
   }
   
   static async delete(id) {  
-    const produkPenjualan = await ProdukPenjualan.findByPk(id);  
-    if (!produkPenjualan) return null;  
-    await produkPenjualan.update({ is_deleted: true });  
-    return true;  
+    const existingProduks = await ProdukPenjualan.findAll({
+      where: { penjualan_id: id }
+    })
+
+    for (const existingProduk of existingProduks) {
+      const { fieldName, fieldValue } = getFieldAndValue(existingProduk);
+      if (!fieldName) continue;
+
+      let stokEntry = await StokBarang.findOne({
+        where: { [fieldName]: fieldValue, cabang_id: existingProduk.cabang_id, is_deleted: false }
+      });
+
+      if (stokEntry) {
+        await stokEntry.increment('jumlah_stok', { by: existingProduk.kuantitas });
+      }
+
+      await existingProduk.destroy();
+    } 
   }  
 
   static async getAllByPenjualanId(penjualanId) {
