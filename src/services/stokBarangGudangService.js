@@ -82,11 +82,13 @@ class StokBarangGudangService {
           model: BarangMentah,
           as: "barang_mentah",
           attributes: ["image", "barang_mentah_id", "nama_barang", "harga_satuan", "is_deleted"],
+          required: false,
         },
         {
           model: PackagingGudang,
           as: "packaging",
-          attributes: ["image", "packaging_id", "nama_packaging", "ukuran", "harga_satuan"]
+          attributes: ["image", "packaging_id", "nama_packaging", "ukuran", "harga_satuan"],
+          required: false,
         },
       ]
     });  

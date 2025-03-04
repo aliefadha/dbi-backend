@@ -188,6 +188,7 @@ class PenjualanService {
   static async delete(id) {  
     const penjualan = await Penjualan.findByPk(id);  
     if (!penjualan) return null;  
+    await ProdukPenjualanService.delete(id);
     await penjualan.destroy();  
     return true;  
   }  

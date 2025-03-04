@@ -278,16 +278,28 @@ class ProdukPembelianService {
     }
 }
 
+  static async delete(id) { 
+    const existingProduks = await ProdukPembelian.findAll({
+        where: { pembelian_id: id }
+    });
 
+    // Delete produkPembelian and update stokBarang
+    for (const existingProduk of existingProduks) {
+        const { fieldName, fieldValue } = getFieldAndValue(existingProduk);
+        if (!fieldName) continue;
 
+        let stokEntry = await StokBarang.findOne({
+            where: { [fieldName]: fieldValue, cabang_id: existingProduk.cabang_id, is_deleted: false }
+        });
 
+        if (stokEntry) {
+            await stokEntry.decrement("jumlah_stok", {
+                by: existingProduk.kuantitas,
+            });
+        }
 
-  
-  static async delete(id) {  
-    const produkPembelian = await ProdukPembelian.findByPk(id);  
-    if (!produkPembelian) return null;  
-    await produkPembelian.destroy();  
-    return true;  
+        await existingProduk.destroy();
+    }  
   }  
 }  
 
