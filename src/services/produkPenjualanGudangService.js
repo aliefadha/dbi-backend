@@ -283,43 +283,48 @@ class ProdukPenjualanGudangService {
     const transaction = await sequelize.transaction();
 
     try {
-      const produkPenjualanGudang = await ProdukPenjualanGudang.findByPk(id);
-      if (!produkPenjualanGudang) return null;
-
-      const { packaging_id, barang_mentah_id, barang_handmade_id, barang_nonhandmade_id, kuantitas } = produkPenjualanGudang;
-
-      let fieldName, fieldValue;
-      if (packaging_id) {
-        fieldName = 'packaging_id';
-        fieldValue = packaging_id;
-      } else if (barang_mentah_id) {
-        fieldName = 'barang_mentah_id';
-        fieldValue = barang_mentah_id;
-      } else if (barang_handmade_id) {
-        fieldName = 'barang_handmade_id';
-        fieldValue = barang_handmade_id;
-      } else if (barang_nonhandmade_id) {
-        fieldName = 'barang_nonhandmade_id';
-        fieldValue = barang_nonhandmade_id;
-      }
-
-      // Return stock
-      const stockRecord = await StokBarangGudang.findOne({
-        where: {
-          [fieldName]: fieldValue,
-          is_deleted: false
-        },
-        transaction
+      const produkPenjualanGudangs = await ProdukPenjualanGudang.findAll({
+        where: { penjualan_id: id }
       });
+      if (!produkPenjualanGudangs) return null;
 
-      if (stockRecord) {
-        await stockRecord.increment('jumlah_stok', {
-          by: kuantitas,
-          transaction,
+      for (const produkPenjualanGudang of produkPenjualanGudangs) {
+        const { packaging_id, barang_mentah_id, barang_handmade_id, barang_nonhandmade_id, kuantitas } = produkPenjualanGudang;
+
+        let fieldName, fieldValue;
+        if (packaging_id) {
+          fieldName = 'packaging_id';
+          fieldValue = packaging_id;
+        } else if (barang_mentah_id) {
+          fieldName = 'barang_mentah_id';
+          fieldValue = barang_mentah_id;
+        } else if (barang_handmade_id) {
+          fieldName = 'barang_handmade_id';
+          fieldValue = barang_handmade_id;
+        } else if (barang_nonhandmade_id) {
+          fieldName = 'barang_nonhandmade_id';
+          fieldValue = barang_nonhandmade_id;
+        }
+
+        // Return stock
+        const stockRecord = await StokBarangGudang.findOne({
+          where: {
+            [fieldName]: fieldValue,
+            is_deleted: false
+          },
+          transaction
         });
+
+        if (stockRecord) {
+          await stockRecord.increment('jumlah_stok', {
+            by: kuantitas,
+            transaction,
+          });
+        }
+
+        await produkPenjualanGudang.destroy({ transaction });
       }
 
-      await produkPenjualanGudang.update({ is_deleted: true }, { transaction });
       await transaction.commit();
       return true;
     } catch (error) {

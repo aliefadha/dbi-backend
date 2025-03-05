@@ -178,8 +178,8 @@ class PenjualanGudangService {
   static async delete(id) {
     const penjualanGudang = await PenjualanGudang.findByPk(id);
     if (!penjualanGudang) return null;
-    await penjualanGudang.update({ is_deleted: true });
-    await penjualanGudang.save();
+    await ProdukPenjualanGudangService.delete(id);
+    await penjualanGudang.destroy();
     return true;
   }
 
