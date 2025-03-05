@@ -1,3 +1,4 @@
+const CabangService = require("../services/cabangService");
 const CustomIdGenerateService = require("../services/customIdGenerateService");
 const PenjualanService = require("../services/penjualanService");  
   
@@ -45,6 +46,36 @@ class PenjualanController {
   static async getById(req, res) {  
     try {  
       const penjualan = await PenjualanService.getById(req.params.id);  
+      if (!penjualan) {  
+        return res.status(404).json({  
+          success: false,  
+          data: null,  
+          message: "not found",  
+        });  
+      }  
+      res.status(200).json({  
+        success: true,  
+        data: penjualan,  
+        message: "retrieved successfully",  
+      });  
+    } catch (error) {  
+      res.status(500).json({  
+        success: false,  
+        data: null,  
+        message: error.message,  
+      });  
+    }  
+  }  
+
+  static async getTimeFrequencyToko(req, res) {  
+    try {  
+      const {toko_id, cabang_id, startDate, endDate} = req.query;
+
+      if (cabang_id) {
+        await CabangService.cabangCheck(cabang_id, toko_id);
+      }
+
+      const penjualan = await PenjualanService.getTimeFrequencyToko(toko_id, startDate, endDate, cabang_id);  
       if (!penjualan) {  
         return res.status(404).json({  
           success: false,  
@@ -277,4 +308,4 @@ class PenjualanController {
   }
   }  
 }
-module.exports = PenjualanController;  
+module.exports = PenjualanController;
