@@ -143,9 +143,24 @@ class ProdukPenjualanController {
     static async getAllTerlarisByKategoriToko(req, res) {
       try {  
         const { toko_id, startDate, endDate } = req.query;
-        const produkTerlaris = toko_id == 1 
-          ? await ProdukPenjualanGudangService.getAllTerlarisByKategori(startDate, endDate)
-          : await ProdukPenjualanService.getAllTerlarisByKategoriToko(toko_id, startDate, endDate);
+        let produkTerlaris = {};
+
+        if (toko_id === null || toko_id === undefined) {
+          const produkTerlarisGudang = await ProdukPenjualanGudangService.getAllTerlarisByKategori(startDate, endDate);
+          const produkTerlarisToko = await ProdukPenjualanService.getAllTerlarisByKategoriToko(null, startDate, endDate);
+
+          // Combine the results
+          produkTerlaris = { 
+            handmade: produkTerlarisGudang.handmade || produkTerlarisToko.handmade || null,
+            nonhandmade: produkTerlarisGudang.nonhandmade || produkTerlarisToko.nonhandmade || null,
+            mentah: produkTerlarisGudang.mentah || produkTerlarisToko.mentah || null,
+            packaging: produkTerlarisGudang.packaging || produkTerlarisToko.packaging || null
+          };
+        } else if (toko_id == 1) {
+          produkTerlaris = await ProdukPenjualanGudangService.getAllTerlarisByKategori(startDate, endDate);
+        } else {
+          produkTerlaris = await ProdukPenjualanService.getAllTerlarisByKategoriToko(toko_id, startDate, endDate);
+        }
         res.status(200).json({  
           success: true,  
           data: produkTerlaris,  
