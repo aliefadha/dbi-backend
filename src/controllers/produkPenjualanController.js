@@ -111,10 +111,21 @@ class ProdukPenjualanController {
   static async getAllTerlarisByToko(req, res) {
       try {  
         const { toko_id, startDate, endDate } = req.query;
-        const produkTerlaris = toko_id == 1 
-          ? await ProdukPenjualanGudangService.getAllTerlaris(startDate, endDate)
-          : await ProdukPenjualanService.getAllTerlarisByToko(toko_id, startDate, endDate);
-        
+        let produkTerlaris = [];
+
+        if (toko_id === null || toko_id === undefined) {
+            // Get data for both toko_id 
+            const produkTerlarisGudang = await ProdukPenjualanGudangService.getAllTerlaris(startDate, endDate);
+            const produkTerlarisToko = await ProdukPenjualanService.getAllTerlarisByToko(null, startDate, endDate);
+
+            // Combine the results
+            produkTerlaris = [...produkTerlarisGudang, ...produkTerlarisToko];
+        } else if (toko_id == 1) {
+            // Get data for toko_id 1
+            produkTerlaris = await ProdukPenjualanGudangService.getAllTerlaris(startDate, endDate);
+        } else {
+          produkTerlaris = await ProdukPenjualanService.getAllTerlarisByToko(toko_id, startDate, endDate);
+        }
         res.status(200).json({  
           success: true,  
           data: produkTerlaris,  
