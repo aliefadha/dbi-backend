@@ -83,7 +83,8 @@ class DataKaryawanService {
                 },  
                 tanggal_selesai: {  
                     [Op.gte]: startDate // End date should be greater than or equal to start of the month  
-                }  
+                },
+                status: 'Diterima'  
             }  
         });  
         let totalCutiDays = 0;  
