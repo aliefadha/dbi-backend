@@ -72,7 +72,7 @@ class AuthenticationService {
       let valid = await compare(password, user.password); // Await the comparison
       if(!valid) throw new Error("Invalid email or password");
       
-      return this.generateToken(user.cabang_id, user.toko_id, role, user.email, roleNamem, toko.image);
+      return this.generateToken(user.cabang_id, user.toko_id, role, user.email, roleName, toko.image);
     } // karyawan umum
     else if(role == 8){
       const roleName = "Karyawan Umum";
