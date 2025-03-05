@@ -99,9 +99,12 @@ class DataKaryawanService {
             const overlapEnd = cutiEnd > endDate ? endDate : cutiEnd;  
     
             // Calculate the number of overlapping days  
-            const cutiDays = Math.max(0, (overlapEnd - overlapStart) / (1000 * 60 * 60 * 24) ); // +1 to include the end day  
+            const cutiDays = Math.max(0, (overlapEnd - overlapStart) / (1000 * 60 * 60 * 24) + 1); // +1 to include the end day  
             totalCutiDays += cutiDays; // Accumulate the total cuti days  
         }  
+        const totalDaysInMonth = new Date(tahun, bulan, 0).getDate();
+        totalCutiDays = Math.min(totalCutiDays, totalDaysInMonth);
+
         totalCutiDays = Math.round(totalCutiDays);
 
         let tidakHadir = Math.max(0, 28 - totalCutiDays - kehadiran);
