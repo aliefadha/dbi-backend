@@ -595,7 +595,7 @@ class ProdukPenjualanService {
             attributes: ['nama_barang', 'image']
           }
         ],
-        group: ['barang_handmade_id', 'barang_handmade.nama_barang', 'barang_handmade.image']
+        group: ['nama_barang', 'image']
       }),
 
       // Get Non-Handmade products
@@ -616,7 +616,7 @@ class ProdukPenjualanService {
             attributes: ['nama_barang', 'image']
           }
         ],
-        group: ['barang_non_handmade_id', 'barang_non_handmade.nama_barang', 'barang_non_handmade.image']
+        group: ['nama_barang', 'image']
       }),
 
       // Get Custom products
@@ -637,7 +637,7 @@ class ProdukPenjualanService {
             attributes: ['nama_barang', 'image']
           }
         ],
-        group: ['barang_custom_id', 'barang_custom.nama_barang', 'barang_custom.image']
+        group: ['nama_barang', 'image']
       }),
 
       // Get Packaging
@@ -658,7 +658,7 @@ class ProdukPenjualanService {
             attributes: ['nama_packaging', 'image']
           }
         ],
-        group: ['packaging_id', 'packaging.nama_packaging', 'packaging.image']
+        group: ['nama_packaging', 'image']
       })
     ]);
 
@@ -1084,7 +1084,6 @@ class ProdukPenjualanService {
       .sort((a, b) => b.total_terjual - a.total_terjual)
       .slice(0, 10);
   }
-
 }
 
 // Helper function to determine field name and value dynamically
