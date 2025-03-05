@@ -7,6 +7,7 @@ const ProdukPenjualanService = require("./produkPenjualanService");
 const RincianBiayaCustomService = require("./rincianBiayaCustomService");
 const Cabang = require("../models/cabang");
 const Toko = require("../models/toko");
+const ProdukPenjualan = require("../models/produkPenjualan");
 require('dotenv').config();
   
 class PenjualanService {  
@@ -243,6 +244,153 @@ class PenjualanService {
   
     return this.generateInvoiceData(penjualan);
   }
+
+  static async getTimeFrequencyToko(toko_id, startDate, endDate, cabang_id) {
+      const whereConditions = {
+        toko_id,
+        tanggal: {
+          [Op.between]: [startDate, endDate]
+        },
+        is_deleted: false
+      };
+  
+      if (cabang_id) {
+        whereConditions.cabang_id = cabang_id;
+      }
+  
+      // Get hourly transaction counts with cabang info
+      const hourlyData = await Penjualan.findAll({
+        where: whereConditions,
+        attributes: [
+          [sequelize.fn('strftime', '%w', sequelize.col('Penjualan.tanggal')), 'day_number'],
+          [sequelize.fn('strftime', '%H', sequelize.col('Penjualan.tanggal')), 'hour'],
+          [sequelize.fn('COUNT', sequelize.col('Penjualan.penjualan_id')), 'transaction_count'],
+          [sequelize.fn('SUM', sequelize.col('Penjualan.total_penjualan')), 'total_sales'],
+          [sequelize.col('Penjualan.cabang_id'), 'cabang_id']
+        ],
+        include: [{
+          model: Cabang,
+          as: 'cabang',
+          attributes: ['nama_cabang']
+        }],
+        group: [
+          'Penjualan.cabang_id',
+          sequelize.fn('strftime', '%w', sequelize.col('Penjualan.tanggal')),
+          sequelize.fn('strftime', '%H', sequelize.col('Penjualan.tanggal'))
+        ],
+        order: [
+          [sequelize.col('Penjualan.cabang_id'), 'ASC'],
+          [sequelize.fn('strftime', '%w', sequelize.col('Penjualan.tanggal')), 'ASC'],
+          [sequelize.literal('transaction_count DESC')]
+        ],
+        raw: false
+      });
+  
+      // Get daily quantities with cabang info
+      const quantityData = await ProdukPenjualan.findAll({
+        attributes: [
+          [sequelize.fn('strftime', '%w', sequelize.col('penjualan.tanggal')), 'day_number'],
+          [sequelize.fn('SUM', sequelize.col('produk_penjualan.kuantitas')), 'total_quantity'],
+          [sequelize.col('penjualan.cabang_id'), 'cabang_id']
+        ],
+        include: [{
+          model: Penjualan,
+          as: 'penjualan',
+          attributes: [],
+          where: whereConditions
+        }],
+        group: [
+          'penjualan.cabang_id',
+          sequelize.fn('strftime', '%w', sequelize.col('penjualan.tanggal'))
+        ],
+        raw: true
+      });
+  
+      const dayNames = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+      const cabangPatterns = {};
+      
+      if (hourlyData.length === 0) {
+        return cabang_id ? [] : [];
+      }
+  
+      hourlyData.forEach(record => {
+        if (!record || !record.cabang) return;
+
+        const cabangId = record.get('cabang_id');
+        const cabangName = record.cabang?.nama_cabang || 'Unknown';
+        const dayNumber = record.get('day_number');
+        const hour = parseInt(record.get('hour')) || 0;
+        const count = parseInt(record.get('transaction_count')) || 0;
+        const sales = parseInt(record.get('total_sales')) || 0;
+
+        if (!cabangId || dayNumber === null || dayNumber === undefined) return;
+
+        if (!cabangPatterns[cabangId]) {
+          cabangPatterns[cabangId] = {
+            cabang_id: cabangId,
+            cabang_name: cabangName,
+            daily_stats: {}
+          };
+        }
+
+        if (!cabangPatterns[cabangId].daily_stats[dayNumber] || 
+            count > (cabangPatterns[cabangId].daily_stats[dayNumber]?.peak_count || 0)) {
+          cabangPatterns[cabangId].daily_stats[dayNumber] = {
+            day: dayNames[parseInt(dayNumber) || 0],
+            peak_hour_start: `${hour.toString().padStart(2, '0')}:00`,
+            peak_hour_end: `${hour.toString().padStart(2, '0')}:59`,
+            peak_count: count,
+            total_sales: sales,
+            total_quantity: 0
+          };
+        }
+      });
+  
+      // Add quantities to patterns
+      quantityData.forEach(record => {
+        if (!record) return;
+        
+        const cabangId = record.cabang_id;
+        const dayNumber = record.day_number;
+        if (cabangPatterns[cabangId]?.daily_stats?.[dayNumber]) {
+          cabangPatterns[cabangId].daily_stats[dayNumber].total_quantity = 
+            parseInt(record.total_quantity) || 0;
+        }
+      });
+  
+      if (cabang_id) {
+        // Return single cabang format
+        const cabangData = cabangPatterns[cabang_id];
+        if (!cabangData) return []; // Return empty array if no data found for cabang_id
+        
+        return Object.values(cabangData.daily_stats).map(day => ({
+          day: day.day,
+          peak_hour: {
+            start: day.peak_hour_start,
+            end: day.peak_hour_end,
+            transactions: day.peak_count
+          },
+          total_quantity: day.total_quantity,
+          total_sales: day.total_sales
+        }));
+      }
+  
+      // Return multi-cabang format
+      return Object.values(cabangPatterns).map(cabang => ({
+        cabang_id: cabang.cabang_id,
+        cabang_name: cabang.cabang_name,
+        daily_stats: Object.values(cabang.daily_stats).map(day => ({
+          day: day.day,
+          peak_hour: {
+            start: day.peak_hour_start,
+            end: day.peak_hour_end,
+            transactions: day.peak_count
+          },
+          total_quantity: day.total_quantity,
+          total_sales: day.total_sales
+        }))
+      }));
+    }
 }  
   
-module.exports = PenjualanService;  
+module.exports = PenjualanService;
