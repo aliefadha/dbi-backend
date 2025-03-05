@@ -183,6 +183,108 @@ class PenjualanGudangService {
     return true;
   }
 
+  static async getTimeFrequencyToko(startDate, endDate) {
+    if (!startDate || !endDate) {
+      throw new Error("startDate and endDate are required");
+    }
+
+    const whereConditions = {
+      tanggal: {
+        [Op.between]: [startDate, endDate]
+      },
+      is_deleted: false
+    };
+
+    // Get hourly transaction counts
+    const hourlyData = await PenjualanGudang.findAll({
+      where: whereConditions,
+      attributes: [
+        [sequelize.fn('strftime', '%w', sequelize.col('penjualan_gudang.tanggal')), 'day_number'],
+        [sequelize.fn('strftime', '%H', sequelize.col('penjualan_gudang.tanggal')), 'hour'],
+        [sequelize.fn('COUNT', sequelize.col('penjualan_gudang.penjualan_id')), 'transaction_count'],
+        [sequelize.fn('SUM', sequelize.col('penjualan_gudang.total_penjualan')), 'total_sales']
+      ],
+      group: [
+        sequelize.fn('strftime', '%w', sequelize.col('penjualan_gudang.tanggal')),
+        sequelize.fn('strftime', '%H', sequelize.col('penjualan_gudang.tanggal'))
+      ],
+      order: [
+        [sequelize.fn('strftime', '%w', sequelize.col('penjualan_gudang.tanggal')), 'ASC'],
+        [sequelize.literal('transaction_count DESC')]
+      ],
+      raw: false
+    });
+
+    // Get daily quantities
+    const quantityData = await ProdukPenjualanGudang.findAll({
+      attributes: [
+        [sequelize.fn('strftime', '%w', sequelize.col('penjualan.tanggal')), 'day_number'],
+        [sequelize.fn('SUM', sequelize.col('produk_penjualan_gudang.kuantitas')), 'total_quantity']
+      ],
+      include: [{
+        model: PenjualanGudang,
+        as: 'penjualan',
+        attributes: [],
+        where: whereConditions
+      }],
+      group: [
+        sequelize.fn('strftime', '%w', sequelize.col('penjualan.tanggal'))
+      ],
+      raw: true
+    });
+
+    const dayNames = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    const dailyStats = {};
+
+    if (hourlyData.length === 0) {
+      return [];
+    }
+
+    hourlyData.forEach(record => {
+      if (!record) return;
+
+      const dayNumber = record.get('day_number');
+      const hour = parseInt(record.get('hour')) || 0;
+      const count = parseInt(record.get('transaction_count')) || 0;
+      const sales = parseInt(record.get('total_sales')) || 0;
+
+      if (dayNumber === null || dayNumber === undefined) return;
+
+      if (!dailyStats[dayNumber] || count > (dailyStats[dayNumber]?.peak_count || 0)) {
+        dailyStats[dayNumber] = {
+          day: dayNames[parseInt(dayNumber) || 0],
+          peak_hour_start: `${hour.toString().padStart(2, '0')}:00`,
+          peak_hour_end: `${hour.toString().padStart(2, '0')}:59`,
+          peak_count: count,
+          total_sales: sales,
+          total_quantity: 0
+        };
+      }
+    });
+
+    // Add quantities to patterns
+    quantityData.forEach(record => {
+      if (!record) return;
+      
+      const dayNumber = record.day_number;
+      if (dailyStats[dayNumber]) {
+        dailyStats[dayNumber].total_quantity = parseInt(record.total_quantity) || 0;
+      }
+    });
+
+    // Return daily stats
+    return Object.values(dailyStats).map(day => ({
+      day: day.day,
+      peak_hour: {
+        start: day.peak_hour_start,
+        end: day.peak_hour_end,
+        transactions: day.peak_count
+      },
+      total_quantity: day.total_quantity,
+      total_sales: day.total_sales
+    }));
+  }
+
 }
 
 module.exports = PenjualanGudangService;
