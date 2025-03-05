@@ -8,6 +8,8 @@ const RincianBiayaCustomService = require("./rincianBiayaCustomService");
 const Cabang = require("../models/cabang");
 const Toko = require("../models/toko");
 const ProdukPenjualan = require("../models/produkPenjualan");
+const ProdukPenjualanGudang = require("../models/produkPenjualanGudang");
+const PenjualanGudang = require("../models/penjualanGudang");
 require('dotenv').config();
   
 class PenjualanService {  
@@ -291,7 +293,7 @@ class PenjualanService {
         attributes: [
           [sequelize.fn('strftime', '%w', sequelize.col('penjualan.tanggal')), 'day_number'],
           [sequelize.fn('SUM', sequelize.col('produk_penjualan.kuantitas')), 'total_quantity'],
-          [sequelize.col('penjualan.cabang_id'), 'cabang_id']
+          [sequelize.col('penjualan.toko_id'), 'toko_id']  // Changed from cabang_id to toko_id
         ],
         include: [{
           model: Penjualan,
@@ -300,7 +302,7 @@ class PenjualanService {
           where: whereConditions
         }],
         group: [
-          'penjualan.cabang_id',
+          'penjualan.toko_id',
           sequelize.fn('strftime', '%w', sequelize.col('penjualan.tanggal'))
         ],
         raw: true
@@ -380,6 +382,207 @@ class PenjualanService {
         cabang_id: cabang.cabang_id,
         cabang_name: cabang.cabang_name,
         daily_stats: Object.values(cabang.daily_stats).map(day => ({
+          day: day.day,
+          peak_hour: {
+            start: day.peak_hour_start,
+            end: day.peak_hour_end,
+            transactions: day.peak_count
+          },
+          total_quantity: day.total_quantity,
+          total_sales: day.total_sales
+        }))
+      }));
+    }
+
+    static async getTimeFrequencyAll(startDate, endDate) {
+      const whereConditions = {
+        tanggal: {
+          [Op.between]: [startDate, endDate]
+        },
+        is_deleted: false
+      };
+
+      // Get store data
+      const hourlyData = await Penjualan.findAll({
+        where: whereConditions,
+        attributes: [
+          [sequelize.fn('strftime', '%w', sequelize.col('Penjualan.tanggal')), 'day_number'],
+          [sequelize.fn('strftime', '%H', sequelize.col('Penjualan.tanggal')), 'hour'],
+          [sequelize.fn('COUNT', sequelize.col('Penjualan.penjualan_id')), 'transaction_count'],
+          [sequelize.fn('SUM', sequelize.col('Penjualan.total_penjualan')), 'total_sales'],
+          [sequelize.col('Penjualan.toko_id'), 'toko_id']
+        ],
+        include: [{
+          model: Toko,
+          as: 'toko',
+          attributes: ['nama_toko']
+        }],
+        group: [
+          'Penjualan.toko_id',
+          sequelize.fn('strftime', '%w', sequelize.col('Penjualan.tanggal')),
+          sequelize.fn('strftime', '%H', sequelize.col('Penjualan.tanggal'))
+        ],
+        order: [
+          [sequelize.col('Penjualan.toko_id'), 'ASC'],
+          [sequelize.fn('strftime', '%w', sequelize.col('Penjualan.tanggal')), 'ASC'],
+          [sequelize.literal('transaction_count DESC')]
+        ],
+        raw: false
+      });
+
+      // Get warehouse data
+      const hourlyDataGudang = await PenjualanGudang.findAll({
+        where: whereConditions,
+        attributes: [
+          [sequelize.fn('strftime', '%w', sequelize.col('penjualan_gudang.tanggal')), 'day_number'],
+          [sequelize.fn('strftime', '%H', sequelize.col('penjualan_gudang.tanggal')), 'hour'],
+          [sequelize.fn('COUNT', sequelize.col('penjualan_gudang.penjualan_id')), 'transaction_count'],
+          [sequelize.fn('SUM', sequelize.col('penjualan_gudang.total_penjualan')), 'total_sales']
+        ],
+        group: [
+          sequelize.fn('strftime', '%w', sequelize.col('penjualan_gudang.tanggal')),
+          sequelize.fn('strftime', '%H', sequelize.col('penjualan_gudang.tanggal'))
+        ],
+        order: [
+          [sequelize.fn('strftime', '%w', sequelize.col('penjualan_gudang.tanggal')), 'ASC'],
+          [sequelize.literal('transaction_count DESC')]
+        ],
+        raw: false
+      });
+
+      // Get store quantities
+      const quantityData = await ProdukPenjualan.findAll({
+        attributes: [
+          [sequelize.fn('strftime', '%w', sequelize.col('penjualan.tanggal')), 'day_number'],
+          [sequelize.fn('SUM', sequelize.col('produk_penjualan.kuantitas')), 'total_quantity'],
+          [sequelize.col('penjualan.toko_id'), 'toko_id']
+        ],
+        include: [{
+          model: Penjualan,
+          as: 'penjualan',
+          attributes: [],
+          where: whereConditions
+        }],
+        group: [
+          'penjualan.toko_id',
+          sequelize.fn('strftime', '%w', sequelize.col('penjualan.tanggal'))
+        ],
+        raw: true
+      });
+
+      // Get warehouse quantities
+      const quantityDataGudang = await ProdukPenjualanGudang.findAll({
+        attributes: [
+          [sequelize.fn('strftime', '%w', sequelize.col('penjualan.tanggal')), 'day_number'],
+          [sequelize.fn('SUM', sequelize.col('produk_penjualan_gudang.kuantitas')), 'total_quantity']
+        ],
+        include: [{
+          model: PenjualanGudang,
+          as: 'penjualan',
+          attributes: [],
+          where: whereConditions
+        }],
+        group: [
+          sequelize.fn('strftime', '%w', sequelize.col('penjualan.tanggal'))
+        ],
+        raw: true
+      });
+
+      const dayNames = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+      const tokoPatterns = {};
+
+      // Process store data
+      if (hourlyData.length > 0) {
+        hourlyData.forEach(record => {
+          if (!record || !record.toko) return;
+          const tokoId = record.get('toko_id');
+          const tokoName = record.toko?.nama_toko || 'Unknown';
+          const dayNumber = record.get('day_number');
+          const hour = parseInt(record.get('hour')) || 0;
+          const count = parseInt(record.get('transaction_count')) || 0;
+          const sales = parseInt(record.get('total_sales')) || 0;
+
+          if (!tokoId || dayNumber === null || dayNumber === undefined) return;
+
+          if (!tokoPatterns[tokoId]) {
+            tokoPatterns[tokoId] = {
+              toko_id: tokoId,
+              toko_name: tokoName,
+              daily_stats: {}
+            };
+          }
+          if (!tokoPatterns[tokoId].daily_stats[dayNumber] ||
+              count > (tokoPatterns[tokoId].daily_stats[dayNumber]?.peak_count || 0)) {
+            tokoPatterns[tokoId].daily_stats[dayNumber] = {
+              day: dayNames[parseInt(dayNumber) || 0],
+              peak_hour_start: `${hour.toString().padStart(2, '0')}:00`,
+              peak_hour_end: `${hour.toString().padStart(2, '0')}:59`,
+              peak_count: count,
+              total_sales: sales,
+              total_quantity: 0
+            };
+          }
+        });
+      }
+
+      // Process warehouse data
+      if (hourlyDataGudang.length > 0) {
+        const gudangId = '1';
+        tokoPatterns[gudangId] = {
+          toko_id: gudangId,
+          toko_name: 'Gudang',
+          daily_stats: {}
+        };
+
+        hourlyDataGudang.forEach(record => {
+          if (!record) return;
+          const dayNumber = record.get('day_number');
+          const hour = parseInt(record.get('hour')) || 0;
+          const count = parseInt(record.get('transaction_count')) || 0;
+          const sales = parseInt(record.get('total_sales')) || 0;
+
+          if (dayNumber === null || dayNumber === undefined) return;
+
+          if (!tokoPatterns[gudangId].daily_stats[dayNumber] ||
+              count > (tokoPatterns[gudangId].daily_stats[dayNumber]?.peak_count || 0)) {
+            tokoPatterns[gudangId].daily_stats[dayNumber] = {
+              day: dayNames[parseInt(dayNumber) || 0],
+              peak_hour_start: `${hour.toString().padStart(2, '0')}:00`,
+              peak_hour_end: `${hour.toString().padStart(2, '0')}:59`,
+              peak_count: count,
+              total_sales: sales,
+              total_quantity: 0
+            };
+          }
+        });
+      }
+
+      // Add store quantities
+      quantityData.forEach(record => {
+        if (!record) return;
+        const tokoId = record.toko_id;
+        const dayNumber = record.day_number;
+        if (tokoPatterns[tokoId]?.daily_stats?.[dayNumber]) {
+          tokoPatterns[tokoId].daily_stats[dayNumber].total_quantity =
+            parseInt(record.total_quantity) || 0;
+        }
+      });
+
+      // Add warehouse quantities
+      quantityDataGudang.forEach(record => {
+        if (!record) return;
+        const gudangId = '1';
+        const dayNumber = record.day_number;
+        if (tokoPatterns[gudangId]?.daily_stats?.[dayNumber]) {
+          tokoPatterns[gudangId].daily_stats[dayNumber].total_quantity =
+            parseInt(record.total_quantity) || 0;
+        }
+      });
+
+      return Object.values(tokoPatterns).map(toko => ({
+        toko_id: toko.toko_id,
+        toko_name: toko.toko_name,
+        daily_stats: Object.values(toko.daily_stats).map(day => ({
           day: day.day,
           peak_hour: {
             start: day.peak_hour_start,
