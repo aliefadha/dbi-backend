@@ -128,6 +128,27 @@ class ProdukPenjualanGudangController {
     }
   }
 
+  static async getTerlarisByKategori(req, res) {
+    try {
+      const { startDate, endDate } = req.query;
+      const produkTerlaris = await ProdukPenjualanGudangService.getAllTerlarisByKategori(
+        startDate? new Date(startDate) : null,
+        endDate? new Date(endDate) : null
+      );
+      res.status(200).json({
+        success: true,
+        data: produkTerlaris,
+        message: "retrieved successfully",
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        data: null,
+        message: error.message,
+      });
+    }
+  }
+
   static async getTopten(req, res) {
     try {
       const { startDate, endDate } = req.query;

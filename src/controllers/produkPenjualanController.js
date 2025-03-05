@@ -108,24 +108,6 @@ class ProdukPenjualanController {
     }  
   }  
 
-  static async getAllTerlaris(req, res) {  
-    try {  
-      const { cabang, bulan, tahun} = req.query;
-      const produkTerlaris = await ProdukPenjualanService.getAllTerlaris(cabang, bulan, tahun);  
-      res.status(200).json({  
-        success: true,  
-        data: produkTerlaris,  
-        message: "retrieved successfully",  
-      });  
-    } catch (error) {  
-      res.status(500).json({  
-        success: false,  
-        data: null,  
-        message: error.message,  
-      });  
-    }  
-  }
-
   static async getAllTerlarisByToko(req, res) {
       try {  
         const { toko_id, startDate, endDate } = req.query;
@@ -133,6 +115,46 @@ class ProdukPenjualanController {
           ? await ProdukPenjualanGudangService.getAllTerlaris(startDate, endDate)
           : await ProdukPenjualanService.getAllTerlarisByToko(toko_id, startDate, endDate);
         
+        res.status(200).json({  
+          success: true,  
+          data: produkTerlaris,  
+          message: "retrieved successfully",  
+        });  
+      } catch (error) {  
+        res.status(500).json({  
+          success: false,  
+          data: null,  
+          message: error.message,  
+        });  
+      } 
+    }
+
+    static async getAllTerlarisByKategoriToko(req, res) {
+      try {  
+        const { toko_id, startDate, endDate } = req.query;
+        const produkTerlaris = toko_id == 1 
+          ? await ProdukPenjualanGudangService.getAllTerlarisByKategori(startDate, endDate)
+          : await ProdukPenjualanService.getAllTerlarisByKategoriToko(toko_id, startDate, endDate);
+        res.status(200).json({  
+          success: true,  
+          data: produkTerlaris,  
+          message: "retrieved successfully",  
+        });  
+      } catch (error) {  
+        res.status(500).json({  
+          success: false,  
+          data: null,  
+          message: error.message,  
+        });  
+      } 
+    }
+
+    static async getAllTerlarisByKategoriCabang(req, res) {
+      try {  
+        const { cabang_id, startDate, endDate } = req.query;
+        const produkTerlaris = cabang_id == 1 
+          ? await ProdukPenjualanGudangService.getAllTerlarisByKategori(startDate, endDate)
+          : await ProdukPenjualanService.getAllTerlarisByKategoriCabang(cabang_id, startDate, endDate);
         res.status(200).json({  
           success: true,  
           data: produkTerlaris,  
