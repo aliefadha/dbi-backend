@@ -111,7 +111,7 @@ class DataKaryawanService {
         // Round down the total cuti days to the nearest whole number
         totalCutiDays = Math.floor(totalCutiDays);
     
-        let tidakHadir = Math.max(0, totalDaysInMonth - totalCutiDays - kehadiran);
+        let tidakHadir = Math.max(0, 28 - totalCutiDays - kehadiran);
         tidakHadir = Math.floor(tidakHadir);
     
         const { totalPersentaseTercapai, totalBonusDiterima } = await this.getByKaryawanId(id, bulan, tahun);  
