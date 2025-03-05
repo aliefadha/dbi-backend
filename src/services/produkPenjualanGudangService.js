@@ -462,6 +462,141 @@ class ProdukPenjualanGudangService {
       .slice(0, 10);
   }
 
+  static async getAllTerlarisByKategori(startDate, endDate) {
+    const whereClause = {
+      is_deleted: false
+    };
+
+    // Add date range filter if dates are provided
+    if (startDate && endDate) {
+      whereClause.createdAt = {
+        [Op.between]: [startDate, endDate]
+      };
+    }
+
+    const [handmade, nonhandmade, mentah, packaging] = await Promise.all([
+      // Get Handmade products
+      ProdukPenjualanGudang.findAll({
+        attributes: [
+          'barang_handmade_id',
+          [sequelize.fn('SUM', sequelize.col('kuantitas')), 'total_terjual']
+        ],
+        where: {
+          ...whereClause,
+          barang_handmade_id: { [Op.not]: null }
+        },
+        include: [
+          {
+            model: BarangHandmadeGudang,
+            as: "barang_handmade",
+            attributes: ['nama_barang', 'image']
+          }
+        ],
+        group: ['nama_barang'],
+        order: [[sequelize.fn('SUM', sequelize.col('kuantitas')), 'DESC']],
+        limit: 1
+      }),
+
+      // Get Non-Handmade products
+      ProdukPenjualanGudang.findAll({
+        attributes: [
+          'barang_nonhandmade_id',
+          [sequelize.fn('SUM', sequelize.col('kuantitas')), 'total_terjual']
+        ],
+        where: {
+          ...whereClause,
+          barang_nonhandmade_id: { [Op.not]: null }
+        },
+        include: [
+          {
+            model: BarangNonHandmadeGudang,
+            as: "barang_nonhandmade",
+            attributes: ['nama_barang', 'image']
+          }
+        ],
+        group: ['nama_barang'],
+        order: [[sequelize.fn('SUM', sequelize.col('kuantitas')), 'DESC']],
+        limit: 1
+      }),
+
+      // Get Raw Materials
+      ProdukPenjualanGudang.findAll({
+        attributes: [
+          'barang_mentah_id',
+          [sequelize.fn('SUM', sequelize.col('kuantitas')), 'total_terjual']
+        ],
+        where: {
+          ...whereClause,
+          barang_mentah_id: { [Op.not]: null }
+        },
+        include: [
+          {
+            model: BarangMentah,
+            as: "barang_mentah",
+            attributes: ['nama_barang', 'image']
+          }
+        ],
+        group: ['nama_barang'],
+        order: [[sequelize.fn('SUM', sequelize.col('kuantitas')), 'DESC']],
+        limit: 1
+      }),
+
+      // Get Packaging
+      ProdukPenjualanGudang.findAll({
+        attributes: [
+          'packaging_id',
+          [sequelize.fn('SUM', sequelize.col('kuantitas')), 'total_terjual']
+        ],
+        where: {
+          ...whereClause,
+          packaging_id: { [Op.not]: null }
+        },
+        include: [
+          {
+            model: PackagingGudang,
+            as: "packaging",
+            attributes: ['nama_packaging', 'image']
+          }
+        ],
+        group: ['nama_packaging'],
+        order: [[sequelize.fn('SUM', sequelize.col('kuantitas')), 'DESC']],
+        limit: 1
+      })
+    ]);
+
+    // Format the results
+    return {
+      handmade: handmade[0] ? {
+        id: handmade[0].barang_handmade_id,
+        image: handmade[0].barang_handmade.image,
+        nama: handmade[0].barang_handmade.nama_barang,
+        total_terjual: parseInt(handmade[0].dataValues.total_terjual),
+        kategori: 'Handmade'
+      } : null,
+      nonhandmade: nonhandmade[0] ? {
+        id: nonhandmade[0].barang_nonhandmade_id,
+        image: nonhandmade[0].barang_nonhandmade.image,
+        nama: nonhandmade[0].barang_nonhandmade.nama_barang,
+        total_terjual: parseInt(nonhandmade[0].dataValues.total_terjual),
+        kategori: 'Non-Handmade'
+      } : null,
+      mentah: mentah[0] ? {
+        id: mentah[0].barang_mentah_id,
+        image: mentah[0].barang_mentah.image,
+        nama: mentah[0].barang_mentah.nama_barang,
+        total_terjual: parseInt(mentah[0].dataValues.total_terjual),
+        kategori: 'Bahan Mentah'
+      } : null,
+      packaging: packaging[0] ? {
+        id: packaging[0].packaging_id,
+        image: packaging[0].packaging.image,
+        nama: packaging[0].packaging.nama_packaging,
+        total_terjual: parseInt(packaging[0].dataValues.total_terjual),
+        kategori: 'Packaging'
+      } : null
+    };
+  }
+
   static async getTopTenTerlaris(startDate, endDate) {
     const whereClause = {
       is_deleted: false

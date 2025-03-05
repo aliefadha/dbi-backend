@@ -5,6 +5,7 @@ const ProdukPenjualanGudangController = require('../controllers/produkPenjualanG
 router.post('/produk-penjualan-gudang', ProdukPenjualanGudangController.create);  
 router.get('/produk-penjualan-gudang', ProdukPenjualanGudangController.getAll);  
 router.get('/produk-penjualan-gudang/terlaris', ProdukPenjualanGudangController.getAllTerlaris);
+router.get('/produk-penjualan-gudang/terlaris/kategori', ProdukPenjualanGudangController.getTerlarisByKategori);
 router.get('/produk-penjualan-gudang/topten', ProdukPenjualanGudangController.getTopten)
 router.get('/produk-penjualan-gudang/:id', ProdukPenjualanGudangController.getById);  
 router.put('/produk-penjualan-gudang/:id', ProdukPenjualanGudangController.update);  
