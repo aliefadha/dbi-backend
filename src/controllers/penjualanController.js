@@ -1,5 +1,6 @@
 const CabangService = require("../services/cabangService");
 const CustomIdGenerateService = require("../services/customIdGenerateService");
+const PenjualanGudangService = require("../services/penjualanGudangService");
 const PenjualanService = require("../services/penjualanService");  
   
 class PenjualanController {  
@@ -71,11 +72,19 @@ class PenjualanController {
     try {  
       const {toko_id, cabang_id, startDate, endDate} = req.query;
 
-      if (cabang_id) {
-        await CabangService.cabangCheck(cabang_id, toko_id);
+      let penjualan;
+      
+      if (toko_id == null) {
+        penjualan = await PenjualanService.getTimeFrequencyAll(startDate, endDate);
+      } else if (toko_id === '1') {
+        penjualan = await PenjualanGudangService.getTimeFrequencyToko(startDate, endDate);
+      } else {
+        if (cabang_id) {
+          await CabangService.cabangCheck(cabang_id, toko_id);
+        }
+        penjualan = await PenjualanService.getTimeFrequencyToko(toko_id, startDate, endDate, cabang_id);
       }
 
-      const penjualan = await PenjualanService.getTimeFrequencyToko(toko_id, startDate, endDate, cabang_id);  
       if (!penjualan) {  
         return res.status(404).json({  
           success: false,  
