@@ -753,7 +753,7 @@ class ProdukPenjualanGudangService {
         {
           model: PackagingGudang,
           as: "packaging",
-          attributes: ["image", "packaging_id", "nama_packaging", "ukuran", "harga_satuan"]
+          attributes: ["image", "packaging_id", "nama_packaging", "ukuran", "harga_satuan", "harga_jual"]
         },
       ]
     });
@@ -789,6 +789,7 @@ class ProdukPenjualanGudangService {
         plainProduct.image = plainProduct.packaging.image;
         plainProduct.nama_barang = plainProduct.packaging.nama_packaging;
         plainProduct.harga_satuan = plainProduct.packaging.harga_satuan;
+        plainProduct.harga_jual = plainProduct.packaging.harga_jual;
         delete plainProduct.packaging;
       } else {
         plainProduct.jenis = null;
