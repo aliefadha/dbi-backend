@@ -219,24 +219,41 @@ class ProdukPenjualanController {
     static async getToptenByToko(req, res) {
       try {
         const { toko_id, startDate, endDate } = req.query;
+        let produkTopten = {};
+        if (toko_id === null || toko_id === undefined) {
+          // Fetch data from both services
+          const produkToptenGudang = await ProdukPenjualanGudangService.getTopTenTerlaris(
+            startDate ? new Date(startDate) : null,
+            endDate ? new Date(endDate) : null
+          );
+          const produkToptenToko = await ProdukPenjualanService.getTopTenTerlarisByToko(
+            null,
+            startDate ? new Date(startDate) : null,
+            endDate ? new Date(endDate) : null
+          );
 
-        if(toko_id == 1){
-          const produkTopten = await ProdukPenjualanGudangService.getTopTenTerlaris(
+          // Combine the results
+          produkTopten = [...produkToptenGudang, ...produkToptenToko];
+
+          // Sort the combined results by total_terjual in descending order
+          produkTopten.sort((a, b) => b.total_terjual - a.total_terjual);
+
+          // Slice to get the top 10 products
+          produkTopten = produkTopten.slice(0, 10);
+        } else if (toko_id == 1) {
+          // Get data for toko_id 1
+          produkTopten = await ProdukPenjualanGudangService.getTopTenTerlaris(
             startDate? new Date(startDate) : null,
             endDate? new Date(endDate) : null
           );
-          return res.status(200).json({
-            success: true,
-            data: produkTopten,
-            message: "retrieved successfully",
-          });
+        } else {
+          // Get data for other toko_id
+          produkTopten = await ProdukPenjualanService.getTopTenTerlarisByToko(
+            toko_id,
+            startDate? new Date(startDate) : null,
+            endDate? new Date(endDate) : null
+          );
         }
-
-        const produkTopten = await ProdukPenjualanService.getTopTenTerlarisByToko(
-          toko_id,
-          startDate? new Date(startDate) : null,
-          endDate? new Date(endDate) : null
-        );
         res.status(200).json({
           success: true,
           data: produkTopten,

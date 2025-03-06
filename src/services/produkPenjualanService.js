@@ -303,7 +303,7 @@ class ProdukPenjualanService {
         }
       ];
     }
-    
+
     const [handmade, nonhandmade, custom, packaging] = await Promise.all([
       // Get Handmade products
       ProdukPenjualan.findAll({
@@ -835,15 +835,18 @@ class ProdukPenjualanService {
         [Op.between]: [startDate, endDate]
       };
     }
+    let includeConditions = [];
 
-    const includeConditions = [
-      {
-        model: Cabang,
-        as: 'cabang',
-        where: { toko_id: toko_id },
-        attributes: []
-      }
-    ];
+    if (toko_id !== null && toko_id !== undefined) {
+      includeConditions = [
+        {
+          model: Cabang,
+          as: 'cabang',
+          where: { toko_id: toko_id },
+          attributes: []
+        }
+      ];
+    }
 
     const [handmade, nonhandmade, custom, packaging] = await Promise.all([
       // Get Handmade products
