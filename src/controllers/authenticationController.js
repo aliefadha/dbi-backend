@@ -62,27 +62,38 @@ class AuthenticationController {
           message: "not found",
         });
       }
+      // Check if the user wants to change the password
       const oldPassword = req.body.old_password;
-      let valid = await compare(oldPassword, user.password); 
-      if (!valid) {
-        return res.status(400).json({
-          success: false,
-          data: null,
-          message: "old password not match",
-        });
+      const newPassword = req.body.password;
+      const confirmPassword = req.body.confirm_password;
+
+      if (oldPassword || newPassword || confirmPassword) {
+          // If any of the password fields are provided, validate them
+          let valid = await compare(oldPassword, user.password);
+          if (!valid) {
+              return res.status(400).json({
+                  success: false,
+                  data: null,
+                  message: "old password not match",
+              });
+          }
+
+          if (newPassword !== confirmPassword) {
+              return res.status(400).json({
+                  success: false,
+                  data: null,
+                  message: "password and confirm password do not match",
+              });
+          }
+
+          const hashPassword = bcrypt.hashSync(newPassword, 10);
+          req.body.password = hashPassword;
+      } else {
+          // If no password fields are provided, remove the password field from the request body
+          delete req.body.password;
       }
-      const pasword = req.body.password;  
-      if (pasword !== req.body.confirm_password) {  
-        return res.status(400).json({  
-          success: false,  
-          data: null,  
-          message: "password and confirm password not match",  
-        });  
-      }
-      const hashPassword = bcrypt.hashSync(req.body.password, 10);
       const authData = {
         ...req.body,
-        password: hashPassword
       }
       if (req.file) {
         if(user.image!==null) {

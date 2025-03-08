@@ -21,20 +21,54 @@ class TokoService {
   }
 
   static async getAll() {
-    return await Toko.findAll({
+    const tokoList = await Toko.findAll({
       where: {
         is_deleted: false
       }
     });
+
+    const result = tokoList.map(toko => {
+      const tokoData = {
+          toko_id: toko.toko_id,
+          image: toko.image,
+          nama_toko: toko.nama_toko,
+          email: toko.email,
+          password: toko.password,
+      };
+
+      // Add the new field only if toko_id is 1
+      if (toko.toko_id === 1) {
+          tokoData.nama_toko_lama = 'Rumah Produksi';
+      }
+
+      return tokoData;
+    });
+
+    return result;
   }
 
   static async getById(id) {
-    return await Toko.findOne({
+    const toko = await Toko.findOne({
       where: {
         toko_id: id,
         is_deleted: false
       }
     });
+
+    const tokoData = {
+        toko_id: toko.toko_id,
+        image: toko.image,
+        nama_toko: toko.nama_toko,
+        email: toko.email,
+        password: toko.password,
+    };
+
+    // Add the new field only if toko_id is 1
+    if (toko.toko_id === 1) {
+        tokoData.nama_toko_lama = 'Rumah Produksi';
+    }
+
+    return tokoData;
   }
 
   static async update(id, data) {

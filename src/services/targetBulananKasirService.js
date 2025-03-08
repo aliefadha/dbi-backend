@@ -73,6 +73,7 @@ class TargetBulananKasirService {
         {
           model: Cabang,
           as: "cabang",
+          attributes: ["toko_id","nama_cabang","email"],
         },
       ]});  
   }  
@@ -101,6 +102,7 @@ class TargetBulananKasirService {
         {
           model: Cabang,
           as: "cabang",
+          attributes: ["toko_id","nama_cabang","email"],
         },
       ]
     })
