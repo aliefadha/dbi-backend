@@ -26,7 +26,7 @@ const PembelianGudang = sequelize.define("pembelian_gudang", {
   },
   nama_pembeli: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: true
   },
   catatan: {
     type: DataTypes.TEXT,
