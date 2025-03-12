@@ -206,8 +206,15 @@ class ProduksiGudangService {
         if (!karyawanData) {  
           throw new Error("Karyawan not found");  
         } 
+        
+        const tanggalAbsen = new Date(tanggal);
+        const gajiPokokPermenit = karyawanData.jumlah_gaji_pokok / karyawanData.waktu_kerja_sebulan_menit;
+        let gajiPokokPerhari = gajiPokokPermenit * produksiGudang.total_menit;
 
-        let gajiPokokPerhari = (karyawanData.jumlah_gaji_pokok / karyawanData.waktu_kerja_sebulan_menit) * produksiGudang.total_menit; 
+        // Check if the date is Saturday and subtract 60 minutes worth of pay
+        if (tanggalAbsen.getDay() === 6) { // 6 represents Saturday
+            gajiPokokPerhari -= 60 * gajiPokokPermenit; // Subtract 60 minutes worth of pay
+        }
 
         // Create absensi record
         await AbsensiKaryawan.create({
