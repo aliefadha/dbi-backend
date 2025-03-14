@@ -155,6 +155,10 @@ class AuthenticationService {
         throw error;
     }
   }
+
+  static async getAll() {
+    return await Authentication.findAll();
+  }
 }  
   
 module.exports = AuthenticationService;

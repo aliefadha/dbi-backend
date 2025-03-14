@@ -5,6 +5,8 @@ const path = require("path");
 const fs = require('fs');
 const { compare } = require("bcrypt");
 const blacklist = require("../config/blacklist");
+const CabangService = require("../services/cabangService");
+const TokoService = require("../services/tokoService");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -150,6 +152,57 @@ class AuthenticationController {
         message: error.message,  
       });  
     }  
+  }
+
+  static async getAll(req, res) {
+    try {
+      const authentication = await AuthenticationService.getAll();
+      const listToko = await TokoService.getAll();
+      const cabang = await CabangService.getById(1);
+
+      const authenticationData = authentication.map(auth => auth.dataValues);
+      const cabangData = cabang.dataValues;
+  
+      // Rename properties
+      const renamedAuthentication = authenticationData.map(auth => ({
+        user_id: auth.authentication_id,
+        nama: auth.nama,
+        email: auth.email,
+        role_id: 1,
+      }))
+      const renamedToko = listToko.map(toko => ({
+        user_id: toko.toko_id,
+        nama: toko.nama_toko, 
+        email: toko.email,
+        role_id: 2,
+      }));
+
+      const renamedCabang = {
+        user_id: cabangData.cabang_id,
+        nama: cabangData.nama_cabang, 
+        email: cabangData.email,
+        role_id: 3,
+      };
+
+      // Combine the results
+      const combinedResults = [
+        ...renamedAuthentication,
+        ...renamedToko,
+        renamedCabang,
+      ];
+
+      res.status(200).json({
+        success: true,
+        data: combinedResults,
+        message: "retrieved successfully",
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        data: null,
+        message: error.message,
+      });
+    }
   }
 }  
   
