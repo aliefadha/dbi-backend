@@ -2,6 +2,7 @@ const TargetBulananKasir = require("../models/targetBulananKasir");
 const Cabang = require("../models/cabang");
 const Penjualan = require("../models/penjualan");
 const { Op } = require("sequelize");
+const PenjualanGudang = require("../models/penjualanGudang");
 
 class TargetBulananKasirService {  
   static async create(data) {  
@@ -46,15 +47,27 @@ class TargetBulananKasirService {
         ],
       });
 
-      // Calculate the sum of total_penjualan for the current month
-      const totalPenjualan = await Penjualan.sum('total_penjualan', {
-        where: {
-          cabang_id: cabang,
-          tanggal: {
-            [Op.between]: [startDate, endDate]
+      let totalPenjualan;
+
+      if (cabang == 1) {
+        totalPenjualan = await PenjualanGudang.sum('total_penjualan', {
+          where: {
+            tanggal: {
+              [Op.between]: [startDate, endDate]
+            }
           }
-        }
-      });
+        });
+      } else {
+        // Calculate the sum of total_penjualan for the current month
+        totalPenjualan = await Penjualan.sum('total_penjualan', {
+          where: {
+            cabang_id: cabang,
+            tanggal: {
+              [Op.between]: [startDate, endDate]
+            }
+          }
+        });
+      }
 
       // Add the calculated sum to the target bulanan kasir data
       result.push({
