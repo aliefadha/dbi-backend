@@ -34,6 +34,7 @@ class TokoService {
           nama_toko: toko.nama_toko,
           email: toko.email,
           password: toko.password,
+          role: toko.role
       };
 
       // Add the new field only if toko_id is 1

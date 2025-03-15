@@ -169,12 +169,14 @@ class AuthenticationController {
         nama: auth.nama,
         email: auth.email,
         role_id: 1,
+        role_name: auth.role
       }))
       const renamedToko = listToko.map(toko => ({
         user_id: toko.toko_id,
         nama: toko.nama_toko, 
         email: toko.email,
         role_id: 2,
+        role_name: toko.role
       }));
 
       const renamedCabang = {
@@ -182,6 +184,7 @@ class AuthenticationController {
         nama: cabangData.nama_cabang, 
         email: cabangData.email,
         role_id: 3,
+        role_name: "Admin Gudang"
       };
 
       // Combine the results

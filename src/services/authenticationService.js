@@ -11,7 +11,7 @@ class AuthenticationService {
     // owner
     if(role == 1){
       let roleName = "Owner";
-      let user = await Authentication.findOne({where: {email: email}});
+      let user = await Authentication.findOne({where: {email: email, role: roleName}});
       if(!user) throw new Error("Invalid email or password");
       let valid = await compare(password, user.password); // Await the comparison
       if(!valid) throw new Error("Invalid email or password");
@@ -20,7 +20,7 @@ class AuthenticationService {
     } // finance
     else if(role == 2){
       let roleName = "Finance";
-      let user = await Authentication.findOne({where: {email: email}});
+      let user = await Authentication.findOne({where: {email: email, role: roleName}});
       if(!user) throw new Error("Invalid email or password");
       let valid = await compare(password, user.password); // Await the comparison
       if(!valid) throw new Error("Invalid email or password");
@@ -29,7 +29,7 @@ class AuthenticationService {
     } // manager
     else if(role == 3){
       let roleName = "Manager";
-      let user = await Authentication.findOne({where: {email: email}});
+      let user = await Authentication.findOne({where: {email: email, role: roleName}});
       if(!user) throw new Error("Invalid email or password");
       let valid = await compare(password, user.password); // Await the comparison
       if(!valid) throw new Error("Invalid email or password");
@@ -38,7 +38,7 @@ class AuthenticationService {
     } // spv
     else if(role == 4){
       let roleName = "SPV";
-      let user = await Toko.findOne({where: {email: email}});
+      let user = await Toko.findOne({where: {email: email, role: roleName}});
       if(!user) throw new Error("Invalid email or password");
       let valid = await compare(password, user.password); // Await the comparison
       if(!valid) throw new Error("Invalid email or password");
@@ -47,7 +47,7 @@ class AuthenticationService {
     } // head gudang
     else if(role == 5){
       let roleName = "Head Gudang";
-      let user = await Toko.findOne({where: {email: email}});
+      let user = await Toko.findOne({where: {email: email, role: roleName}});
       if(!user) throw new Error("Invalid email or password");
       let valid = await compare(password, user.password); // Await the comparison
       if(!valid) throw new Error("Invalid email or password");
@@ -56,7 +56,7 @@ class AuthenticationService {
     } // admin gudang
     else if(role == 6){
       let roleName = "Admin Gudang";
-      let user = await Cabang.findOne({where: {email: email}});
+      let user = await Cabang.findOne({where: {email: email, cabang_id: 1}});
       let toko = await Toko.findOne({where: {toko_id: user.toko_id}});
       if(!user) throw new Error("Invalid email or password");
       let valid = await compare(password, user.password); // Await the comparison

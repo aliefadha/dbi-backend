@@ -16,6 +16,10 @@ const Toko = sequelize.define("toko", {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  role: {
+    type: DataTypes.STRING,
+    defaultValue: "SPV",
+  },
   email: {
     type: DataTypes.STRING,
     unique: true,
