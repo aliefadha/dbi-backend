@@ -59,6 +59,7 @@ const Pemasukan = require('./pemasukan');
 const DeskripsiPemasukan = require('./deskripsiPemasukan');
 const BayarGaji = require('./bayarGaji');
 const RincianGaji = require('./rincianGaji');
+const Catatan = require('./catatan');
 
 
 
@@ -987,6 +988,16 @@ Karyawan.hasOne(RincianGaji, {
 RincianGaji.belongsTo(Karyawan, {
     foreignKey: "karyawan_id",
     as: "karyawan"
+})
+
+Toko.hasMany(Catatan, {
+    foreignKey: "toko_id",
+    as: "catatan"
+})
+
+Catatan.belongsTo(Toko, {
+    foreignKey: "toko_id",
+    as: "toko"
 })
 
 // Sync models with the database  

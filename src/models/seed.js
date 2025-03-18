@@ -46,7 +46,7 @@ const seedDatabase = async () => {
     try {
         const hashPassword = bcrypt.hashSync('12345678', 10);
         // Seed data fot toko
-        await Toko.create({ toko_id: 1, nama_toko: "Dansa", role:"Head Gudang", email: "headgudang@gmail.com", password: hashPassword });
+        await Toko.create({ toko_id: 1, nama_toko: "Dansa", role:"Head Gudang", email: "head@gmail.com", password: hashPassword });
         await Toko.create({ toko_id: 2, nama_toko: "Tatitatu", role:"SPV", email: "tatitatu@gmail.com", password: hashPassword });
 
         // Seed data for JenisBarang  
@@ -103,12 +103,12 @@ const seedDatabase = async () => {
         await DivisiKaryawan.create({ toko_id: null, nama_divisi: "Owner" });
         await DivisiKaryawan.create({ toko_id: null, nama_divisi: "Finance" });
         await DivisiKaryawan.create({ toko_id: null, nama_divisi: "Manager" });
-        await DivisiKaryawan.create({ toko_id: 1, nama_divisi: "Head Gudang" });
-        await DivisiKaryawan.create({ toko_id: 1, nama_divisi: "Admin Gudang" });
+        await DivisiKaryawan.create({ toko_id: 1, nama_divisi: "Head" });
+        await DivisiKaryawan.create({ toko_id: 1, nama_divisi: "Admin" });
         await DivisiKaryawan.create({ toko_id: 2, nama_divisi: "SPV" });
 
         // Seed data for Cabang  
-        await Cabang.create({ cabang_id: 1, toko_id: 1, nama_cabang: "Gudang", email: "admingudang@gmail.com", password: hashPassword });
+        await Cabang.create({ cabang_id: 1, toko_id: 1, nama_cabang: "Gudang", email: "admin@gmail.com", password: hashPassword });
         // await Cabang.create({ cabang_id: 2, toko_id: 2, nama_cabang: "Upi", email: "upi@gmail.com", password: hashPassword });
         // await Cabang.create({ cabang_id: 3, toko_id: 2, nama_cabang: "Taplau", email: "taplau@gmail.com", password: hashPassword });
         // await Cabang.create({ cabang_id: 4, toko_id: 2, nama_cabang: "Soetomo", email: "soetomo@gmail.com", password: hashPassword });
