@@ -36,7 +36,7 @@ class BarangMentahService {
   static async delete(id) {  
     const barangMentah = await BarangMentah.findByPk(id);  
     if (!barangMentah) return null;  
-    await barangMentah.update({ is_deleted: true });  
+    await barangMentah.destroy();  
     return true;  
   }  
 }  

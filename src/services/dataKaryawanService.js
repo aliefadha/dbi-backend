@@ -42,39 +42,40 @@ class DataKaryawanService {
         const endDate = new Date(tahun, bulan, 0);
         endDate.setHours(23, 59, 59, 999);
         const karyawan = await Karyawan.findOne({
-        where: {karyawan_id: id},
-        include: [
-            {
-                model: Toko,
-                as: 'toko',
-                attributes: ['nama_toko']
-            },
-            {
-                model: Cabang,
-                as: 'cabang',
-                attributes: ['nama_cabang']
-            },
-            {
-                model: Cabang,
-                as: 'cabang_first',
-                attributes: ['nama_cabang']
-            },
-            {
-                model: DivisiKaryawan,
-                as: 'divisi',
-                attributes: ['nama_divisi']
-            }
-        ]});
-
+            where: { karyawan_id: id },
+            include: [
+                {
+                    model: Toko,
+                    as: 'toko',
+                    attributes: ['nama_toko']
+                },
+                {
+                    model: Cabang,
+                    as: 'cabang',
+                    attributes: ['nama_cabang']
+                },
+                {
+                    model: Cabang,
+                    as: 'cabang_first',
+                    attributes: ['nama_cabang']
+                },
+                {
+                    model: DivisiKaryawan,
+                    as: 'divisi',
+                    attributes: ['nama_divisi']
+                }
+            ]
+        });
+    
         const kehadiran = await AbsensiKaryawan.count({
-        where: {
-            karyawan_id: id,
-            tanggal: {
-            [Op.between]: [startDate, endDate]
-            },
-        }
-        })
-
+            where: {
+                karyawan_id: id,
+                tanggal: {
+                    [Op.between]: [startDate, endDate]
+                },
+            }
+        });
+    
         const cutiKaryawanRecords = await CutiKaryawan.findAll({  
             where: {  
                 karyawan_id: id,  
@@ -83,11 +84,12 @@ class DataKaryawanService {
                 },  
                 tanggal_selesai: {  
                     [Op.gte]: startDate // End date should be greater than or equal to start of the month  
-                }  
+                },
+                status: 'Diterima'  
             }  
         });  
         let totalCutiDays = 0;  
-        
+    
         // Calculate the number of days of leave that fall within the specified month  
         for (const cutiKaryawan of cutiKaryawanRecords) {  
             const cutiStart = new Date(cutiKaryawan.tanggal_mulai);  
@@ -101,20 +103,27 @@ class DataKaryawanService {
             const cutiDays = Math.max(0, (overlapEnd - overlapStart) / (1000 * 60 * 60 * 24) + 1); // +1 to include the end day  
             totalCutiDays += cutiDays; // Accumulate the total cuti days  
         }  
-        totalCutiDays = Math.round(totalCutiDays);
-
+    
+        // Ensure that the total cuti days do not exceed the number of days in the month
+        const totalDaysInMonth = new Date(tahun, bulan, 0).getDate();
+        totalCutiDays = Math.min(totalCutiDays, totalDaysInMonth);
+    
+        // Round down the total cuti days to the nearest whole number
+        totalCutiDays = Math.floor(totalCutiDays);
+    
         let tidakHadir = Math.max(0, 28 - totalCutiDays - kehadiran);
-        tidakHadir = Math.round(tidakHadir);
-
+        tidakHadir = Math.floor(tidakHadir);
+    
         const { totalPersentaseTercapai, totalBonusDiterima } = await this.getByKaryawanId(id, bulan, tahun);  
-
+    
         const { totalGajiPokok, totalMenit } = await this.getListAbsensiByKaryawan(id, bulan, tahun);
-
+    
         const totalGajiAkhir = totalGajiPokok + totalBonusDiterima;
-
+    
         const roundedTotalPersentaseTercapai = parseFloat(totalPersentaseTercapai.toFixed(2));
-        const roundedTotalGajiAkhir = Math.round(totalGajiAkhir);
-
+        const roundedTotalGajiAkhir = Math.round(totalGajiAkhir / 1000) * 1000;
+        const roundedTotalBonusDiterima = Math.round(totalBonusDiterima / 1000) * 1000;
+    
         return {  
             karyawan,  
             kehadiran,  
@@ -123,7 +132,7 @@ class DataKaryawanService {
             totalGajiPokok,
             totalMenit,
             totalPersentaseTercapai: roundedTotalPersentaseTercapai,
-            totalBonusDiterima,
+            totalBonusDiterima: roundedTotalBonusDiterima,
             totalGajiAkhir: roundedTotalGajiAkhir
         };
     }
@@ -197,15 +206,15 @@ class DataKaryawanService {
             if (kpi.waktu === 'Harian') {  
                 tidakTercapai = Math.max(0, totalDaysInMonth - tercapai);
                 persentaseTercapai = (kpi.persentase / totalDaysInMonth) * tercapai;  
-                bonusDiterima = (persentaseTercapai / kpi.persentase) * bonus; // Adjusted bonus calculation  
+                bonusDiterima = (persentaseTercapai / 100) * bonus; // Adjusted bonus calculation  
             } else if (kpi.waktu === 'Mingguan') {  
                 tidakTercapai = Math.max(0, 4 - tercapai);  
                 persentaseTercapai = (kpi.persentase / 4) * tercapai;  
-                bonusDiterima = (persentaseTercapai / kpi.persentase) * bonus; // Adjusted bonus calculation  
+                bonusDiterima = (persentaseTercapai / 100) * bonus; // Adjusted bonus calculation  
             } else if (kpi.waktu === 'Bulanan') {  
                 tidakTercapai = Math.max(0, 1 - tercapai);  
                 persentaseTercapai = (kpi.persentase / 1) * tercapai;  
-                bonusDiterima = (persentaseTercapai / kpi.persentase) * bonus; // Adjusted bonus calculation  
+                bonusDiterima = (persentaseTercapai / 100) * bonus; // Adjusted bonus calculation  
             }  
     
             // Store the calculated values back into the kpi object  
@@ -223,8 +232,8 @@ class DataKaryawanService {
         const result = Object.values(groupedKpi);  
         return {    
             result,    
-            totalPersentaseTercapai,    
-            totalBonusDiterima,    
+            totalPersentaseTercapai: parseFloat(totalPersentaseTercapai.toFixed(2)),    
+            totalBonusDiterima: Math.round(totalBonusDiterima / 1000) * 1000, 
         };    
     }
 

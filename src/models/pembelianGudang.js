@@ -24,6 +24,10 @@ const PembelianGudang = sequelize.define("pembelian_gudang", {
     },
     allowNull: true,
   },
+  nama_pembeli: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
   catatan: {
     type: DataTypes.TEXT,
   },

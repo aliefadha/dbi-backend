@@ -20,8 +20,8 @@ class CatatanController {
   
   static async getAll(req, res) {  
     try {  
-      const { bulan, tahun} = req.query;
-      const catatans = await CatatanService.getAll(bulan, tahun);  
+      const { bulan, tahun, toko_id} = req.query;
+      const catatans = await CatatanService.getAll(bulan, tahun, toko_id);  
       res.status(200).json({  
         success: true,  
         data: catatans,  

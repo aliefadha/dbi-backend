@@ -6,6 +6,7 @@ const KategoriBarangGudang = require("../models/kategoriBarangGudang");
 const PackagingGudang = require("../models/packagingGudang");
 const ProdukPembelianGudang = require("../models/produkPembelianGudang");
 const StokBarangGudang = require("../models/stokBarangGudang");
+const { sequelize } = require("../models");
 
 class ProdukPembelianGudangService {
   static async create(data) {
@@ -288,10 +289,56 @@ class ProdukPembelianGudangService {
 
 
   static async delete(id) {
-    const produkPembelianGudang = await ProdukPembelianGudang.findByPk(id);
-    if (!produkPembelianGudang) return null;
-    await produkPembelianGudang.update({ is_deleted: true });
-    return true;
+    const transaction = await sequelize.transaction();
+
+    try {
+      const produkPembelianGudangs = await ProdukPembelianGudang.findAll({
+        where: { pembelian_id: id }
+      });
+      if (!produkPembelianGudangs) return null;
+      for (const produkPembelianGudang of produkPembelianGudangs) {
+        const { packaging_id, barang_mentah_id, barang_handmade_id, barang_nonhandmade_id, kuantitas } = produkPembelianGudang;
+
+        let fieldName, fieldValue;
+        if (packaging_id) {
+          fieldName = 'packaging_id';
+          fieldValue = packaging_id;
+        } else if (barang_mentah_id) {
+          fieldName = 'barang_mentah_id';
+          fieldValue = barang_mentah_id;
+        } else if (barang_handmade_id) {
+          fieldName = 'barang_handmade_id';
+          fieldValue = barang_handmade_id;
+        } else if (barang_nonhandmade_id) {
+          fieldName = 'barang_nonhandmade_id';
+          fieldValue = barang_nonhandmade_id;
+        }
+
+        // Return stock
+        const stockRecord = await StokBarangGudang.findOne({
+          where: {
+            [fieldName]: fieldValue,
+            is_deleted: false
+          },
+          transaction,
+        });
+
+        if (stockRecord) {
+          await stockRecord.decrement('jumlah_stok', {
+            by: kuantitas,
+            transaction,
+          });
+        }
+
+        await produkPembelianGudang.destroy({ transaction });
+      }
+      await transaction.commit();
+
+      return true;
+    } catch (error) {
+      await transaction.rollback();
+      throw error;
+    }
   }
 
   static async getAllByPembelianId(pembelianId) {

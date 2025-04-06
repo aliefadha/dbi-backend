@@ -1,5 +1,6 @@
 const { DataTypes } = require("sequelize");  
 const sequelize = require("../config/database");  
+const Toko = require("./toko");
   
 const Catatan = sequelize.define("catatan", {  
   catatan_id: {  
@@ -8,6 +9,13 @@ const Catatan = sequelize.define("catatan", {
     primaryKey: true,
     autoIncrement: true,
   }, 
+  toko_id: {
+    type: DataTypes.INTEGER,
+    references: {
+        model: Toko,
+        key: 'toko_id'
+    }
+  },
   nama: {
     type: DataTypes.STRING,
     allowNull: false,

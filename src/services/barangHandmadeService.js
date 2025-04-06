@@ -105,7 +105,7 @@ class BarangHandmadeService {
           ]
         }
       ],
-      order: [["created_at", "DESC"]]
+      order: [["createdAt", "DESC"]]
     });
   }
   

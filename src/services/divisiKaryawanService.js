@@ -1,6 +1,6 @@
 const DivisiKaryawan = require("../models/divisiKaryawan");  
 const Karyawan = require("../models/karyawan");
-  
+const { Op } = require("sequelize");
 class DivisiKaryawanService {  
   static async create(data) {  
     return await DivisiKaryawan.create(data);  
@@ -11,8 +11,13 @@ class DivisiKaryawanService {
       is_deleted: false
     }
 
-    if (toko_id) {
-      whereConditions.toko_id = toko_id
+    if (toko_id !== undefined) {
+      whereConditions.toko_id = toko_id;
+    } else {
+      whereConditions[Op.or] = [
+        { toko_id: null },
+        { nama_divisi: ["Head Gudang", "Admin Gudang", "SPV"] }
+      ];
     }
     return await DivisiKaryawan.findAll({
       where: whereConditions
