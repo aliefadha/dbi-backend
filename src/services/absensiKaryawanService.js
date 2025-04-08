@@ -14,17 +14,19 @@ class AbsensiKaryawanService {
     let gajiPokokPermenit;
     let gajiPokokPerantar;  
   
-    if (!karyawanData.waktu_kerja_sebulan_menit) {  
+    if (karyawanData.waktu_kerja_sebulan_antar) {  
         gajiPokokPerantar = karyawanData.jumlah_gaji_pokok / karyawanData.waktu_kerja_sebulan_antar;  
         gajiPokokPerhari = gajiPokokPerantar;
-    } else {  
+    } else if (karyawanData.waktu_kerja_sebulan_menit) {
         gajiPokokPermenit = karyawanData.jumlah_gaji_pokok / karyawanData.waktu_kerja_sebulan_menit; 
         gajiPokokPerhari = gajiPokokPermenit * data.total_menit; 
         const tanggalAbsen = new Date(data.tanggal); // Assuming data.tanggal_absen is provided in the data
         if (tanggalAbsen.getDay() === 6) { // 6 represents Saturday
             gajiPokokPerhari -= 60 * gajiPokokPermenit; // Subtract 60 minutes worth of pay
         }
-    }  
+    }  else {
+        gajiPokokPerhari = 0;
+    }
 
     const roundedGajiPokokPerhari = Math.round(gajiPokokPerhari)
   
@@ -104,7 +106,8 @@ class AbsensiKaryawanService {
     if (!karyawanData.waktu_kerja_sebulan_menit) {  
         gajiPokokPerantar = karyawanData.jumlah_gaji_pokok / karyawanData.waktu_kerja_sebulan_antar;  
         gajiPokokPerhari = gajiPokokPerantar;
-    } else {  
+    } else if (karyawanData.waktu_kerja_sebulan_menit) {
+       
         gajiPokokPermenit = karyawanData.jumlah_gaji_pokok / karyawanData.waktu_kerja_sebulan_menit; 
         gajiPokokPerhari = gajiPokokPermenit * data.total_menit; 
     }  
