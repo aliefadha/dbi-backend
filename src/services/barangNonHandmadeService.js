@@ -1,4 +1,4 @@
-const BarangNonHandmade = require("../models/barangNonHandmade");  
+const BarangNonHandmade = require("../models/barangNonHandmade");
 const RincianBiaya = require("../models/rincianBiaya");
 const DetailRincianBiaya = require("../models/detailRincianBiaya");
 const KategoriBarang = require("../models/kategoriBarang");
@@ -6,8 +6,9 @@ const JenisBarang = require("../models/jenisBarang");
 const Cabang = require("../models/cabang");
 const BiayaToko = require("../models/biayaToko");
 const Toko = require("../models/toko");
-class BarangNonHandmadeService {  
-  static async create(data) {  
+const StokBarang = require("../models/stokBarang");
+class BarangNonHandmadeService {
+  static async create(data) {
     const { image, barang_non_handmade_id, jenis_barang_id, kategori_barang_id, nama_barang, jumlah_minimum_stok, rincian_biaya } = data;
 
     const barangNonHandmade = await BarangNonHandmade.create({
@@ -20,7 +21,7 @@ class BarangNonHandmadeService {
     });
 
     for (const rincian of rincian_biaya) {
-      const { cabang_id, detail_rincian_biaya, total_hpp, keuntungan, harga_jual} = rincian;
+      const { cabang_id, detail_rincian_biaya, total_hpp, keuntungan, harga_jual } = rincian;
 
       const rincianBiaya = await RincianBiaya.create({
         barang_non_handmade_id: barangNonHandmade.barang_non_handmade_id,
@@ -41,9 +42,9 @@ class BarangNonHandmadeService {
     }
 
     return barangNonHandmade;
-  }  
-  
-  static async getAll(toko_id, cabang_id) {  
+  }
+
+  static async getAll(toko_id, cabang_id) {
     const whereConditionsToko = {
       is_deleted: false
     }
@@ -75,22 +76,27 @@ class BarangNonHandmadeService {
           attributes: ["nama_jenis_barang"]
         },
         {
+          model: StokBarang,
+          as: "stok_barang",
+          attributes: ["jumlah_stok"]
+        },
+        {
           model: RincianBiaya,
           as: "rincian_biaya",
-          required: true, 
+          required: true,
           include: [
             {
               model: Cabang,
               as: "cabang",
               attributes: ["cabang_id", "nama_cabang"],
-              required: true, 
+              required: true,
               where: whereConditionsCabang,
               include: [
                 {
                   model: Toko,
                   as: "toko",
                   attributes: ["toko_id", "nama_toko"],
-                  required: true, 
+                  required: true,
                   where: whereConditionsToko
                 }
               ]
@@ -103,10 +109,10 @@ class BarangNonHandmadeService {
         }
       ],
       order: [["createdAt", "DESC"]]
-    });  
-  }  
-  
-  static async getById(id) {  
+    });
+  }
+
+  static async getById(id) {
     return await BarangNonHandmade.findOne({
       where: {
         barang_non_handmade_id: id,
@@ -122,6 +128,11 @@ class BarangNonHandmadeService {
           model: JenisBarang,
           as: "jenis",
           attributes: ["nama_jenis_barang"]
+        },
+        {
+          model: StokBarang,
+          as: "stok_barang",
+          attributes: ["jumlah_stok"]
         },
         {
           model: RincianBiaya,
@@ -145,10 +156,10 @@ class BarangNonHandmadeService {
           ]
         }
       ]
-    });  
-  }  
-  
-  static async update(id, data) {  
+    });
+  }
+
+  static async update(id, data) {
     const { image, barang_non_handmade_id, jenis_barang_id, kategori_barang_id, nama_barang, jumlah_minimum_stok, rincian_biaya } = data;
 
     const barangNonHandmade = await BarangNonHandmade.findOne({
@@ -156,7 +167,7 @@ class BarangNonHandmadeService {
         barang_non_handmade_id: id,
         is_deleted: false
       }
-    });  
+    });
     if (!barangNonHandmade) return null;
 
     await barangNonHandmade.update({
@@ -169,7 +180,7 @@ class BarangNonHandmadeService {
     });
 
     for (const rincian of rincian_biaya) {
-      const { cabang_id, detail_rincian_biaya, total_hpp, keuntungan, harga_jual} = rincian;
+      const { cabang_id, detail_rincian_biaya, total_hpp, keuntungan, harga_jual } = rincian;
 
       let rincianBiaya = await RincianBiaya.findOne({
         where: {
@@ -211,14 +222,14 @@ class BarangNonHandmadeService {
     }
 
     return barangNonHandmade;
-  }  
-  
-  static async delete(id) {  
-    const barangNonHandmade = await BarangNonHandmade.findByPk(id);  
-    if (!barangNonHandmade) return null;  
-    await barangNonHandmade.destroy();  
-    return true;  
-  }  
-}  
-  
+  }
+
+  static async delete(id) {
+    const barangNonHandmade = await BarangNonHandmade.findByPk(id);
+    if (!barangNonHandmade) return null;
+    await barangNonHandmade.destroy();
+    return true;
+  }
+}
+
 module.exports = BarangNonHandmadeService;  

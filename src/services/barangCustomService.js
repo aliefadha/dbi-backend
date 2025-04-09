@@ -1,14 +1,15 @@
 const { where } = require("sequelize");
-const BarangCustom = require("../models/barangCustom"); 
+const BarangCustom = require("../models/barangCustom");
 const JenisBarang = require("../models/jenisBarang");
-const KategoriBarang = require("../models/kategoriBarang"); 
-  
-class BarangCustomService {  
-  static async create(data) {  
-    return await BarangCustom.create(data);  
-  }  
-  
-  static async getAll(toko_id) {  
+const KategoriBarang = require("../models/kategoriBarang");
+const StokBarang = require("../models/stokBarang");
+
+class BarangCustomService {
+  static async create(data) {
+    return await BarangCustom.create(data);
+  }
+
+  static async getAll(toko_id) {
     const whereConditions = {
       is_deleted: false
     }
@@ -22,12 +23,13 @@ class BarangCustomService {
       include: [
         { model: JenisBarang, as: "jenis_barang" },
         { model: KategoriBarang, as: "kategori" },
+        { model: StokBarang, as: "stok_barang", attributes: ["jumlah_stok"] }
       ],
       order: [['createdAt', 'DESC']]
-    });  
-  }  
-  
-  static async getById(id) {  
+    });
+  }
+
+  static async getById(id) {
     return await BarangCustom.findOne({
       where: {
         barang_custom_id: id,
@@ -36,26 +38,27 @@ class BarangCustomService {
       include: [
         { model: JenisBarang, as: "jenis_barang" },
         { model: KategoriBarang, as: "kategori" },
+        { model: StokBarang, as: "stok_barang", attributes: ["jumlah_stok"] }
       ]
-    });  
-  }  
-  
-  static async update(id, data) {  
-    const barangCustom = await BarangCustom.findByPk(id);  
-    if (!barangCustom) return null;  
-  
-    Object.assign(barangCustom, data);  
-    await barangCustom.save();  
-  
-    return barangCustom;  
-  }  
-  
-  static async delete(id) {  
-    const barangCustom = await BarangCustom.findByPk(id);  
+    });
+  }
+
+  static async update(id, data) {
+    const barangCustom = await BarangCustom.findByPk(id);
     if (!barangCustom) return null;
-    await barangCustom.destroy(); 
-    return true;    
-  }  
-}  
-  
+
+    Object.assign(barangCustom, data);
+    await barangCustom.save();
+
+    return barangCustom;
+  }
+
+  static async delete(id) {
+    const barangCustom = await BarangCustom.findByPk(id);
+    if (!barangCustom) return null;
+    await barangCustom.destroy();
+    return true;
+  }
+}
+
 module.exports = BarangCustomService;  
