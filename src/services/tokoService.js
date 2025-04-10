@@ -94,7 +94,7 @@ class TokoService {
   static async delete(id) {
     const toko = await Toko.findByPk(id);
     if (!toko) return null;
-    await toko.update({ is_deleted: true });
+    await toko.destroy();
     return true;
   }
 
