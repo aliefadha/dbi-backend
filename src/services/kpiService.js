@@ -1,6 +1,7 @@
 const Kpi = require("../models/kpi");  
 const DivisiKaryawan = require("../models/divisiKaryawan");
 const { sequelize } = require('../models');
+const { Op } = require("sequelize");
   
 class KpiService {  
   static async create(data) {
@@ -157,51 +158,53 @@ class KpiService {
 
   static async getManagerKpiByDivisi() {
     const divisiKaryawanList = await DivisiKaryawan.findAll({
-      include: [
-        {
-          model: Kpi,
-          as: "kpi",
+        where: {
+            [Op.or]: [
+                { toko_id: null },
+                { nama_divisi: { [Op.in]: ["Manager", "Finance", "Head Gudang", "SPV"] } }
+            ]
         },
-      ],
-    });
-
-    const allowedDivisiNames = ["Manager", "Finance", "SPV", "Head Gudang"];
-    const result = divisiKaryawanList.map(divisi => {
-      // Check if the divisi name is one of the allowed divisi names
-      if (allowedDivisiNames.includes(divisi.nama_divisi)) {
-        return {
-          divisi_karyawan_id: divisi.divisi_karyawan_id,
-          nama_divisi: divisi.nama_divisi,
-          kpi: divisi.kpi,
-          kpi_count: divisi.kpi ? divisi.kpi.length : 0
-        };
-      }
-      // Return null for divisi names that should be hidden
-      return null;
-    }).filter(item => item !== null); 
-
-    return result;
-}
-
-  static async getManagerKpiList() {
-    const divisiKpi = await DivisiKaryawan.findAll({
         include: [
             {
                 model: Kpi,
                 as: "kpi",
-                // Exclude Kpi associations with through: null (if applicable)
-                through: null
             },
-        ]
+        ],
     });
-    
-    // Filter out entries with any Kpi data
-    const result = divisiKpi.filter(entry => 
-        (entry.kpi === undefined || entry.kpi.length === 0) &&
-        ["Manager", "Finance", "Head Gudang", "SPV"].includes(entry.nama_divisi)
-    );
-      return result;
-  }
+
+    const result = divisiKaryawanList.map(divisi => ({
+        divisi_karyawan_id: divisi.divisi_karyawan_id,
+        nama_divisi: divisi.nama_divisi,
+        kpi: divisi.kpi,
+        kpi_count: divisi.kpi ? divisi.kpi.length : 0
+    }));
+
+    return result;
+}
+
+
+static async getManagerKpiList() {
+  const divisiKpi = await DivisiKaryawan.findAll({
+      where: {
+          is_deleted: false,
+          [Op.or]: [
+              { toko_id: null },
+              { nama_divisi: { [Op.in]: ["Manager", "Finance", "Head Gudang", "SPV"] } }
+          ]
+      },
+      include: [
+          {
+              model: Kpi,
+              as: "kpi",
+              through: null
+          },
+      ]
+  });
+
+  // Filter: hanya ambil yang tidak memiliki Kpi
+  return divisiKpi.filter(entry => !entry.kpi || entry.kpi.length === 0);
+}
+
 
 }  
   
