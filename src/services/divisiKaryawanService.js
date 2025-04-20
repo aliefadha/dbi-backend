@@ -46,7 +46,7 @@ class DivisiKaryawanService {
   static async delete(id) {  
     const divisiKaryawan = await DivisiKaryawan.findByPk(id);  
     if (!divisiKaryawan) return null;  
-    await divisiKaryawan.update({ is_deleted: true });  
+    await divisiKaryawan.destroy();  
     return true;  
   }  
 
