@@ -40,16 +40,55 @@ class AbsensiKaryawanService {
   }  
 
   static async getAllByKaryawan(karyawanId) {
-    return await AbsensiKaryawan.findAll({
+    const karyawan = await Karyawan.findByPk(karyawanId);
+  
+    const absensiRecord = await AbsensiKaryawan.findAll({
       where: {
         karyawan_id: karyawanId
       },
       attributes: {
         exclude: ['createdAt', 'updatedAt', 'gaji_pokok_perhari']
       },
-      order: [['createdAt', 'DESC']]
+      order: [['tanggal', 'ASC'], ['jam_masuk', 'ASC']]
     });
+  
+    // Jika bukan 'Umum', kembalikan langsung
+    if (karyawan.jenis_karyawan !== 'Umum') {
+      return absensiRecord;
+    }
+  
+    // Jika 'Umum', lakukan penggabungan berdasarkan tanggal
+    const grouped = {};
+  
+    absensiRecord.forEach(absen => {
+      const date = absen.tanggal.toISOString().split('T')[0];
+  
+      if (!grouped[date]) {
+        grouped[date] = {
+          tanggal: date,
+          jam_masuk: null,
+          jam_keluar: null,
+        };
+      }
+  
+      const jamObj = {
+        jam: absen.jam_masuk || absen.jam_keluar || null,
+        foto: absen.image,
+        lokasi: absen.gmaps
+      };
+  
+      if (absen.jam_keluar) {
+        grouped[date].jam_keluar = jamObj;
+      } else {
+        grouped[date].jam_masuk = jamObj;
+      }
+    });
+  
+    const mergedAbsensi = Object.values(grouped).sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
+  
+    return mergedAbsensi;
   }
+  
   
   static async getAll(bulan, tahun, toko_id, cabang, divisi) {  
       const whereConditions = {
