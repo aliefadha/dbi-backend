@@ -13,6 +13,7 @@ class DataKaryawanService {
         const startDate = new Date(tahun, bulan - 1, 1);
         const endDate = new Date(tahun, bulan, 0);
         endDate.setHours(23, 59, 59, 999);
+        
         const karyawan = await Karyawan.findByPk(id);
         const absensiRecord = await AbsensiKaryawan.findAll({
             where: {
@@ -26,9 +27,8 @@ class DataKaryawanService {
     
         let totalGajiPokok = 0;
         let totalMenit = 0;
-        
+    
         if (karyawan.jenis_karyawan !== 'Umum') {
-            // Tidak merge, kembalikan seperti biasa
             absensiRecord.forEach(absen => {
                 if (absen.total_menit) totalMenit += absen.total_menit;
                 if (absen.gaji_pokok_perhari) totalGajiPokok += absen.gaji_pokok_perhari;
@@ -40,46 +40,60 @@ class DataKaryawanService {
                 totalMenit,
             };
         }
-
+    
         const grouped = {};
     
         absensiRecord.forEach(absen => {
             const date = absen.tanggal.toISOString().split('T')[0];
     
             if (!grouped[date]) {
-                grouped[date] = {
+                grouped[date] = [];
+            }
+    
+            let currentGroup = grouped[date][grouped[date].length - 1];
+    
+            if (!currentGroup || (currentGroup.jam_masuk && currentGroup.jam_keluar)) {
+                // Buat group baru kalau perlu
+                currentGroup = {
                     tanggal: date,
                     jam_masuk: null,
                     jam_keluar: null,
                     total_menit: 0,
                     total_gaji_pokok: 0,
                 };
+                grouped[date].push(currentGroup);
             }
     
-            const jamObj = {
-                jam: absen.jam_masuk || absen.jam_keluar || null,
-                foto: absen.image,
-                lokasi: absen.gmaps
-            };
+            const absenJam = absen.jam_masuk || absen.jam_keluar;
     
-            if (absen.jam_keluar) {
-                grouped[date].jam_keluar = jamObj;
-            } else {
-                grouped[date].jam_masuk = jamObj;
+            if (absen.jam_masuk && !currentGroup.jam_masuk) {
+                currentGroup.jam_masuk = {
+                    jam: absen.jam_masuk,
+                    foto: absen.image,
+                    lokasi: absen.gmaps,
+                    absensi_karyawan_id: absen.absensi_karyawan_id,
+                };
+            } else if (absen.jam_keluar && !currentGroup.jam_keluar) {
+                currentGroup.jam_keluar = {
+                    jam: absen.jam_keluar,
+                    foto: absen.image,
+                    lokasi: absen.gmaps,
+                    absensi_karyawan_id: absen.absensi_karyawan_id,
+                };
             }
     
             if (absen.total_menit) {
-                grouped[date].total_menit += absen.total_menit;
+                currentGroup.total_menit += absen.total_menit;
                 totalMenit += absen.total_menit;
             }
     
             if (absen.gaji_pokok_perhari) {
-                grouped[date].total_gaji_pokok += absen.gaji_pokok_perhari;
+                currentGroup.total_gaji_pokok += absen.gaji_pokok_perhari;
                 totalGajiPokok += absen.gaji_pokok_perhari;
             }
         });
     
-        const mergedAbsensi = Object.values(grouped);
+        const mergedAbsensi = Object.values(grouped).flat();
     
         return {
             absensiRecord: mergedAbsensi,
@@ -87,6 +101,9 @@ class DataKaryawanService {
             totalMenit,
         };
     }
+    
+    
+    
     
 
     static async getDataAbsensiByKaryawan(id, bulan, tahun) {

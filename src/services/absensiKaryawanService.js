@@ -59,32 +59,48 @@ class AbsensiKaryawanService {
   
     // Jika 'Umum', lakukan penggabungan berdasarkan tanggal
     const grouped = {};
-  
+    
     absensiRecord.forEach(absen => {
-      const date = absen.tanggal.toISOString().split('T')[0];
-  
-      if (!grouped[date]) {
-        grouped[date] = {
-          tanggal: date,
-          jam_masuk: null,
-          jam_keluar: null,
-        };
-      }
-  
-      const jamObj = {
-        jam: absen.jam_masuk || absen.jam_keluar || null,
-        foto: absen.image,
-        lokasi: absen.gmaps
-      };
-  
-      if (absen.jam_keluar) {
-        grouped[date].jam_keluar = jamObj;
-      } else {
-        grouped[date].jam_masuk = jamObj;
-      }
+        const date = absen.tanggal.toISOString().split('T')[0];
+
+        if (!grouped[date]) {
+            grouped[date] = [];
+        }
+
+        let currentGroup = grouped[date][grouped[date].length - 1];
+
+        if (!currentGroup || (currentGroup.jam_masuk && currentGroup.jam_keluar)) {
+            // Buat group baru kalau perlu
+            currentGroup = {
+                tanggal: date,
+                jam_masuk: null,
+                jam_keluar: null,
+                total_menit: 0,
+                total_gaji_pokok: 0,
+            };
+            grouped[date].push(currentGroup);
+        }
+
+        const absenJam = absen.jam_masuk || absen.jam_keluar;
+
+        if (absen.jam_masuk && !currentGroup.jam_masuk) {
+            currentGroup.jam_masuk = {
+                jam: absen.jam_masuk,
+                foto: absen.image,
+                lokasi: absen.gmaps,
+                absensi_karyawan_id: absen.absensi_karyawan_id,
+            };
+        } else if (absen.jam_keluar && !currentGroup.jam_keluar) {
+            currentGroup.jam_keluar = {
+                jam: absen.jam_keluar,
+                foto: absen.image,
+                lokasi: absen.gmaps,
+                absensi_karyawan_id: absen.absensi_karyawan_id,
+            };
+        }
     });
-  
-    const mergedAbsensi = Object.values(grouped).sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
+    
+    const mergedAbsensi = Object.values(grouped).flat();
   
     return mergedAbsensi;
   }
