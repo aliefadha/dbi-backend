@@ -34,6 +34,7 @@ class TokoService {
           nama_toko: toko.nama_toko,
           email: toko.email,
           password: toko.password,
+          detail_password: toko.detail_password,
           role: toko.role
       };
 
