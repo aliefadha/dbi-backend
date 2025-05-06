@@ -96,6 +96,7 @@ class AuthenticationController {
       }
       const authData = {
         ...req.body,
+        detail_password: newPassword
       }
       if (req.file) {
         if(user.image!==null) {

@@ -31,6 +31,7 @@ class TokoController {
       const tokoData = {
         ...req.body,
         password: hashPassword,
+        detail_password: req.body.password,
         image: req.file.filename
       }
       const toko = await TokoService.create(tokoData);  
@@ -108,7 +109,7 @@ class TokoController {
         });  
       }  
       const hashPassword = bcrypt.hashSync(req.body.password, 10);  
-      const updatedData = { ...req.body, password: hashPassword };
+      const updatedData = { ...req.body, detail_password: req.body.password, password: hashPassword };
       
       if (req.file) {
         // Check if existingToko.image is not null
@@ -212,6 +213,7 @@ class TokoController {
       }
       const tokoData = {  
         ...req.body,  
+        detail_password : newPassword
       }  
       if (req.file) {  
         // Delete the old image file  

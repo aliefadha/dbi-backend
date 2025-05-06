@@ -15,7 +15,8 @@ class CabangController {
       const hashPassword = bcrypt.hashSync(req.body.password, 10);
       const cabangData = {
         ...req.body,
-        password: hashPassword
+        password: hashPassword,
+        detail_password: req.body.password
       }
       const cabang = await CabangService.create(cabangData);  
       res.status(201).json({  
@@ -87,7 +88,8 @@ class CabangController {
       const hashPassword = bcrypt.hashSync(req.body.password, 10);
       const cabangData = {
         ...req.body,
-        password: hashPassword
+        password: hashPassword,
+        detail_password: req.body.password
       }
       const cabang = await CabangService.update(req.params.id, cabangData);  
       if (!cabang) {  
@@ -177,6 +179,7 @@ class CabangController {
       }
       const cabangData = {
         ...req.body,
+        detail_password: newPassword
       }
       const cabang = await CabangService.update(req.params.id, cabangData);
       if (!cabang) {
