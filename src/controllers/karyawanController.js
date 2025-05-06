@@ -42,6 +42,7 @@ class KaryawanController {
             const hashPassword = bcrypt.hashSync(req.body.password, 10);
             const karyawanData = {
                 ...req.body,
+                detail_password: req.body.password,
                 password: hashPassword,
                 image: req.file.filename
             }
@@ -50,7 +51,7 @@ class KaryawanController {
                 success: true,
                 data: karyawan,
                 message: "Karyawan created successfully"
-            }); 
+            });
         } catch (error) {
             res.status(400).json({
                 success: false,
@@ -84,56 +85,56 @@ class KaryawanController {
         }
     }
 
-    static async update(req, res) {  
-        try {  
-            const existingKaryawan = await KaryawanService.getById(req.params.id);  
-            if (!existingKaryawan) {  
-                return res.status(404).json({  
-                    success: false,  
-                    data: null,  
-                    message: "Karyawan not found"  
-                });  
-            }  
+    static async update(req, res) {
+        try {
+            const existingKaryawan = await KaryawanService.getById(req.params.id);
+            if (!existingKaryawan) {
+                return res.status(404).json({
+                    success: false,
+                    data: null,
+                    message: "Karyawan not found"
+                });
+            }
             const hashPassword = bcrypt.hashSync(req.body.password, 10);
-            const updatedData = { ...req.body, password: hashPassword };  
-  
-            // Check if a new file is uploaded  
-            if (req.file) {  
-                // Delete the old image file  
-                const oldImagePath = path.join(__dirname, "../public/karyawan", existingKaryawan.image);  
-                fs.unlink(oldImagePath, (err) => {  
-                    if (err) {  
-                        console.error("Failed to delete old image:", err);  
-                    }  
-                });  
-  
-                updatedData.image = req.file.filename;  
-            }  
+            const updatedData = { ...req.body, detail_password: req.body.password, password: hashPassword };
 
-            const karyawan = await KaryawanService.update(req.params.id, updatedData);  
-            if (!karyawan) {  
-                return res.status(404).json({  
-                    success: false,  
-                    data: null,  
-                    message: "Karyawan not found"  
-                });  
-            }  
-  
-            res.status(200).json({  
-                success: true,  
-                data: karyawan,  
-                message: "Karyawan updated successfully"  
-            });  
-        } catch (error) {  
-            res.status(400).json({  
-                success: false,  
-                data: null,  
-                message: error.message  
-            });  
-        }  
+            // Check if a new file is uploaded  
+            if (req.file) {
+                // Delete the old image file  
+                const oldImagePath = path.join(__dirname, "../public/karyawan", existingKaryawan.image);
+                fs.unlink(oldImagePath, (err) => {
+                    if (err) {
+                        console.error("Failed to delete old image:", err);
+                    }
+                });
+
+                updatedData.image = req.file.filename;
+            }
+
+            const karyawan = await KaryawanService.update(req.params.id, updatedData);
+            if (!karyawan) {
+                return res.status(404).json({
+                    success: false,
+                    data: null,
+                    message: "Karyawan not found"
+                });
+            }
+
+            res.status(200).json({
+                success: true,
+                data: karyawan,
+                message: "Karyawan updated successfully"
+            });
+        } catch (error) {
+            res.status(400).json({
+                success: false,
+                data: null,
+                message: error.message
+            });
+        }
     }
 
-    static async delete(req, res) {    
+    static async delete(req, res) {
         try {
             const deleted = await KaryawanService.delete(req.params.id);
             if (!deleted) {
@@ -191,12 +192,12 @@ class KaryawanController {
                     message: "Karyawan not found"
                 });
             }
-    
+
             // Check if the user wants to change the password
             const oldPassword = req.body.old_password;
             const newPassword = req.body.password;
             const confirmPassword = req.body.confirm_password;
-    
+
             if (oldPassword || newPassword || confirmPassword) {
                 // If any of the password fields are provided, validate them
                 let valid = await compare(oldPassword, user.password);
@@ -207,7 +208,7 @@ class KaryawanController {
                         message: "old password not match",
                     });
                 }
-    
+
                 if (newPassword !== confirmPassword) {
                     return res.status(400).json({
                         success: false,
@@ -215,18 +216,19 @@ class KaryawanController {
                         message: "password and confirm password do not match",
                     });
                 }
-    
+
                 const hashPassword = bcrypt.hashSync(newPassword, 10);
                 req.body.password = hashPassword;
             } else {
                 // If no password fields are provided, remove the password field from the request body
                 delete req.body.password;
             }
-    
+
             const karyawanData = {
                 ...req.body,
+                detail_password: req.body.newPassword,
             };
-    
+
             if (req.file) {
                 // Delete the old image file
                 const oldImagePath = path.join(__dirname, "../public/karyawan", user.image);
@@ -235,10 +237,10 @@ class KaryawanController {
                         console.error("Failed to delete old image:", err);
                     }
                 });
-    
+
                 karyawanData.image = req.file.filename;
             }
-    
+
             const karyawan = await KaryawanService.update(req.params.id, karyawanData);
             res.status(200).json({
                 success: true,
@@ -293,4 +295,4 @@ class KaryawanController {
     }
 }
 
-module.exports = {KaryawanController, upload};
+module.exports = { KaryawanController, upload };

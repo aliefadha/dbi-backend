@@ -29,6 +29,10 @@ const Karyawan = sequelize.define("karyawans", {
         type: DataTypes.STRING,
         allowNull: false,
     },
+    detail_password: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
     divisi_karyawan_id: {
         type: DataTypes.INTEGER,
         references: {
