@@ -40,9 +40,10 @@ class KaryawanController {
         try {
             console.log(req.body);
             const hashPassword = bcrypt.hashSync(req.body.password, 10);
+            const detailPassword = req.body.password.substring(0, 3) + '*'.repeat(req.body.password.length - 3);
             const karyawanData = {
                 ...req.body,
-                detail_password: req.body.password,
+                detail_password: detailPassword,
                 password: hashPassword,
                 image: req.file.filename
             }
@@ -96,8 +97,8 @@ class KaryawanController {
                 });
             }
             const hashPassword = bcrypt.hashSync(req.body.password, 10);
-            const updatedData = { ...req.body, detail_password: req.body.password, password: hashPassword };
-
+            const detailPassword = req.body.password.substring(0, 3) + '*'.repeat(req.body.password.length - 3);
+            const updatedData = { ...req.body, detail_password: detailPassword, password: hashPassword };
             // Check if a new file is uploaded  
             if (req.file) {
                 // Delete the old image file  
@@ -197,6 +198,7 @@ class KaryawanController {
             const oldPassword = req.body.old_password;
             const newPassword = req.body.password;
             const confirmPassword = req.body.confirm_password;
+            const detailPassword = req.body.newPassword.substring(0, 3) + '*'.repeat(req.body.newPassword.length - 3);
 
             if (oldPassword || newPassword || confirmPassword) {
                 // If any of the password fields are provided, validate them
@@ -226,7 +228,7 @@ class KaryawanController {
 
             const karyawanData = {
                 ...req.body,
-                detail_password: req.body.newPassword,
+                detail_password: detailPassword,
             };
 
             if (req.file) {
