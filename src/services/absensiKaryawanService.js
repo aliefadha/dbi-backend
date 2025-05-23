@@ -89,6 +89,7 @@ class AbsensiKaryawanService {
                 foto: absen.image,
                 lokasi: absen.gmaps,
                 absensi_karyawan_id: absen.absensi_karyawan_id,
+                note: absen.note
             };
         } else if (absen.jam_keluar && !currentGroup.jam_keluar) {
             currentGroup.jam_keluar = {
@@ -96,6 +97,7 @@ class AbsensiKaryawanService {
                 foto: absen.image,
                 lokasi: absen.gmaps,
                 absensi_karyawan_id: absen.absensi_karyawan_id,
+                note: absen.note
             };
         }
     });

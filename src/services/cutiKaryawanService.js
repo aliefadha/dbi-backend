@@ -15,21 +15,34 @@ class CutiKaryawanService {
     return await CutiKaryawan.create(data);  
   }
   
-  static async getAll(bulan, tahun, toko_id) {  
-    const whereConditions = {  
+  static async getAll(bulan, tahun, toko_id) {
+    const karyawanWhereClause = {
       is_deleted: false
-    };  
-    if (toko_id) {  
-      whereConditions.toko_id = toko_id;  
+    };
+
+    const divisiIncludeOptions = {
+      model: DivisiKaryawan,
+      as: "divisi",
+      attributes: ["nama_divisi"],
+      required: true
+    };
+
+    if (toko_id !== undefined) {
+      karyawanWhereClause.toko_id = toko_id;
+    } else {
+      divisiIncludeOptions.where = {
+        nama_divisi: ["Owner", "Finance", "Manager", "Head Gudang", "Admin Gudang", "SPV"]
+      };
     }
-    console.log(whereConditions);
+
     const startDate = new Date(tahun, bulan - 1, 1);
     const endDate = new Date(tahun, bulan, 0);
     endDate.setHours(23, 59, 59, 999);
+
     return await Karyawan.findAll({
-      where: whereConditions,
+      where: karyawanWhereClause, // Klausa where utama untuk Karyawan
       attributes: [
-        "karyawan_id","nama_karyawan"
+        "karyawan_id", "nama_karyawan"
       ],
       include: [
         {
@@ -42,21 +55,17 @@ class CutiKaryawanService {
             tanggal_selesai: {
               [Op.gte]: startDate,
             },
-           
           },
           attributes: {
             exclude: ["is_deleted", "createdAt", "updatedAt"]
           },
-          order: [['createdAt', 'DESC']]
-        }, 
-        {
-          model: DivisiKaryawan,
-          as: "divisi",
-          attributes: ["nama_divisi"]
-        }
-      ]
-    });     
-  }  
+          order: [['createdAt', 'DESC']],
+          required: false 
+        },
+        divisiIncludeOptions
+      ],
+    });
+  }
   
   static async getById(id) {  
     return await CutiKaryawan.findByPk(id);

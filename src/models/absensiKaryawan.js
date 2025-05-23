@@ -61,6 +61,10 @@ const AbsensiKaryawan = sequelize.define("absensi_karyawan", {
       type: DataTypes.STRING,
       allowNull: true,
   },
+  note: {
+      type: DataTypes.STRING,
+      allowNull: true,
+  },
   is_deleted: {
       type: DataTypes.BOOLEAN,
       defaultValue: false
