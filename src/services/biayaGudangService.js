@@ -25,19 +25,7 @@ class BiayaGudangService {
         biaya_gudang_id: 1,
         is_deleted: false
       },
-      attributes: ["total", "rata_rata", "total_biaya", "waktu_kerja", "total_modal"],
-      include: [
-        {
-          model: BiayaOperasionalProduksiGudang,
-          as: 'biaya_operasional',
-          attributes: ['nama_biaya', 'total_biaya']
-        },
-        {
-          model: BiayaOperasionalStaffGudang,
-          as: 'biaya_staff',
-          attributes: ['nama_biaya', 'total_biaya']
-        }
-      ]
+      attributes: ["total", "rata_rata", "total_biaya", "waktu_kerja", "total_modal", "persentase"],
     });
   }
 
