@@ -7,6 +7,8 @@ const Cabang = require("../models/cabang");
 const BiayaToko = require("../models/biayaToko");
 const Toko = require("../models/toko");
 const StokBarang = require("../models/stokBarang");
+const { Op } = require("sequelize");
+
 class BarangNonHandmadeService {
   static async create(data) {
     const { image, barang_non_handmade_id, jenis_barang_id, kategori_barang_id, nama_barang, jumlah_minimum_stok, rincian_biaya } = data;
@@ -21,20 +23,23 @@ class BarangNonHandmadeService {
     });
 
     for (const rincian of rincian_biaya) {
-      const { cabang_id, detail_rincian_biaya, total_hpp, keuntungan, harga_jual } = rincian;
+      const { cabang_id, detail_rincian_biaya, total_hpp, keuntungan, harga_jual, harga_jual_ideal, margin_persentase, margin_nominal, harga_logis } = rincian;
 
       const rincianBiaya = await RincianBiaya.create({
         barang_non_handmade_id: barangNonHandmade.barang_non_handmade_id,
         cabang_id,
         total_hpp,
         keuntungan,
-        harga_jual
+        harga_jual,
+        harga_jual_ideal,
+        margin_persentase,
+        margin_nominal,
+        harga_logis
       });
 
       for (const detail of detail_rincian_biaya) {
         await DetailRincianBiaya.create({
           rincian_biaya_id: rincianBiaya.rincian_biaya_id,
-          biaya_toko_id: detail.biaya_toko_id,
           nama_biaya: detail.nama_biaya,
           jumlah_biaya: detail.jumlah_biaya
         });
@@ -84,6 +89,9 @@ class BarangNonHandmadeService {
           model: RincianBiaya,
           as: "rincian_biaya",
           required: true,
+          where: {
+            is_deleted: false
+          },
           include: [
             {
               model: Cabang,
@@ -122,12 +130,10 @@ class BarangNonHandmadeService {
         {
           model: KategoriBarang,
           as: "kategori",
-          attributes: ["nama_kategori_barang"]
         },
         {
           model: JenisBarang,
           as: "jenis",
-          attributes: ["nama_jenis_barang"]
         },
         {
           model: StokBarang,
@@ -160,7 +166,7 @@ class BarangNonHandmadeService {
   }
 
   static async update(id, data) {
-    const { image, barang_non_handmade_id, jenis_barang_id, kategori_barang_id, nama_barang, jumlah_minimum_stok, rincian_biaya } = data;
+    const { image, jenis_barang_id, kategori_barang_id, nama_barang, jumlah_minimum_stok, rincian_biaya } = data;
 
     const barangNonHandmade = await BarangNonHandmade.findOne({
       where: {
@@ -168,11 +174,11 @@ class BarangNonHandmadeService {
         is_deleted: false
       }
     });
+
     if (!barangNonHandmade) return null;
 
     await barangNonHandmade.update({
       image,
-      barang_non_handmade_id,
       jenis_barang_id,
       kategori_barang_id,
       nama_barang,
@@ -180,6 +186,10 @@ class BarangNonHandmadeService {
     });
 
     for (const rincian of rincian_biaya) {
+      if (!rincian || !rincian.detail_rincian_biaya) {
+        throw new Error('Invalid rincian_biaya data structure');
+      }
+
       const { cabang_id, detail_rincian_biaya, total_hpp, keuntungan, harga_jual } = rincian;
 
       let rincianBiaya = await RincianBiaya.findOne({
@@ -212,9 +222,12 @@ class BarangNonHandmadeService {
       });
 
       for (const detail of detail_rincian_biaya) {
+        if (!detail || typeof detail.nama_biaya === 'undefined' || typeof detail.jumlah_biaya === 'undefined') {
+          throw new Error('Invalid detail_rincian_biaya data structure');
+        }
+
         await DetailRincianBiaya.create({
           rincian_biaya_id: rincianBiaya.rincian_biaya_id,
-          biaya_toko_id: detail.biaya_toko_id,
           nama_biaya: detail.nama_biaya,
           jumlah_biaya: detail.jumlah_biaya
         });

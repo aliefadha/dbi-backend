@@ -48,6 +48,22 @@ const RincianBiaya = sequelize.define('rincian_biaya', {
         type: DataTypes.INTEGER,
         allowNull: false,
     },
+    harga_jual_ideal: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+    },
+    margin_persentase: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+    },
+    margin_nominal: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+    },
+    harga_logis: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+    },
     is_deleted: {
         type: DataTypes.BOOLEAN,
         defaultValue: false

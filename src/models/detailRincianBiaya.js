@@ -18,14 +18,14 @@ const DetailRincianBiaya = sequelize.define("detail_rincian_biaya", {
         key: "rincian_biaya_id",
     },
   },
-  biaya_toko_id: {
-    type: DataTypes.INTEGER,
-    allowNull: true,
-    references: {
-        model: BiayaToko,
-        key: "biaya_toko_id",
-    },
-  },
+  // biaya_toko_id: {
+  //   type: DataTypes.INTEGER,
+  //   allowNull: true,
+  //   references: {
+  //       model: BiayaToko,
+  //       key: "biaya_toko_id",
+  //   },
+  // },
   nama_biaya: {
     type: DataTypes.STRING,
     allowNull: true,

@@ -21,20 +21,26 @@ class BarangHandmadeService {
       jumlah_minimum_stok
     });
     for (const rincian of rincian_biaya) {
-      const { cabang_id, detail_rincian_biaya, total_hpp, keuntungan, harga_jual } = rincian;
+
+      const { cabang_id, detail_rincian_biaya, total_hpp, keuntungan, harga_jual, harga_jual_ideal, margin_persentase, margin_nominal, harga_logis } = rincian;
 
       const rincianBiaya = await RincianBiaya.create({
         barang_handmade_id: barangHandmade.barang_handmade_id,
         cabang_id,
         total_hpp,
         keuntungan,
-        harga_jual
+        harga_jual,
+        harga_jual_ideal,
+        margin_persentase,
+        margin_nominal,
+        harga_logis,
       });
 
       for (const detail of detail_rincian_biaya) {
+
         await DetailRincianBiaya.create({
           rincian_biaya_id: rincianBiaya.rincian_biaya_id,
-          biaya_toko_id: detail.biaya_toko_id,
+          // biaya_toko_id: detail.biaya_toko_id,
           nama_biaya: detail.nama_biaya,
           jumlah_biaya: detail.jumlah_biaya
         });
@@ -182,6 +188,10 @@ class BarangHandmadeService {
     });
 
     for (const rincian of rincian_biaya) {
+      if (!rincian || !rincian.detail_rincian_biaya) {
+        throw new Error('Invalid rincian_biaya data structure');
+      }
+
       const { cabang_id, detail_rincian_biaya, total_hpp, keuntungan, harga_jual } = rincian;
 
       let rincianBiaya = await RincianBiaya.findOne({
@@ -214,6 +224,10 @@ class BarangHandmadeService {
       });
 
       for (const detail of detail_rincian_biaya) {
+        if (!detail || typeof detail.nama_biaya === 'undefined' || typeof detail.jumlah_biaya === 'undefined') {
+          throw new Error('Invalid detail_rincian_biaya data structure');
+        }
+
         await DetailRincianBiaya.create({
           rincian_biaya_id: rincianBiaya.rincian_biaya_id,
           biaya_toko_id: detail.biaya_toko_id,

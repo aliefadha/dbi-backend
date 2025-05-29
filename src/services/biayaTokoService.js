@@ -1,36 +1,13 @@
 const BiayaToko = require("../models/biayaToko");  
-const BiayaStaff = require("../models/biayaStaff");
-const BiayaOperasional = require("../models/biayaOperasional");
-  
+
 class BiayaTokoService {  
   static async create(data) {  
-    // return await BiayaToko.create(data);
-    const { cabang_id, biaya_operasional, biaya_staff, total, rata_rata, total_biaya } = data;
+    const { cabang_id, persentase } = data;
 
     const biayaToko = await BiayaToko.create({
       cabang_id,
-      total,
-      rata_rata,
-      total_biaya
+      persentase
     });
-
-    const operasionalPromises = biaya_operasional.map(item => {
-      return BiayaOperasional.create({
-        biaya_toko_id: biayaToko.biaya_toko_id,
-        nama_biaya: item.nama_biaya,
-        jumlah_biaya: item.jumlah_biaya
-      });
-    });
-
-    const staffPromises = biaya_staff.map(item => {
-      return BiayaStaff.create({
-        biaya_toko_id: biayaToko.biaya_toko_id,
-        nama_biaya: item.nama_biaya,
-        jumlah_biaya: item.jumlah_biaya
-      });
-    });
-
-    await Promise.all([...operasionalPromises, ...staffPromises]);
 
     return biayaToko;
   }  
@@ -39,17 +16,7 @@ class BiayaTokoService {
     return await BiayaToko.findAll({
       where: {
         is_deleted: false
-      },
-      include: [
-        {
-          model: BiayaOperasional,
-          as: "biaya_operasional",
-        },
-        {
-          model: BiayaStaff,
-          as: "biaya_staff",
-        },
-      ]
+      }
     });  
   }  
   
@@ -58,22 +25,12 @@ class BiayaTokoService {
       where: {
         cabang_id: id,
         is_deleted: false
-      },
-      include: [
-        {
-          model: BiayaOperasional,
-          as: "biaya_operasional",
-        },
-        {
-          model: BiayaStaff,
-          as: "biaya_staff",
-        },
-      ]
+      }
     });  
   }  
   
   static async update(id, data) {  
-    const { biaya_operasional, biaya_staff, total, rata_rata, total_biaya } = data;
+    const { persentase } = data;
     const biayaToko = await BiayaToko.findOne({
       where: {
         cabang_id: id
@@ -81,32 +38,8 @@ class BiayaTokoService {
     });  
     if (!biayaToko) return null;  
     await biayaToko.update({
-      total,
-      rata_rata,
-      total_biaya
+      persentase
     });
-
-    // Update operational costs  
-    await BiayaOperasional.destroy({ where: { biaya_toko_id: biayaToko.biaya_toko_id } }); // Clear existing records  
-    const operasionalPromises = biaya_operasional.map(item => {  
-      return BiayaOperasional.create({  
-        biaya_toko_id: biayaToko.biaya_toko_id,  
-        nama_biaya: item.nama_biaya,  
-        jumlah_biaya: item.jumlah_biaya  
-      });  
-    });  
-  
-    // Update staff costs  
-    await BiayaStaff.destroy({ where: { biaya_toko_id: biayaToko.biaya_toko_id } }); // Clear existing records  
-    const staffPromises = biaya_staff.map(item => {  
-      return BiayaStaff.create({  
-        biaya_toko_id: biayaToko.biaya_toko_id,  
-        nama_biaya: item.nama_biaya,  
-        jumlah_biaya: item.jumlah_biaya  
-      });  
-    });  
-  
-    await Promise.all([...operasionalPromises, ...staffPromises]);  
   
     return biayaToko;  
   }  

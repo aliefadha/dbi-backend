@@ -19,13 +19,17 @@ const BiayaToko = sequelize.define("biaya_toko", {
   },
   total: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    defaultValue: 0,
   },
   rata_rata: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    defaultValue: 0,
   },
   total_biaya: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+  },
+  persentase: {
     type: DataTypes.INTEGER,
     allowNull: false,
   },

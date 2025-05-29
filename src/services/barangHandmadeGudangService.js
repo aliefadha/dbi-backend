@@ -3,10 +3,7 @@ const BarangHandmadeGudang = require("../models/barangHandmadeGudang");
 const BarangMentah = require("../models/barangMentah");
 const KategoriBarangGudang = require("../models/kategoriBarangGudang");
 const RincianBahanGudang = require("../models/rincianBahanGudang");
-const RincianBiayaGudang = require("../models/rincianBiayaGudang");
 const RincianBahanGudangService = require("./rincianBahanGudangService");
-const RincianBiayaGudangService = require("./rincianBiayaGudangService");
-const BiayaGudang = require("../models/biayaGudang");
 const StokBarangGudang = require("../models/stokBarangGudang");
 
 class BarangHandmadeGudangService {
@@ -39,9 +36,17 @@ class BarangHandmadeGudangService {
         waktu_pengerjaan
       }, { transaction });
 
+      if (!barangHandmadeGudang) {
+        throw new Error('Failed to create barang handmade gudang');
+      }
+
       const rincianBahanToCreate = rincian_bahan.map((bahan) => ({
-        ...bahan,
         barang_handmade_id: barangHandmadeGudang.barang_handmade_id,
+        barang_mentah_id: bahan.barang_mentah_id,
+        harga_satuan: bahan.harga_satuan,
+        kuantitas: bahan.kuantitas,
+        total_biaya: bahan.total_biaya,
+        is_deleted: false
       }));
 
       const createdRincianBahan = await RincianBahanGudangService.createMany(
@@ -49,44 +54,15 @@ class BarangHandmadeGudangService {
         { transaction }
       );
 
-
-      const biayaGudang = await BiayaGudang.findByPk(1, {
-        attributes: ['total_biaya', 'total_modal'],
-        where: { is_deleted: false },
-      });
-
-      if (!biayaGudang) {
-        throw new Error('Biaya Gudang data not found');
-      }
-
-      const defaultRincianBiaya = [
-        {
-          barang_handmade_id: barangHandmadeGudang.barang_handmade_id,
-          nama_biaya: "Biaya Operasional dan Staff",
-          jumlah_biaya: biayaGudang.total_biaya
-        },
-        {
-          barang_handmade_id: barangHandmadeGudang.barang_handmade_id,
-          nama_biaya: "Biaya Operasional Produksi",
-          jumlah_biaya: biayaGudang.total_modal
-        }
-      ];
-
-      const createdRincianBiaya = await RincianBiayaGudangService.createMany(
-        defaultRincianBiaya,
-        { transaction }
-      );
-
-      if (!createdRincianBiaya) {
-        throw new Error('Failed to create rincian biaya');
+      if (!createdRincianBahan) {
+        throw new Error('Failed to create rincian bahan');
       }
 
       await transaction.commit();
 
       return {
         barang_handmade: barangHandmadeGudang,
-        rincian_bahan: createdRincianBahan,
-        rincian_biaya: createdRincianBiaya
+        rincian_bahan: createdRincianBahan
       };
     } catch (error) {
       await transaction.rollback();
@@ -127,14 +103,6 @@ class BarangHandmadeGudangService {
               attributes: ["image", "nama_barang"]
             }
           ]
-        },
-        {
-          model: RincianBiayaGudang,
-          as: 'rincian_biaya',
-          where: {
-            is_deleted: false
-          },
-          attributes: ["nama_biaya", "jumlah_biaya"]
         }
       ],
       order: [['createdAt', 'DESC']]
@@ -175,14 +143,6 @@ class BarangHandmadeGudangService {
               attributes: ["image", "nama_barang"]
             }
           ]
-        },
-        {
-          model: RincianBiayaGudang,
-          as: 'rincian_biaya',
-          where: {
-            is_deleted: false
-          },
-          attributes: ["nama_biaya", "jumlah_biaya"]
         }
       ]
     });
@@ -222,38 +182,16 @@ class BarangHandmadeGudangService {
         await RincianBahanGudangService.deleteByBarangId(id, { transaction });
 
         const rincianBahanToCreate = rincian_bahan.map((bahan) => ({
-          ...bahan,
           barang_handmade_id: id,
+          barang_mentah_id: bahan.barang_mentah_id,
+          harga_satuan: bahan.harga_satuan,
+          kuantitas: bahan.kuantitas,
+          total_biaya: bahan.total_biaya,
+          is_deleted: false
         }));
 
         await RincianBahanGudangService.createMany(rincianBahanToCreate, { transaction });
       }
-
-      const biayaGudang = await BiayaGudang.findByPk(1, {
-        attributes: ['total_biaya', 'total_modal'],
-        where: { is_deleted: false },
-      });
-
-      if (!biayaGudang) {
-        throw new Error('Biaya Gudang data not found');
-      }
-
-      await RincianBiayaGudangService.deleteByBarangId(id, { transaction });
-
-      const defaultRincianBiaya = [
-        {
-          barang_handmade_id: id,
-          nama_biaya: "Biaya Operasional dan Staff",
-          jumlah_biaya: biayaGudang.total_biaya
-        },
-        {
-          barang_handmade_id: id,
-          nama_biaya: "Biaya Operasional Produksi",
-          jumlah_biaya: biayaGudang.total_modal
-        }
-      ];
-
-      await RincianBiayaGudangService.createMany(defaultRincianBiaya, { transaction });
 
       await transaction.commit();
 
@@ -276,12 +214,15 @@ class BarangHandmadeGudangService {
     const transaction = await sequelize.transaction();
 
     try {
-
       const barangHandmadeGudang = await BarangHandmadeGudang.create(barangData, { transaction });
 
       const rincianBahanToCreate = rincianBahan.map((bahan) => ({
-        ...bahan,
-        barang_handmade_id: newId,
+        barang_handmade_id: barangHandmadeGudang.barang_handmade_id,
+        barang_mentah_id: bahan.barang_mentah_id,
+        harga_satuan: bahan.harga_satuan,
+        kuantitas: bahan.kuantitas,
+        total_biaya: bahan.total_biaya,
+        is_deleted: false
       }));
 
       const createdRincianBahan = await RincianBahanGudangService.createMany(
@@ -289,50 +230,17 @@ class BarangHandmadeGudangService {
         { transaction }
       );
 
-      const biayaGudang = await BiayaGudang.findByPk(1, {
-        attributes: ['total_biaya', 'total_modal'],
-        where: { is_deleted: false },
-      });
-
-      if (!biayaGudang) {
-        throw new Error('Biaya Gudang data not found');
-      }
-
-      const defaultRincianBiaya = [
-        {
-          barang_handmade_id: newId,
-          nama_biaya: "Biaya Operasional dan Staff",
-          jumlah_biaya: biayaGudang.total_biaya
-        },
-        {
-          barang_handmade_id: newId,
-          nama_biaya: "Biaya Operasional Produksi",
-          jumlah_biaya: biayaGudang.total_modal
-        }
-      ];
-
-      const createdRincianBiaya = await RincianBiayaGudangService.createMany(
-        defaultRincianBiaya,
-        { transaction }
-      );
-
-      if (!createdRincianBiaya) {
-        throw new Error('Failed to create rincian biaya');
-      }
-
       await transaction.commit();
 
       return {
         barangHandmade: barangHandmadeGudang,
-        rincian_bahan: createdRincianBahan,
-        rincian_biaya: createdRincianBiaya
+        rincian_bahan: createdRincianBahan
       };
     } catch (error) {
       await transaction.rollback();
       throw error;
     }
   }
-
 }
 
 module.exports = BarangHandmadeGudangService;
