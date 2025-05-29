@@ -4,7 +4,7 @@ const BiayaOperasionalStaffGudang = require("../models/biayaOperasionalStaffGuda
 
 class BiayaGudangService {
   static async create(data) {
-    const { total, rata_rata, total_biaya, waktu_kerja, total_modal } = data;
+    const { total, rata_rata, total_biaya, waktu_kerja, total_modal, persentase } = data;
 
     const biayaGudang = await BiayaGudang.create({
       total,
