@@ -21,7 +21,11 @@ class BarangHandmadeGudangService {
         keuntungan,
         harga_jual,
         waktu_pengerjaan,
-        rincian_bahan
+        rincian_bahan,
+        harga_jual_ideal,
+        margin_persentase,
+        margin_nominal,
+        harga_logis
       } = data;
 
       const barangHandmadeGudang = await BarangHandmadeGudang.create({
@@ -33,7 +37,11 @@ class BarangHandmadeGudangService {
         total_hpp,
         keuntungan,
         harga_jual,
-        waktu_pengerjaan
+        waktu_pengerjaan,
+        harga_jual_ideal,
+        margin_persentase,
+        margin_nominal,
+        harga_logis
       }, { transaction });
 
       if (!barangHandmadeGudang) {
