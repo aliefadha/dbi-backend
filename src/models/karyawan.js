@@ -82,6 +82,11 @@ const Karyawan = sequelize.define("karyawans", {
         type: DataTypes.INTEGER,
         allowNull: true,
     },
+    label: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: "APM"
+    },
     nomor_handphone: {
         type: DataTypes.STRING,
         allowNull: true,
