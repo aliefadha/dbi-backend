@@ -112,7 +112,13 @@ class BarangHandmadeService {
             },
             {
               model: DetailRincianBiaya,
-              as: "detail_rincian_biaya"
+              as: "detail_rincian_biaya",
+              where: {
+                biaya_toko_id: null
+              },
+              attributes: {
+                exclude: ["biaya_toko_id"]
+              }
             },
           ]
         }
@@ -154,13 +160,13 @@ class BarangHandmadeService {
             {
               model: DetailRincianBiaya,
               as: "detail_rincian_biaya",
-              include: [
-                {
-                  model: BiayaToko,
-                  as: "biaya_toko"
-                }
-              ]
-            }
+              where: {
+                biaya_toko_id: null
+              },
+              attributes: {
+                exclude: ["biaya_toko_id"]
+              }
+            },
           ]
         }
       ]

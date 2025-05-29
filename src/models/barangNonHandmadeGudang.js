@@ -38,15 +38,31 @@ const BarangNonHandmadeGudang = sequelize.define("barang_non_handmade_gudang", {
   },
   total_hpp: {
     type: DataTypes.INTEGER,
-    defaultValue: 0,
+    allowNull: false,
   },
   keuntungan: {
-    type: DataTypes.INTEGER,
-    defaultValue: 0,
+      type: DataTypes.INTEGER,
+      allowNull: false,
   },
   harga_jual: {
-    type: DataTypes.INTEGER,
-    defaultValue: 0,
+      type: DataTypes.INTEGER,
+      allowNull: false,
+  },
+  harga_jual_ideal: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+  },
+  margin_persentase: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+  },
+  margin_nominal: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+  },
+  harga_logis: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
   },
   is_deleted: {
     type: DataTypes.BOOLEAN,

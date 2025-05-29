@@ -16,6 +16,9 @@ class BiayaTokoService {
     return await BiayaToko.findAll({
       where: {
         is_deleted: false
+      },
+      attributes: {
+        exclude: ["is_deleted", "total", "rata_rata", "total_biaya"]
       }
     });  
   }  
@@ -25,6 +28,9 @@ class BiayaTokoService {
       where: {
         cabang_id: id,
         is_deleted: false
+      },
+      attributes: {
+        exclude: ["is_deleted", "total", "rata_rata", "total_biaya"]
       }
     });  
   }  

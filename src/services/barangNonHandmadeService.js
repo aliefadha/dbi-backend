@@ -4,7 +4,6 @@ const DetailRincianBiaya = require("../models/detailRincianBiaya");
 const KategoriBarang = require("../models/kategoriBarang");
 const JenisBarang = require("../models/jenisBarang");
 const Cabang = require("../models/cabang");
-const BiayaToko = require("../models/biayaToko");
 const Toko = require("../models/toko");
 const StokBarang = require("../models/stokBarang");
 const { Op } = require("sequelize");
@@ -111,8 +110,14 @@ class BarangNonHandmadeService {
             },
             {
               model: DetailRincianBiaya,
-              as: "detail_rincian_biaya"
-            }
+              as: "detail_rincian_biaya",
+              where: {
+                biaya_toko_id: null
+              },
+              attributes: {
+                exclude: ["biaya_toko_id"]
+              }
+            },
           ]
         }
       ],
@@ -152,13 +157,13 @@ class BarangNonHandmadeService {
             {
               model: DetailRincianBiaya,
               as: "detail_rincian_biaya",
-              include: [
-                {
-                  model: BiayaToko,
-                  as: "biaya_toko"
-                }
-              ]
-            }
+              where: {
+                biaya_toko_id: null
+              },
+              attributes: {
+                exclude: ["biaya_toko_id"]
+              }
+            },
           ]
         }
       ]

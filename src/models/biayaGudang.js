@@ -28,6 +28,10 @@ const BiayaGudang = sequelize.define("biaya_gudang", {
     type: DataTypes.INTEGER,
     defaultValue: 0,
   },
+  persentase: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+  },
   is_deleted: {
     type: DataTypes.BOOLEAN,
     defaultValue: false

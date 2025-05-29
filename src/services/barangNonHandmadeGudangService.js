@@ -17,7 +17,11 @@ class BarangNonHandmadeGudangService {
         jumlah_minimum_stok,
         total_hpp,
         keuntungan,
-        harga_jual
+        harga_jual,
+        harga_jual_ideal,
+        margin_persentase,
+        margin_nominal,
+        harga_logis
       } = data;
 
       const barangNonHandmadeGudang = await BarangNonHandmadeGudang.create({
@@ -28,7 +32,11 @@ class BarangNonHandmadeGudangService {
         jumlah_minimum_stok,
         total_hpp,
         keuntungan,
-        harga_jual
+        harga_jual,
+        harga_jual_ideal,
+        margin_persentase,
+        margin_nominal,
+        harga_logis
       }, { transaction });
 
       await transaction.commit();
