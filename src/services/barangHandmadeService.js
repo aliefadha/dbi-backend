@@ -198,7 +198,7 @@ class BarangHandmadeService {
         throw new Error('Invalid rincian_biaya data structure');
       }
 
-      const { cabang_id, detail_rincian_biaya, total_hpp, keuntungan, harga_jual } = rincian;
+      const { cabang_id, detail_rincian_biaya, total_hpp, keuntungan, harga_jual, harga_jual_ideal, margin_persentase, margin_nominal, harga_logis } = rincian;
 
       let rincianBiaya = await RincianBiaya.findOne({
         where: {
@@ -213,13 +213,21 @@ class BarangHandmadeService {
           cabang_id,
           total_hpp,
           keuntungan,
-          harga_jual
+          harga_jual,
+          harga_jual_ideal,
+          margin_persentase,
+          margin_nominal,
+          harga_logis
         });
       } else {
         await rincianBiaya.update({
           total_hpp,
           keuntungan,
-          harga_jual
+          harga_jual,
+          harga_jual_ideal,
+          margin_persentase,
+          margin_nominal,
+          harga_logis
         });
       }
 
