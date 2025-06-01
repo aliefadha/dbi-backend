@@ -184,7 +184,7 @@ class ProdukPenjualanGudangService {
         {
           model: BarangNonHandmadeGudang,
           as: "barang_nonhandmade",
-          attributes: ["image", "nama_barang", "kategori_barang_id", "jenis_barang_id", "harga_jual", "is_deleted"],
+          attributes: ["image", "nama_barang", "kategori_barang_id", "jenis_barang_id", "harga_logis", "is_deleted"],
           include: [
             {
               model: JenisBarangGudang,
@@ -194,9 +194,40 @@ class ProdukPenjualanGudangService {
           ]
         },
         {
+          model: BarangHandmadeGudang,
+          as: "barang_handmade",
+          attributes: ["image", "nama_barang", "kategori_barang_id", "jenis_barang_id", "harga_logis", "is_deleted"],
+          include: [
+            {
+              model: JenisBarangGudang,
+              as: "jenis",
+              attributes: ["nama_jenis_barang", "is_deleted"]
+            }
+          ]
+        },
+        {
+          model: BarangMentah,
+          as: "barang_mentah",
+          attributes: ["image", "nama_barang", "kategori_barang_id", "jenis_barang_id", "harga_jual", "is_deleted"],
+          include: [
+            {
+              model: JenisBarangGudang,
+              as: "jenis",
+              attributes: ["nama_jenis_barang", "is_deleted"]
+            }
+          ]
+          },
+        {
           model: PackagingGudang,
           as: "packaging",
-          attributes: ["image", "nama_packaging", "ukuran", "harga_satuan"]
+          attributes: ["image", "nama_packaging", "ukuran", "harga_satuan"],
+          include: [
+            {
+              model: JenisBarangGudang,
+              as: "jenis",
+              attributes: ["nama_jenis_barang", "is_deleted"]
+            }
+          ]
         }
       ]
     });
@@ -738,12 +769,12 @@ class ProdukPenjualanGudangService {
         {
           model: BarangNonHandmadeGudang,
           as: "barang_nonhandmade",
-          attributes: ["image", "barang_nonhandmade_id", "nama_barang", "jenis_barang_id", "harga_jual", "is_deleted"],
+          attributes: ["image", "barang_nonhandmade_id", "nama_barang", "jenis_barang_id", "harga_logis", "is_deleted"],
         },
         {
           model: BarangHandmadeGudang,
           as: "barang_handmade",
-          attributes: ["image", "barang_handmade_id", "nama_barang", "jenis_barang_id", "harga_jual", "is_deleted"],
+            attributes: ["image", "barang_handmade_id", "nama_barang", "jenis_barang_id", "harga_logis", "is_deleted"],
         },
         {
           model: BarangMentah,
@@ -759,52 +790,7 @@ class ProdukPenjualanGudangService {
     });
 
     // Map the products to include single jenis and barang_id fields
-    return products.map(product => {
-      const plainProduct = product.get({ plain: true });
-
-      if (plainProduct.barang_nonhandmade) {
-        plainProduct.jenis = "Barang Non handmade"
-        plainProduct.barang_id = plainProduct.barang_nonhandmade.barang_nonhandmade_id;
-        plainProduct.image = plainProduct.barang_nonhandmade.image;
-        plainProduct.nama_barang = plainProduct.barang_nonhandmade.nama_barang;
-        plainProduct.harga_satuan = plainProduct.barang_nonhandmade.harga_jual;
-        delete plainProduct.barang_nonhandmade;
-      } else if (plainProduct.barang_handmade) {
-        plainProduct.jenis = "Barang Handmade"
-        plainProduct.barang_id = plainProduct.barang_handmade.barang_handmade_id;
-        plainProduct.image = plainProduct.barang_handmade.image;
-        plainProduct.nama_barang = plainProduct.barang_handmade.nama_barang;
-        plainProduct.harga_satuan = plainProduct.barang_handmade.harga_jual;
-        delete plainProduct.barang_handmade;
-      } else if (plainProduct.barang_mentah) {
-        plainProduct.jenis = "Barang Mentah";
-        plainProduct.barang_id = plainProduct.barang_mentah.barang_mentah_id;
-        plainProduct.image = plainProduct.barang_mentah.image;
-        plainProduct.nama_barang = plainProduct.barang_mentah.nama_barang;
-        plainProduct.harga_satuan = plainProduct.barang_mentah.harga_satuan;
-        delete plainProduct.barang_mentah;
-      } else if (plainProduct.packaging) {
-        plainProduct.jenis = "Packaging";
-        plainProduct.barang_id = plainProduct.packaging.packaging_id;
-        plainProduct.image = plainProduct.packaging.image;
-        plainProduct.nama_barang = plainProduct.packaging.nama_packaging;
-        plainProduct.harga_satuan = plainProduct.packaging.harga_satuan;
-        plainProduct.harga_jual = plainProduct.packaging.harga_jual;
-        delete plainProduct.packaging;
-      } else {
-        plainProduct.jenis = null;
-        plainProduct.barang_id = null;
-        plainProduct.barang = null;
-      }
-
-      // Clean up remaining ID fields
-      delete plainProduct.barang_nonhandmade;
-      delete plainProduct.barang_handmade;
-      delete plainProduct.barang_mentah;
-      delete plainProduct.packaging;
-
-      return plainProduct;
-    });
+    return products;
   }
 
 }
