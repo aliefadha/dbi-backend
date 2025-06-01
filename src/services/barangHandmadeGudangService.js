@@ -5,6 +5,7 @@ const KategoriBarangGudang = require("../models/kategoriBarangGudang");
 const RincianBahanGudang = require("../models/rincianBahanGudang");
 const RincianBahanGudangService = require("./rincianBahanGudangService");
 const StokBarangGudang = require("../models/stokBarangGudang");
+const RincianBiayaGudangService = require("./rincianBiayaGudangService");
 
 class BarangHandmadeGudangService {
   static async create(data) {
@@ -212,10 +213,28 @@ class BarangHandmadeGudangService {
   }
 
   static async delete(id) {
-    const barangHandmadeGudang = await BarangHandmadeGudang.findByPk(id);
-    if (!barangHandmadeGudang) return null;
-    await barangHandmadeGudang.destroy();
-    return true;
+    const transaction = await sequelize.transaction();
+    try {
+      // First, mark all related rincian bahan as deleted
+      await RincianBahanGudangService.deleteByBarangId(id, { transaction });
+
+      // Then, mark all related rincian biaya as deleted
+      await RincianBiayaGudangService.deleteByBarangId(id, { transaction });
+
+      // Finally, mark the barang handmade gudang as deleted
+      const barangHandmadeGudang = await BarangHandmadeGudang.findByPk(id);
+      if (!barangHandmadeGudang) {
+        await transaction.rollback();
+        return null;
+      }
+
+      await barangHandmadeGudang.update({ is_deleted: true }, { transaction });
+      await transaction.commit();
+      return true;
+    } catch (error) {
+      await transaction.rollback();
+      throw error;
+    }
   }
 
   static async createWithDetails(barangData, rincianBahan) {

@@ -257,7 +257,9 @@ class BarangHandmadeService {
   static async delete(id) {
     const barangHandmade = await BarangHandmade.findByPk(id);
     if (!barangHandmade) return null;
-    await barangHandmade.destroy();
+    await barangHandmade.update({
+      is_deleted: true
+    });
     return true;
   }
 }
