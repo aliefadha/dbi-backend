@@ -3,6 +3,8 @@ const KategoriBarangGudang = require("../models/kategoriBarangGudang");
 const sequelize = require("../config/database");
 const CustomIdGenerateService = require("./customIdGenerateService");
 const StokBarangGudang = require("../models/stokBarangGudang");
+const RincianBiayaGudangService = require("./rincianBiayaGudangService");
+const RincianBiayaGudang = require("../models/rincianBiayaGudang");
 
 class BarangNonHandmadeGudangService {
   static async create(data) {
@@ -21,7 +23,8 @@ class BarangNonHandmadeGudangService {
         harga_jual_ideal,
         margin_persentase,
         margin_nominal,
-        harga_logis
+        harga_logis,
+        rincian_biaya
       } = data;
 
       const barangNonHandmadeGudang = await BarangNonHandmadeGudang.create({
@@ -38,6 +41,15 @@ class BarangNonHandmadeGudangService {
         margin_nominal,
         harga_logis
       }, { transaction });
+
+      for (const rincian of rincian_biaya) {
+        await RincianBiayaGudangService.create({
+          barang_nonhandmade_id: barangNonHandmadeGudang.barang_nonhandmade_id,
+          rincian_biaya_id: rincian.rincian_biaya_id,
+          nama_biaya: rincian.nama_biaya,
+          jumlah_biaya: rincian.jumlah_biaya
+        }, { transaction });
+      }
 
       await transaction.commit();
 
@@ -71,6 +83,13 @@ class BarangNonHandmadeGudangService {
           model: StokBarangGudang,
           as: "stok_barang",
           attributes: ["jumlah_stok"]
+        },
+        {
+          model: RincianBiayaGudang,
+          as: "rincian_biaya",
+          attributes: {
+            exclude: ["barang_handmade_id"]
+          }
         }
       ],
       order: [["createdAt", "DESC"]]
@@ -99,6 +118,13 @@ class BarangNonHandmadeGudangService {
           model: StokBarangGudang,
           as: "stok_barang",
           attributes: ["jumlah_stok"]
+        },
+        {
+          model: RincianBiayaGudang,
+          as: "rincian_biaya",
+          attributes: {
+            exclude: ["barang_handmade_id"]
+          }
         }
       ]
     });
@@ -113,6 +139,7 @@ class BarangNonHandmadeGudangService {
         kategori_barang_id,
         nama_barang,
         jumlah_minimum_stok,
+        rincian_biaya,
         ...otherData
       } = data;
 
@@ -132,6 +159,26 @@ class BarangNonHandmadeGudangService {
         jumlah_minimum_stok,
         ...otherData
       }, { transaction });
+
+      // Delete existing rincian biaya
+      await RincianBiayaGudang.destroy({
+        where: {
+          barang_nonhandmade_id: id
+        },
+        transaction
+      });
+
+      // Create new rincian biaya
+      if (rincian_biaya && rincian_biaya.length > 0) {
+        for (const rincian of rincian_biaya) {
+          await RincianBiayaGudangService.create({
+            barang_nonhandmade_id: id,
+            rincian_biaya_id: rincian.rincian_biaya_id,
+            nama_biaya: rincian.nama_biaya,
+            jumlah_biaya: rincian.jumlah_biaya
+          }, { transaction });
+        }
+      }
 
       await transaction.commit();
 
