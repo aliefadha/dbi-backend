@@ -196,6 +196,17 @@ class AbsensiKaryawanService {
   }
 
   static async getManagerAbsensi(bulan, tahun) {
+      // Get all divisi names where toko_id is null
+      const divisiList = await DivisiKaryawan.findAll({
+          where: {
+              toko_id: null
+          },
+          attributes: ['nama_divisi'],
+          group: ['nama_divisi']
+      });
+      
+      const allowedDivisiNames = divisiList.map(divisi => divisi.nama_divisi);
+      
       const karyawanList = await Karyawan.findAll({
           include: [
             {
@@ -205,7 +216,6 @@ class AbsensiKaryawanService {
             }
           ]
       });  
-      const allowedDivisiNames = ["Manager", "Finance", "SPV", "Head Gudang"];
       // Initialize an array to hold the results  
       const results = [];  
 
