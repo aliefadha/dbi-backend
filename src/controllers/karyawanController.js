@@ -96,9 +96,19 @@ class KaryawanController {
                     message: "Karyawan not found"
                 });
             }
-            const hashPassword = bcrypt.hashSync(req.body.password, 10);
-            const detailPassword = req.body.password.substring(0, 3) + '*'.repeat(req.body.password.length - 3);
-            const updatedData = { ...req.body, detail_password: detailPassword, password: hashPassword };
+            const updatedData = { ...req.body };
+
+            // Update password only if it's present in the request body
+            if (req.body.password && req.body.password.trim() !== "") {
+                const hashPassword = bcrypt.hashSync(req.body.password, 10);
+                const detailPassword = req.body.password.substring(0, 3) + '*'.repeat(req.body.password.length - 3);
+                updatedData.password = hashPassword;
+                updatedData.detail_password = detailPassword;
+            } else {
+                // Prevent overwriting existing password and detail_password with undefined
+                delete updatedData.password;
+                delete updatedData.detail_password;
+            }
             // Check if a new file is uploaded  
             if (req.file) {
                 // Delete the old image file  
