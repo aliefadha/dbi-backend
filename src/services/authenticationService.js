@@ -84,8 +84,8 @@ class AuthenticationService {
       return this.generateToken(user.karyawan_id, user.toko_id, role, user.email, roleName, user.image);
     }
     else if(role == 9){
-      const roleName = "Team Hybrid";
-      let user = await Karyawan.findOne({where: {email: email, jenis_karyawan: "Team Hybrid"}});
+      const roleName = "Tim Hybrid";
+      let user = await Karyawan.findOne({where: {email: email, jenis_karyawan: "Tim Hybrid"}});
       if(!user) throw new Error("Invalid email or password");
       let valid = await compare(password, user.password); // Await the comparison
       if(!valid) throw new Error("Invalid email or password");
