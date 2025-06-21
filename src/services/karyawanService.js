@@ -61,7 +61,7 @@ class KaryawanService {
     static async getByUserId(id) {
         return await Karyawan.findOne({ 
             where: { karyawan_id: id },
-            attributes: ["karyawan_id", "image", "email", "password", "nama_karyawan","nomor_handphone"]
+            attributes: ["karyawan_id", "image", "email", "password","detail_password", "nama_karyawan","nomor_handphone"]
         });
     }
     static async create(data) {
