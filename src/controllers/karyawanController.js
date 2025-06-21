@@ -208,10 +208,10 @@ class KaryawanController {
             const oldPassword = req.body.old_password;
             const newPassword = req.body.password;
             const confirmPassword = req.body.confirm_password;
-            const detailPassword = req.body.newPassword.substring(0, 3) + '*'.repeat(req.body.newPassword.length - 3);
+
+            let detailPassword = null;
 
             if (oldPassword || newPassword || confirmPassword) {
-                // If any of the password fields are provided, validate them
                 let valid = await compare(oldPassword, user.password);
                 if (!valid) {
                     return res.status(400).json({
@@ -231,8 +231,9 @@ class KaryawanController {
 
                 const hashPassword = bcrypt.hashSync(newPassword, 10);
                 req.body.password = hashPassword;
+
+                detailPassword = newPassword.substring(0, 3) + '*'.repeat(newPassword.length - 3);
             } else {
-                // If no password fields are provided, remove the password field from the request body
                 delete req.body.password;
             }
 
@@ -242,14 +243,12 @@ class KaryawanController {
             };
 
             if (req.file) {
-                // Delete the old image file
                 const oldImagePath = path.join(__dirname, "../public/karyawan", user.image);
                 fs.unlink(oldImagePath, (err) => {
                     if (err) {
                         console.error("Failed to delete old image:", err);
                     }
                 });
-
                 karyawanData.image = req.file.filename;
             }
 
@@ -267,6 +266,7 @@ class KaryawanController {
             });
         }
     }
+
 
     static async export(req, res) {
         try {
