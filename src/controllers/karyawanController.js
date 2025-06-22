@@ -204,36 +204,49 @@ class KaryawanController {
                 });
             }
 
-            // Check if the user wants to change the password
+            // Ambil input
             const oldPassword = req.body.old_password;
             const newPassword = req.body.password;
             const confirmPassword = req.body.confirm_password;
 
-            let detailPassword = null;
+            let detailPassword = user.detail_password; // default: tetap password lama
 
+            // Jika user ingin update password
             if (oldPassword || newPassword || confirmPassword) {
-                let valid = await compare(oldPassword, user.password);
+                // Semua field password harus diisi
+                if (!oldPassword || !newPassword || !confirmPassword) {
+                    return res.status(400).json({
+                        success: false,
+                        data: null,
+                        message: "All password fields (old, new, confirm) must be provided",
+                    });
+                }
+
+                // Validasi password lama
+                const valid = await compare(oldPassword, user.password);
                 if (!valid) {
                     return res.status(400).json({
                         success: false,
                         data: null,
-                        message: "old password not match",
+                        message: "Old password not match",
                     });
                 }
 
+                // Validasi new password sama confirm
                 if (newPassword !== confirmPassword) {
                     return res.status(400).json({
                         success: false,
                         data: null,
-                        message: "password and confirm password do not match",
+                        message: "Password and confirm password do not match",
                     });
                 }
 
+                // Jika semua validasi lolos → hash password baru
                 const hashPassword = bcrypt.hashSync(newPassword, 10);
                 req.body.password = hashPassword;
-
                 detailPassword = newPassword.substring(0, 3) + '*'.repeat(newPassword.length - 3);
             } else {
+                // Tidak ingin update password
                 delete req.body.password;
             }
 
@@ -258,6 +271,7 @@ class KaryawanController {
                 data: karyawan,
                 message: "Karyawan updated successfully"
             });
+
         } catch (error) {
             res.status(500).json({
                 success: false,
@@ -266,6 +280,7 @@ class KaryawanController {
             });
         }
     }
+
 
 
     static async export(req, res) {
