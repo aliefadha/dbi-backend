@@ -6,38 +6,40 @@ const XLSX = require('xlsx');
 
 class AbsensiKaryawanService {  
   static async create(data) {  
-    const karyawanData = await Karyawan.findOne({where: {karyawan_id: data.karyawan_id}});
+    const karyawanData = await Karyawan.findOne({ where: { karyawan_id: data.karyawan_id } });
     if (!karyawanData) {  
         throw new Error("Karyawan not found");  
     } 
-    let gajiPokokPerhari;
-    let gajiPokokPermenit;
-    let gajiPokokPerantar;  
-  
-    if (karyawanData.waktu_kerja_sebulan_antar) {  
-        gajiPokokPerantar = karyawanData.jumlah_gaji_pokok / karyawanData.waktu_kerja_sebulan_antar;  
+
+    let gajiPokokPerhari = 0;
+
+    if (karyawanData.waktu_kerja_sebulan_antar > 0) {  
+        let gajiPokokPerantar = karyawanData.jumlah_gaji_pokok / karyawanData.waktu_kerja_sebulan_antar;  
         gajiPokokPerhari = gajiPokokPerantar;
-    } else if (karyawanData.waktu_kerja_sebulan_menit) {
-        gajiPokokPermenit = karyawanData.jumlah_gaji_pokok / karyawanData.waktu_kerja_sebulan_menit; 
-        gajiPokokPerhari = gajiPokokPermenit * data.total_menit; 
-        const tanggalAbsen = new Date(data.tanggal); // Assuming data.tanggal_absen is provided in the data
-        if (tanggalAbsen.getDay() === 6) { // 6 represents Saturday
-            gajiPokokPerhari -= 60 * gajiPokokPermenit; // Subtract 60 minutes worth of pay
+    } else if (karyawanData.waktu_kerja_sebulan_menit > 0) {
+        let gajiPokokPermenit = karyawanData.jumlah_gaji_pokok / karyawanData.waktu_kerja_sebulan_menit;
+
+        if (!data.total_menit || data.total_menit <= 0) {
+            throw new Error("Total menit absen tidak valid");
         }
-    }  else {
-        gajiPokokPerhari = 0;
+
+        gajiPokokPerhari = gajiPokokPermenit * data.total_menit;
+
+        const tanggalAbsen = new Date(data.tanggal); 
+        if (tanggalAbsen.getDay() === 6) { 
+            gajiPokokPerhari -= 60 * gajiPokokPermenit; 
+        }
     }
 
-    const roundedGajiPokokPerhari = Math.round(gajiPokokPerhari)
-  
-    data.gaji_pokok_perhari = roundedGajiPokokPerhari; 
-    
-     // Generate Google Maps link
-     const googleMapsLink = `https://www.google.com/maps/place/?q=${data.lat},${data.lng}`;
-     data.gmaps = googleMapsLink;
-  
+    const roundedGajiPokokPerhari = Math.round(gajiPokokPerhari);
+    data.gaji_pokok_perhari = roundedGajiPokokPerhari;
+
+    const googleMapsLink = `https://www.google.com/maps/place/?q=${data.lat},${data.lng}`;
+    data.gmaps = googleMapsLink;
+
     return await AbsensiKaryawan.create(data); 
-  }  
+  }
+ 
 
   static async getAllByKaryawan(karyawanId) {
     const karyawan = await Karyawan.findByPk(karyawanId);
