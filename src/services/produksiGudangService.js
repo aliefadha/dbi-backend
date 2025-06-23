@@ -70,6 +70,11 @@ class ProduksiGudangService {
                 is_deleted: false
               },
               attributes: ["barang_handmade_id", "nama_barang"]
+            },
+            {
+              model: Karyawan,
+              as: "karyawan",
+              attributes: ["karyawan_id", "nama_karyawan"]
             }
           ]
         }
