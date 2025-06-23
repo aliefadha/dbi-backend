@@ -19,9 +19,9 @@ class AbsensiKaryawanService {
     } else if (karyawanData.waktu_kerja_sebulan_menit > 0) {
         let gajiPokokPermenit = karyawanData.jumlah_gaji_pokok / karyawanData.waktu_kerja_sebulan_menit;
 
-        if (!data.total_menit || data.total_menit <= 0) {
-            throw new Error("Total menit absen tidak valid");
-        }
+        // if (!data.total_menit || data.total_menit <= 0) {
+        //     throw new Error("Total menit absen tidak valid");
+        // }
 
         gajiPokokPerhari = gajiPokokPermenit * data.total_menit;
 
