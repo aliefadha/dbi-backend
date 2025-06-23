@@ -149,39 +149,55 @@ class CabangController {
           message: "Karyawan not found"
         });
       }
-      // Check if the user wants to change the password
+      // Ambil input
       const oldPassword = req.body.old_password;
       const newPassword = req.body.password;
       const confirmPassword = req.body.confirm_password;
 
+      let detailPassword = user.detail_password; // default: tetap password lama
+
+      // Jika user ingin update password
       if (oldPassword || newPassword || confirmPassword) {
-        // If any of the password fields are provided, validate them
-        let valid = await compare(oldPassword, user.password);
-        if (!valid) {
-          return res.status(400).json({
-            success: false,
-            data: null,
-            message: "old password not match",
-          });
-        }
+          // Semua field password harus diisi
+          if (!oldPassword || !newPassword || !confirmPassword) {
+              return res.status(400).json({
+                  success: false,
+                  data: null,
+                  message: "All password fields (old, new, confirm) must be provided",
+              });
+          }
 
-        if (newPassword !== confirmPassword) {
-          return res.status(400).json({
-            success: false,
-            data: null,
-            message: "password and confirm password do not match",
-          });
-        }
+          // Validasi password lama
+          const valid = await compare(oldPassword, user.password);
+          if (!valid) {
+              return res.status(400).json({
+                  success: false,
+                  data: null,
+                  message: "Old password not match",
+              });
+          }
 
-        const hashPassword = bcrypt.hashSync(newPassword, 10);
-        req.body.password = hashPassword;
+          // Validasi new password sama confirm
+          if (newPassword !== confirmPassword) {
+              return res.status(400).json({
+                  success: false,
+                  data: null,
+                  message: "Password and confirm password do not match",
+              });
+          }
+
+          // Jika semua validasi lolos → hash password baru
+          const hashPassword = bcrypt.hashSync(newPassword, 10);
+          req.body.password = hashPassword;
+          detailPassword = newPassword.substring(0, 3) + '*'.repeat(newPassword.length - 3);
       } else {
-        // If no password fields are provided, remove the password field from the request body
-        delete req.body.password;
+          // Tidak ingin update password
+          delete req.body.password;
       }
+
       const cabangData = {
         ...req.body,
-        detail_password: newPassword
+        detail_password: detailPassword
       }
       const cabang = await CabangService.update(req.params.id, cabangData);
       if (!cabang) {
