@@ -101,7 +101,7 @@ class KaryawanService {
     static async delete(id) {
         const karyawan = await Karyawan.findByPk(id);
         if (!karyawan) return null;
-        await karyawan.destroy();
+        await karyawan.update({ is_deleted: true });
         return true;
     }
 
