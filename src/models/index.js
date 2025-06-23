@@ -1000,15 +1000,17 @@ Catatan.belongsTo(Toko, {
     as: "toko"
 })
 
-BarangProduksiGudang.hasMany(Karyawan, {
+Karyawan.hasMany(ProduksiGudang, {
     foreignKey: "karyawan_id",
-    as: "karyawan"
+    as: "karyawan_produksi"
 })
 
-Karyawan.belongsTo(BarangProduksiGudang, {
+ProduksiGudang.belongsTo(Karyawan, {
     foreignKey: "karyawan_id",
-    as: "karyawan"
+    as: "karyawan_produksi"
 })
+
+
 
 // Sync models with the database  
 const syncDatabase = async () => {

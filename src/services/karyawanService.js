@@ -99,7 +99,10 @@ class KaryawanService {
         }
     }
     static async delete(id) {
-        return await Karyawan.destroy({ where: { karyawan_id: id } });
+        const karyawan = await Karyawan.findByPk(id);
+        if (!karyawan) return null;
+        await karyawan.destroy();
+        return true;
     }
 
     static async exportToExcel(toko_id, divisi) {

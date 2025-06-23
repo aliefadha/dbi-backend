@@ -71,12 +71,13 @@ class ProduksiGudangService {
               },
               attributes: ["barang_handmade_id", "nama_barang"]
             },
-            {
-              model: Karyawan,
-              as: "karyawan",
-              attributes: ["karyawan_id", "nama_karyawan"]
-            }
+            
           ]
+        },
+        {
+          model: Karyawan,
+          as: "karyawan",
+          attributes: ["karyawan_id", "nama_karyawan"]
         }
       ]
     });
