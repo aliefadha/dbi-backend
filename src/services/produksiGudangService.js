@@ -182,7 +182,7 @@ class ProduksiGudangService {
       const bahanProduction = produksiGudang.produk.flatMap(item =>
         item.barang.rincian_bahan
       );
-      if (status === "terima") {
+      if (status === "diterima") {
         // Process stock updates
         for (const bahan of bahanProduction) {
           const stockRecord = await StokBarangGudang.findOne({
