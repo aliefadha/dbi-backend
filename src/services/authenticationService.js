@@ -76,7 +76,7 @@ class AuthenticationService {
     } // karyawan umum
     else if(role == 8){
       const roleName = "Karyawan Umum";
-      let user = await Karyawan.findOne({where: {email: email, jenis_karyawan: "Umum"}});
+      let user = await Karyawan.findOne({where: {email: email, jenis_karyawan: "Umum", is_deleted: 0}});
       if(!user) throw new Error("Invalid email or password");
       let valid = await compare(password, user.password); // Await the comparison
       if(!valid) throw new Error("Invalid email or password");
@@ -85,7 +85,7 @@ class AuthenticationService {
     }
     else if(role == 9){
       const roleName = "Tim Hybrid";
-      let user = await Karyawan.findOne({where: {email: email, jenis_karyawan: "Tim Hybrid"}});
+      let user = await Karyawan.findOne({where: {email: email, jenis_karyawan: "Tim Hybrid", is_deleted: 0}});
       if(!user) throw new Error("Invalid email or password");
       let valid = await compare(password, user.password); // Await the comparison
       if(!valid) throw new Error("Invalid email or password");
@@ -94,7 +94,7 @@ class AuthenticationService {
     }
     else if (role == 10) {
       const roleName = "Karyawan Produksi";
-      let user = await Karyawan.findOne({where: {email: email, jenis_karyawan: "Produksi"}});
+      let user = await Karyawan.findOne({where: {email: email, jenis_karyawan: "Produksi", is_deleted: 0}});
       if(!user) throw new Error("Invalid email or password");
       let valid = await compare(password, user.password); // Await the comparison
       if(!valid) throw new Error("Invalid email or password");
@@ -103,7 +103,7 @@ class AuthenticationService {
     }
     else if (role == 11) {
       const roleName = "Karyawan Transportasi";
-      let user = await Karyawan.findOne({where: {email: email, jenis_karyawan: "Transportasi"}});
+      let user = await Karyawan.findOne({where: {email: email, jenis_karyawan: "Transportasi", is_deleted: 0}});
       if(!user) throw new Error("Invalid email or password");
       let valid = await compare(password, user.password); // Await the comparison
       if(!valid) throw new Error("Invalid email or password");
