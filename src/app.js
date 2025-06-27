@@ -35,7 +35,7 @@ app.use('/images-authentication', express.static(path.join(__dirname, 'public/au
 const corsOptions = {
   origin: process.env.NODE_ENV === 'development'
     ? [process.env.DEV_ORIGIN]
-    : [process.env.PROD_ORIGIN],
+    : [process.env.PROD_ORIGIN, process.env.DEV_ORIGIN],
 };
 
 app.use(cors(corsOptions)); 
