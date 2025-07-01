@@ -757,11 +757,17 @@ class LaporanKeuanganService {
         raw: true,
         nest: true
       });
+      const toko = await Toko.findOne({
+        where: {
+          toko_id: 1
+        }
+      });
 
       return {
         penjualan_id: penjualan.penjualan_id,
         tanggal: penjualan.tanggal,
         total_pemasukan: penjualan.total_penjualan,
+        nama_toko: toko.nama_toko,
         produk: produk.map(item => ({
           nama_barang: item.barang_handmade?.nama_barang ||
             item.barang_nonhandmade?.nama_barang ||
