@@ -50,14 +50,16 @@ class BarangHandmadeService {
     return barangHandmade;
   }
 
-  static async getAll(toko_id, cabang_id) {
+static async getAll(toko_id, cabang_id, page = 1, limit = 10) {
+    const offset = (page - 1) * limit;
+
     const whereConditionsToko = {
       is_deleted: false
-    }
+    };
 
     const whereConditionsCabang = {
       is_deleted: false
-    }
+    };
 
     if (toko_id) {
       whereConditionsToko.toko_id = toko_id;
@@ -66,7 +68,8 @@ class BarangHandmadeService {
     if (cabang_id) {
       whereConditionsCabang.cabang_id = cabang_id;
     }
-    return await BarangHandmade.findAll({
+
+    const { count, rows } = await BarangHandmade.findAndCountAll({
       where: {
         is_deleted: false
       },
@@ -99,7 +102,7 @@ class BarangHandmadeService {
               as: "cabang",
               attributes: ["cabang_id", "nama_cabang"],
               required: true,
-              where: whereConditionsCabang,
+              where: whereConditionsCabang, // This is where the issue might be exposed
               include: [
                 {
                   model: Toko,
@@ -123,9 +126,20 @@ class BarangHandmadeService {
           ]
         }
       ],
-      order: [["createdAt", "DESC"]]
+      order: [["createdAt", "DESC"]],
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      subQuery: false // <--- ADD THIS LINE
     });
+
+    return {
+      totalItems: count,
+      data: rows,
+      currentPage: parseInt(page),
+      totalPages: Math.ceil(count / limit)
+    };
   }
+
 
 
   static async getById(id) {

@@ -6,8 +6,10 @@ class BarangMentahService {
     return await BarangMentah.create(data);
   }
 
-  static async getAll() {
-    return await BarangMentah.findAll({
+  static async getAll(page = 1, limit = 1) {
+    const offset = (page - 1) * limit;
+
+    const { rows, count } = await BarangMentah.findAndCountAll({
       where: {
         is_deleted: false
       },
@@ -18,8 +20,18 @@ class BarangMentahService {
           attributes: ["jumlah_stok"]
         },
       ],
-      order: [['createdAt', 'DESC']]
+      order: [['createdAt', 'DESC']],
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      subQuery: false 
     });
+
+    return {
+      totalItems: count,
+      data: rows,
+      currentPage: parseInt(page),
+      totalPages: Math.ceil(count / limit)
+    };
   }
 
   static async getById(id) {

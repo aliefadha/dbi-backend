@@ -42,13 +42,26 @@ class BarangCustomController {
   
   static async getAll(req, res) {  
     try {  
-      const { toko_id } = req.query;
-      const barangCustoms = await BarangCustomService.getAll(toko_id);  
-      res.status(200).json({  
-        success: true,  
-        data: barangCustoms,  
-        message: "retrieved successfully",  
-      });  
+      const { toko_id, page, limit } = req.query;
+      const currentPage = parseInt(page) || 1;
+      const itemsPerPage = parseInt(limit) || 10;
+
+      const result = await BarangCustomService.getAll(
+        toko_id,
+        currentPage,
+        itemsPerPage
+      )
+      res.status(200).json({
+        success: true,
+        data: result.data,
+        pagination: { // Add pagination metadata
+          totalItems: result.totalItems,
+          currentPage: result.currentPage,
+          totalPages: result.totalPages,
+          itemsPerPage: itemsPerPage
+        },
+        message: "retrieved successfully",
+      });
     } catch (error) {  
       res.status(500).json({  
         success: false,  

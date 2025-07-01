@@ -43,10 +43,22 @@ class BarangHandmadeGudangController {
 
   static async getAll(req, res) {
     try {
-      const barangHandmadeGudangs = await BarangHandmadeGudangService.getAll();
+      const { page, limit } = req.query;
+      const currentPage = parseInt(page) || 1;
+      const itemsPerPage = parseInt(limit) || 10;
+      const result = await BarangHandmadeGudangService.getAll(
+        currentPage,
+        itemsPerPage
+      );
       res.status(200).json({
         success: true,
-        data: barangHandmadeGudangs,
+        data: result.data,
+        pagination: { // Add pagination metadata
+          totalItems: result.totalItems,
+          currentPage: result.currentPage,
+          totalPages: result.totalPages,
+          itemsPerPage: itemsPerPage
+        },
         message: "retrieved successfully",
       });
     } catch (error) {

@@ -41,12 +41,24 @@ class BarangMentahController {
   
   static async getAll(req, res) {  
     try {  
-      const barangMentahs = await BarangMentahService.getAll();  
-      res.status(200).json({  
-        success: true,  
-        data: barangMentahs,  
-        message: "retrieved successfully",  
-      });  
+      const { page, limit } = req.query;
+      const currentPage = parseInt(page) || 1;
+      const itemsPerPage = parseInt(limit) || 10;
+      const result = await BarangMentahService.getAll(
+        currentPage,
+        itemsPerPage
+      );  
+      res.status(200).json({
+        success: true,
+        data: result.data,
+        pagination: { // Add pagination metadata
+          totalItems: result.totalItems,
+          currentPage: result.currentPage,
+          totalPages: result.totalPages,
+          itemsPerPage: itemsPerPage
+        },
+        message: "retrieved successfully",
+      });
     } catch (error) {  
       res.status(500).json({  
         success: false,  

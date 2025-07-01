@@ -79,8 +79,10 @@ class BarangHandmadeGudangService {
     }
   }
 
-  static async getAll() {
-    return await BarangHandmadeGudang.findAll({
+  static async getAll(page = 1, limit = 1) {
+    const offset = (page - 1) * limit;
+
+    const { rows, count } = await BarangHandmadeGudang.findAndCountAll({
       where: {
         is_deleted: false
       },
@@ -114,8 +116,18 @@ class BarangHandmadeGudangService {
           ]
         }
       ],
-      order: [['createdAt', 'DESC']]
+      order: [['createdAt', 'DESC']],
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      subQuery: false 
     });
+
+    return {
+      totalItems: count,
+      data: rows,
+      currentPage: parseInt(page),
+      totalPages: Math.ceil(count / limit)
+    };
   }
 
   static async getById(id) {

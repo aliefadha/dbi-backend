@@ -9,7 +9,9 @@ class BarangCustomService {
     return await BarangCustom.create(data);
   }
 
-  static async getAll(toko_id) {
+  static async getAll(toko_id, page = 1, limit = 10) {
+    const offset = (page - 1) * limit;
+
     const whereConditions = {
       is_deleted: false
     }
@@ -18,15 +20,25 @@ class BarangCustomService {
       whereConditions.toko_id = toko_id
     }
 
-    return await BarangCustom.findAll({
+    const { rows, count } = await BarangCustom.findAndCountAll({
       where: whereConditions,
       include: [
         { model: JenisBarang, as: "jenis_barang" },
         { model: KategoriBarang, as: "kategori" },
         { model: StokBarang, as: "stok_barang", attributes: ["jumlah_stok"] }
       ],
-      order: [['createdAt', 'DESC']]
+      order: [['createdAt', 'DESC']],
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      subQuery: false 
     });
+
+    return {
+      totalItems: count,
+      data: rows,
+      currentPage: parseInt(page),
+      totalPages: Math.ceil(count / limit)
+    };
   }
 
   static async getById(id) {

@@ -48,7 +48,9 @@ class BarangNonHandmadeService {
     return barangNonHandmade;
   }
 
-  static async getAll(toko_id, cabang_id) {
+  static async getAll(toko_id, cabang_id, page = 1, limit = 10) {
+    const offset = (page - 1) * limit;
+    
     const whereConditionsToko = {
       is_deleted: false
     }
@@ -64,7 +66,7 @@ class BarangNonHandmadeService {
     if (cabang_id) {
       whereConditionsCabang.cabang_id = cabang_id;
     }
-    return await BarangNonHandmade.findAll({
+    const { count, rows } = await BarangNonHandmade.findAndCountAll({
       where: {
         is_deleted: false
       },
@@ -121,8 +123,17 @@ class BarangNonHandmadeService {
           ]
         }
       ],
-      order: [["createdAt", "DESC"]]
+      order: [["createdAt", "DESC"]],
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      subQuery: false
     });
+    return {
+      totalItems: count,
+      data: rows,
+      currentPage: parseInt(page),
+      totalPages: Math.ceil(count / limit)
+    };
   }
 
   static async getById(id) {

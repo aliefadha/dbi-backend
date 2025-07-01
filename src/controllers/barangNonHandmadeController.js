@@ -43,13 +43,28 @@ class BarangNonHandmadeController {
   
   static async getAll(req, res) {  
     try {  
-      const { toko_id, cabang } = req.query;
-      const barangNonHandmades = await BarangNonHandmadeService.getAll(toko_id, cabang);  
-      res.status(200).json({  
-        success: true,  
-        data: barangNonHandmades,  
-        message: "retrieved successfully",  
-      });  
+      const { toko_id, cabang, page, limit } = req.query; 
+      const currentPage = parseInt(page) || 1;
+      const itemsPerPage = parseInt(limit) || 10;
+
+      const result = await BarangNonHandmadeService.getAll(
+        toko_id,
+        cabang,
+        currentPage,
+        itemsPerPage
+      );
+
+      res.status(200).json({
+        success: true,
+        data: result.data,
+        pagination: { // Add pagination metadata
+          totalItems: result.totalItems,
+          currentPage: result.currentPage,
+          totalPages: result.totalPages,
+          itemsPerPage: itemsPerPage
+        },
+        message: "retrieved successfully",
+      });
     } catch (error) {  
       res.status(500).json({  
         success: false,  
