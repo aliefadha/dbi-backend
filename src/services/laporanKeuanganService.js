@@ -574,6 +574,13 @@ class LaporanKeuanganService {
       is_deleted: false
     };
 
+    const namaGudang = await Toko.findOne({
+      where: {
+        toko_id: 1
+      },
+      attributes: ["nama_toko"]
+    });
+
     pengeluaranWhereClause.toko_id = 1;
 
     const pengeluaran = await DeskripsiPengeluaran.findAll({
@@ -665,6 +672,7 @@ class LaporanKeuanganService {
         pembelian_id: pembelian.pembelian_id,
         tanggal: pembelian.tanggal,
         total_pengeluaran: pembelian.total_pembelian,
+        nama_toko: namaGudang,
         produk: produk.map(item => ({
           nama_barang: item.barang_handmade?.nama_barang ||
             item.barang_nonhandmade?.nama_barang ||
@@ -757,17 +765,12 @@ class LaporanKeuanganService {
         raw: true,
         nest: true
       });
-      const toko = await Toko.findOne({
-        where: {
-          toko_id: 1
-        }
-      });
 
       return {
         penjualan_id: penjualan.penjualan_id,
         tanggal: penjualan.tanggal,
         total_pemasukan: penjualan.total_penjualan,
-        nama_toko: toko.nama_toko,
+        nama_toko: namaGudang,
         produk: produk.map(item => ({
           nama_barang: item.barang_handmade?.nama_barang ||
             item.barang_nonhandmade?.nama_barang ||
