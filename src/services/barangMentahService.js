@@ -1,3 +1,4 @@
+const { Op } = require("sequelize");
 const BarangMentah = require("../models/barangMentah");
 const StokBarangGudang = require("../models/stokBarangGudang");
 
@@ -6,13 +7,19 @@ class BarangMentahService {
     return await BarangMentah.create(data);
   }
 
-  static async getAll(page = 1, limit = 1) {
+  static async getAll(page = 1, limit = 1, search = "") {
     const offset = (page - 1) * limit;
 
+    const whereConditions = {
+      is_deleted: false
+    }
+
+    if (search) {
+      whereConditions.nama_barang = { [Op.like]: `%${search}%` };
+    }
+
     const { rows, count } = await BarangMentah.findAndCountAll({
-      where: {
-        is_deleted: false
-      },
+      where: whereConditions,
       include: [
         {
           model: StokBarangGudang,

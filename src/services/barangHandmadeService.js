@@ -50,8 +50,12 @@ class BarangHandmadeService {
     return barangHandmade;
   }
 
-static async getAll(toko_id, cabang_id, page = 1, limit = 10) {
+static async getAll(toko_id, cabang_id, page = 1, limit = 10, search = "") {
     const offset = (page - 1) * limit;
+
+    const whereConditionsBarangHandmade = {
+      is_deleted: false
+    }
 
     const whereConditionsToko = {
       is_deleted: false
@@ -60,6 +64,10 @@ static async getAll(toko_id, cabang_id, page = 1, limit = 10) {
     const whereConditionsCabang = {
       is_deleted: false
     };
+
+   if (search) {
+      whereConditionsBarangHandmade.nama_barang = { [Op.like]: `%${search}%` };
+    }
 
     if (toko_id) {
       whereConditionsToko.toko_id = toko_id;
@@ -70,9 +78,7 @@ static async getAll(toko_id, cabang_id, page = 1, limit = 10) {
     }
 
     const { count, rows } = await BarangHandmade.findAndCountAll({
-      where: {
-        is_deleted: false
-      },
+      where: whereConditionsBarangHandmade,
       include: [
         {
           model: KategoriBarang,

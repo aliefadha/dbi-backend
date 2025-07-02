@@ -6,6 +6,7 @@ const RincianBahanGudang = require("../models/rincianBahanGudang");
 const RincianBahanGudangService = require("./rincianBahanGudangService");
 const StokBarangGudang = require("../models/stokBarangGudang");
 const RincianBiayaGudangService = require("./rincianBiayaGudangService");
+const { Op } = require("sequelize");
 
 class BarangHandmadeGudangService {
   static async create(data) {
@@ -79,13 +80,19 @@ class BarangHandmadeGudangService {
     }
   }
 
-  static async getAll(page = 1, limit = 1) {
+  static async getAll(page = 1, limit = 1, search = "") {
     const offset = (page - 1) * limit;
 
+    const whereConditions = {
+      is_deleted: false
+    }
+
+    if (search) {
+      whereConditions.nama_barang = { [Op.like]: `%${search}%` };
+    }
+
     const { rows, count } = await BarangHandmadeGudang.findAndCountAll({
-      where: {
-        is_deleted: false
-      },
+      where: whereConditions,
       include: [
         {
           model: KategoriBarangGudang,

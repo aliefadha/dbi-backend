@@ -1,4 +1,4 @@
-const { where } = require("sequelize");
+const { where, Op } = require("sequelize");
 const BarangCustom = require("../models/barangCustom");
 const JenisBarang = require("../models/jenisBarang");
 const KategoriBarang = require("../models/kategoriBarang");
@@ -9,11 +9,15 @@ class BarangCustomService {
     return await BarangCustom.create(data);
   }
 
-  static async getAll(toko_id, page = 1, limit = 10) {
+  static async getAll(toko_id, page = 1, limit = 10, search = "") {
     const offset = (page - 1) * limit;
 
     const whereConditions = {
       is_deleted: false
+    }
+    
+    if (search) {
+      whereConditions.nama_barang = { [Op.like]: `%${search}%` };
     }
 
     if (toko_id) {

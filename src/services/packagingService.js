@@ -2,17 +2,22 @@ const Packaging = require("../models/packaging");
 const JenisBarang = require("../models/jenisBarang");
 const KategoriBarang = require("../models/kategoriBarang");
 const StokBarang = require("../models/stokBarang");
+const { Op } = require("sequelize");
 
 class PackagingService {
   static async create(data) {
     return await Packaging.create(data);
   }
 
-  static async getAll(toko_id, page = 1, limit = 10) {
+  static async getAll(toko_id, page = 1, limit = 10, search = "") {
     const offset = (page - 1) * limit;
 
     const whereConditions = {
       is_deleted: false
+    }
+
+    if (search) {
+      whereConditions.nama_packaging = { [Op.like]: `%${search}%` };
     }
 
     if (toko_id) {

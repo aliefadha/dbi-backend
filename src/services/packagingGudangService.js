@@ -1,3 +1,4 @@
+const { Op } = require("sequelize");
 const PackagingGudang = require("../models/packagingGudang");
 const StokBarangGudang = require("../models/stokBarangGudang");
 const CustomIdGenerateService = require("./customIdGenerateService");
@@ -7,13 +8,19 @@ class PackagingGudangService {
     return await PackagingGudang.create(data);
   }
 
-  static async getAll(page = 1, limit = 1) {
+  static async getAll(page = 1, limit = 1, search = "") {
     const offset = (page - 1) * limit;
 
+    const whereConditions = {
+      is_deleted: false
+    }
+
+    if (search) {
+      whereConditions.nama_packaging = { [Op.like]: `%${search}%` };
+    }
+
     const { rows, count } = await PackagingGudang.findAndCountAll({
-      where: {
-        is_deleted: false
-      },
+      where: whereConditions,
       include: [
         {
           model: StokBarangGudang,

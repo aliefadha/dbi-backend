@@ -5,6 +5,7 @@ const CustomIdGenerateService = require("./customIdGenerateService");
 const StokBarangGudang = require("../models/stokBarangGudang");
 const RincianBiayaGudangService = require("./rincianBiayaGudangService");
 const RincianBiayaGudang = require("../models/rincianBiayaGudang");
+const { Op } = require("sequelize");
 
 class BarangNonHandmadeGudangService {
   static async create(data) {
@@ -62,13 +63,19 @@ class BarangNonHandmadeGudangService {
     }
   }
 
-  static async getAll(page = 1, limit = 1) {
+  static async getAll(page = 1, limit = 1, search = "") {
     const offset = (page - 1) * limit;
 
+    const whereConditions = {
+      is_deleted: false
+    }
+
+    if (search) {
+      whereConditions.nama_barang = { [Op.like]: `%${search}%` };
+    }
+
     const { rows, count } = await BarangNonHandmadeGudang.findAndCountAll({
-      where: {
-        is_deleted: false
-      },
+      where: whereConditions,
       attributes: {
         exclude: ["kategori_barang_id", "jenis_barang_id"]
       },

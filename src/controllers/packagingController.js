@@ -42,13 +42,16 @@ class PackagingController {
   
   static async getAll(req, res) {  
     try {  
-      const { toko_id, page, limit } = req.query;
+      const { toko_id, page, limit, search } = req.query;
       const currentPage = parseInt(page) || 1;
       const itemsPerPage = parseInt(limit) || 10;
+      const searchItem = search || '';
+
       const result = await PackagingService.getAll(
         toko_id,
         currentPage,
-        itemsPerPage
+        itemsPerPage,
+        searchItem
       );  
       res.status(200).json({
         success: true,

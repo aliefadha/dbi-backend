@@ -41,12 +41,15 @@ class BarangMentahController {
   
   static async getAll(req, res) {  
     try {  
-      const { page, limit } = req.query;
+      const { page, limit, search } = req.query;
       const currentPage = parseInt(page) || 1;
       const itemsPerPage = parseInt(limit) || 10;
+      const searchItem = search || '';
+
       const result = await BarangMentahService.getAll(
         currentPage,
-        itemsPerPage
+        itemsPerPage,
+        searchItem
       );  
       res.status(200).json({
         success: true,
