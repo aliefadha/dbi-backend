@@ -41,12 +41,24 @@ class PackagingGudangController {
   
   static async getAll(req, res) {  
     try {  
-      const packagingGudangs = await PackagingGudangService.getAll();  
-      res.status(200).json({  
-        success: true,  
-        data: packagingGudangs,  
-        message: "retrieved successfully",  
-      });  
+      const { page, limit } = req.query;
+      const currentPage = parseInt(page) || 1;
+      const itemsPerPage = parseInt(limit) || 10;
+      const result = await PackagingGudangService.getAll(
+        currentPage,
+        itemsPerPage
+      );  
+      res.status(200).json({
+        success: true,
+        data: result.data,
+        pagination: { // Add pagination metadata
+          totalItems: result.totalItems,
+          currentPage: result.currentPage,
+          totalPages: result.totalPages,
+          itemsPerPage: itemsPerPage
+        },
+        message: "retrieved successfully",
+      });
     } catch (error) {  
       res.status(500).json({  
         success: false,  

@@ -8,7 +8,9 @@ class PackagingService {
     return await Packaging.create(data);
   }
 
-  static async getAll(toko_id) {
+  static async getAll(toko_id, page = 1, limit = 10) {
+    const offset = (page - 1) * limit;
+
     const whereConditions = {
       is_deleted: false
     }
@@ -16,7 +18,7 @@ class PackagingService {
     if (toko_id) {
       whereConditions.toko_id = toko_id
     }
-    return await Packaging.findAll({
+    const { rows, count } = await Packaging.findAndCountAll({
       where: whereConditions,
       include: [
         {
@@ -35,8 +37,18 @@ class PackagingService {
           attributes: ["kategori_barang_id", "nama_kategori_barang"]
         }
       ],
-      order: [['createdAt', 'DESC']]
+      order: [['createdAt', 'DESC']],
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      subQuery: false 
     });
+
+    return {
+      totalItems: count,
+      data: rows,
+      currentPage: parseInt(page),
+      totalPages: Math.ceil(count / limit)
+    };
   }
 
   static async getById(id) {
