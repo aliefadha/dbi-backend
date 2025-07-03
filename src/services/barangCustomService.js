@@ -9,7 +9,7 @@ class BarangCustomService {
     return await BarangCustom.create(data);
   }
 
-  static async getAll(toko_id, page = 1, limit = 10, search = "") {
+  static async getAll(toko_id, page = 1, limit = 10, search = "", category) {
     const offset = (page - 1) * limit;
 
     const whereConditions = {
@@ -18,6 +18,10 @@ class BarangCustomService {
     
     if (search) {
       whereConditions.nama_barang = { [Op.like]: `%${search}%` };
+    }
+
+    if (category) {
+      whereConditions.kategori_barang_id = category;
     }
 
     if (toko_id) {

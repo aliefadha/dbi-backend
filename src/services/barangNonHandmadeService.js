@@ -48,7 +48,7 @@ class BarangNonHandmadeService {
     return barangNonHandmade;
   }
 
-  static async getAll(toko_id, cabang_id, page = 1, limit = 10, search = "") {
+  static async getAll(toko_id, cabang_id, page = 1, limit = 10, search = "", category) {
     const offset = (page - 1) * limit;
     
     const whereConditionsBarangNonHandmade = {
@@ -65,6 +65,10 @@ class BarangNonHandmadeService {
 
     if (search) {
       whereConditionsBarangNonHandmade.nama_barang = { [Op.like]: `%${search}%` };
+    }
+
+    if (category) {
+      whereConditionsBarangNonHandmade.kategori_barang_id = category;
     }
 
     if (toko_id) {

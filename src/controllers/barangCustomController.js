@@ -42,7 +42,7 @@ class BarangCustomController {
   
   static async getAll(req, res) {  
     try {  
-      const { toko_id, page, limit, search } = req.query;
+      const { toko_id, page, limit, search, category } = req.query;
       const currentPage = parseInt(page) || 1;
       const itemsPerPage = parseInt(limit) || 10;
       const searchItem = search || '';
@@ -51,7 +51,8 @@ class BarangCustomController {
         toko_id,
         currentPage,
         itemsPerPage,
-        searchItem
+        searchItem,
+        category
       )
       res.status(200).json({
         success: true,

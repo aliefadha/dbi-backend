@@ -43,7 +43,7 @@ class BarangNonHandmadeController {
   
   static async getAll(req, res) {  
     try {  
-      const { toko_id, cabang, page, limit, search } = req.query; 
+      const { toko_id, cabang, page, limit, search, category } = req.query; 
       const currentPage = parseInt(page) || 1;
       const itemsPerPage = parseInt(limit) || 10;
       const searchItem = search || '';
@@ -53,7 +53,8 @@ class BarangNonHandmadeController {
         cabang,
         currentPage,
         itemsPerPage,
-        searchItem
+        searchItem,
+        category
       );
 
       res.status(200).json({

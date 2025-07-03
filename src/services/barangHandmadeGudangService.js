@@ -80,13 +80,17 @@ class BarangHandmadeGudangService {
     }
   }
 
-  static async getAll(page = 1, limit = 1, search = "") {
+  static async getAll(page = 1, limit = 1, search = "", category) {
     const offset = (page - 1) * limit;
 
     const whereConditions = {
       is_deleted: false
     }
 
+    if (category) {
+      whereConditions.kategori_barang_id = category;
+    }
+    
     if (search) {
       whereConditions.nama_barang = { [Op.like]: `%${search}%` };
     }

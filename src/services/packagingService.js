@@ -9,11 +9,15 @@ class PackagingService {
     return await Packaging.create(data);
   }
 
-  static async getAll(toko_id, page = 1, limit = 10, search = "") {
+  static async getAll(toko_id, page = 1, limit = 10, search = "", category) {
     const offset = (page - 1) * limit;
 
     const whereConditions = {
       is_deleted: false
+    }
+
+    if (category) {
+      whereConditions.kategori_barang_id = category;
     }
 
     if (search) {

@@ -50,7 +50,7 @@ class BarangHandmadeService {
     return barangHandmade;
   }
 
-static async getAll(toko_id, cabang_id, page = 1, limit = 10, search = "") {
+static async getAll(toko_id, cabang_id, page = 1, limit = 10, search = "", category) {
     const offset = (page - 1) * limit;
 
     const whereConditionsBarangHandmade = {
@@ -75,6 +75,10 @@ static async getAll(toko_id, cabang_id, page = 1, limit = 10, search = "") {
 
     if (cabang_id) {
       whereConditionsCabang.cabang_id = cabang_id;
+    }
+
+    if (category) {
+      whereConditionsBarangHandmade.kategori_barang_id = category;
     }
 
     const { count, rows } = await BarangHandmade.findAndCountAll({

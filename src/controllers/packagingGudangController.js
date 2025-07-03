@@ -49,7 +49,7 @@ class PackagingGudangController {
       const result = await PackagingGudangService.getAll(
         currentPage,
         itemsPerPage,
-        searchItem
+        searchItem,
       );  
       res.status(200).json({
         success: true,

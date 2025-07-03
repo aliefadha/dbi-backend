@@ -43,7 +43,7 @@ class BarangHandmadeGudangController {
 
   static async getAll(req, res) {
     try {
-      const { page, limit, search } = req.query;
+      const { page, limit, search, category } = req.query;
       const currentPage = parseInt(page) || 1;
       const itemsPerPage = parseInt(limit) || 10;
       const searchItem = search || '';
@@ -51,7 +51,8 @@ class BarangHandmadeGudangController {
       const result = await BarangHandmadeGudangService.getAll(
         currentPage,
         itemsPerPage,
-        searchItem
+        searchItem,
+        category
       );
       res.status(200).json({
         success: true,

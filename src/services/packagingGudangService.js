@@ -14,7 +14,7 @@ class PackagingGudangService {
     const whereConditions = {
       is_deleted: false
     }
-
+    
     if (search) {
       whereConditions.nama_packaging = { [Op.like]: `%${search}%` };
     }
