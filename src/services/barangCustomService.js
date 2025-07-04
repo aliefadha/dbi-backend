@@ -14,8 +14,8 @@ class BarangCustomService {
 
     const whereConditions = {
       is_deleted: false
-    }
-    
+    };
+
     if (search) {
       whereConditions.nama_barang = { [Op.like]: `%${search}%` };
     }
@@ -25,29 +25,43 @@ class BarangCustomService {
     }
 
     if (toko_id) {
-      whereConditions.toko_id = toko_id
+      whereConditions.toko_id = toko_id;
     }
 
-    const { rows, count } = await BarangCustom.findAndCountAll({
+    // 1. Fetch all matching IDs
+    const matchingItems = await BarangCustom.findAll({
       where: whereConditions,
+      attributes: ["barang_custom_id"],
+      raw: true
+    });
+
+    const allIds = [...new Set(matchingItems.map(item => item.barang_custom_id))];
+    const totalItems = allIds.length;
+    const totalPages = Math.ceil(totalItems / limit);
+    const paginatedIds = allIds.slice(offset, offset + limit);
+
+    // 2. Fetch paginated full data
+    const rows = await BarangCustom.findAll({
+      where: {
+        barang_custom_id: paginatedIds,
+        is_deleted: false
+      },
       include: [
         { model: JenisBarang, as: "jenis_barang" },
         { model: KategoriBarang, as: "kategori" },
         { model: StokBarang, as: "stok_barang", attributes: ["jumlah_stok"] }
       ],
-      order: [['createdAt', 'DESC']],
-      limit: parseInt(limit),
-      offset: parseInt(offset),
-      subQuery: false 
+      order: [["createdAt", "DESC"]]
     });
 
     return {
-      totalItems: count,
+      totalItems,
       data: rows,
       currentPage: parseInt(page),
-      totalPages: Math.ceil(count / limit)
+      totalPages
     };
   }
+
 
   static async getById(id) {
     return await BarangCustom.findOne({

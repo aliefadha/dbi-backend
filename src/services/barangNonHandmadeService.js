@@ -50,18 +50,19 @@ class BarangNonHandmadeService {
 
   static async getAll(toko_id, cabang_id, page = 1, limit = 10, search = "", category) {
     const offset = (page - 1) * limit;
-    
+
+    // 1. Base filters
     const whereConditionsBarangNonHandmade = {
       is_deleted: false
-    }
+    };
 
     const whereConditionsToko = {
       is_deleted: false
-    }
+    };
 
     const whereConditionsCabang = {
       is_deleted: false
-    }
+    };
 
     if (search) {
       whereConditionsBarangNonHandmade.nama_barang = { [Op.like]: `%${search}%` };
@@ -78,8 +79,55 @@ class BarangNonHandmadeService {
     if (cabang_id) {
       whereConditionsCabang.cabang_id = cabang_id;
     }
-    const { count, rows } = await BarangNonHandmade.findAndCountAll({
+
+    // 2. Fetch matching IDs
+    const matchingItems = await BarangNonHandmade.findAll({
       where: whereConditionsBarangNonHandmade,
+      include: [
+        {
+          model: RincianBiaya,
+          as: "rincian_biaya",
+          required: true,
+          where: { is_deleted: false },
+          include: [
+            {
+              model: Cabang,
+              as: "cabang",
+              required: true,
+              where: whereConditionsCabang,
+              include: [
+                {
+                  model: Toko,
+                  as: "toko",
+                  required: true,
+                  where: whereConditionsToko
+                }
+              ]
+            },
+            {
+              model: DetailRincianBiaya,
+              as: "detail_rincian_biaya",
+              required: false,
+              where: { biaya_toko_id: null }
+            }
+          ]
+        }
+      ],
+      attributes: ["barang_non_handmade_id"],
+      raw: true
+    });
+
+    const allIds = [...new Set(matchingItems.map(item => item.barang_non_handmade_id))];
+    const totalItems = allIds.length;
+    const totalPages = Math.ceil(totalItems / limit);
+    const paginatedIds = allIds.slice(offset, offset + limit);
+
+    // 3. Fetch full data for paginated IDs
+    const rows = await BarangNonHandmade.findAll({
+      where: {
+        barang_non_handmade_id: paginatedIds,
+        is_deleted: false
+      },
       include: [
         {
           model: KategoriBarang,
@@ -99,52 +147,40 @@ class BarangNonHandmadeService {
         {
           model: RincianBiaya,
           as: "rincian_biaya",
-          required: true,
-          where: {
-            is_deleted: false
-          },
           include: [
             {
               model: Cabang,
               as: "cabang",
               attributes: ["cabang_id", "nama_cabang"],
-              required: true,
-              where: whereConditionsCabang,
               include: [
                 {
                   model: Toko,
                   as: "toko",
-                  attributes: ["toko_id", "nama_toko"],
-                  required: true,
-                  where: whereConditionsToko
+                  attributes: ["toko_id", "nama_toko"]
                 }
               ]
             },
             {
               model: DetailRincianBiaya,
               as: "detail_rincian_biaya",
-              where: {
-                biaya_toko_id: null
-              },
-              attributes: {
-                exclude: ["biaya_toko_id"]
-              }
-            },
+              required: false,
+              where: { biaya_toko_id: null },
+              attributes: { exclude: ["biaya_toko_id"] }
+            }
           ]
         }
       ],
-      order: [["createdAt", "DESC"]],
-      limit: parseInt(limit),
-      offset: parseInt(offset),
-      subQuery: false
+      order: [["createdAt", "DESC"]]
     });
+
     return {
-      totalItems: count,
+      totalItems,
       data: rows,
       currentPage: parseInt(page),
-      totalPages: Math.ceil(count / limit)
+      totalPages
     };
   }
+
 
   static async getById(id) {
     return await BarangNonHandmade.findOne({

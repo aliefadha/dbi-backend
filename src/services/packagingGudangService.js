@@ -8,37 +8,50 @@ class PackagingGudangService {
     return await PackagingGudang.create(data);
   }
 
-  static async getAll(page = 1, limit = 1, search = "") {
+  static async getAll(page = 1, limit = 10, search = "") {
     const offset = (page - 1) * limit;
 
     const whereConditions = {
       is_deleted: false
-    }
-    
+    };
+
     if (search) {
       whereConditions.nama_packaging = { [Op.like]: `%${search}%` };
     }
 
-    const { rows, count } = await PackagingGudang.findAndCountAll({
+    // 1. Fetch matching IDs (avoid JOIN impact)
+    const matchingItems = await PackagingGudang.findAll({
       where: whereConditions,
+      attributes: ["packaging_id"],
+      raw: true
+    });
+
+    const allIds = [...new Set(matchingItems.map(item => item.packaging_id))];
+    const totalItems = allIds.length;
+    const totalPages = Math.ceil(totalItems / limit);
+    const paginatedIds = allIds.slice(offset, offset + limit);
+
+    // 2. Fetch full data for paginated IDs
+    const rows = await PackagingGudang.findAll({
+      where: {
+        packaging_id: paginatedIds,
+        is_deleted: false
+      },
       include: [
         {
           model: StokBarangGudang,
           as: "stok_barang",
           attributes: ["jumlah_stok"]
-        },
+        }
       ],
-      order: [['createdAt', 'DESC']],
-      limit: parseInt(limit),
-      offset: parseInt(offset),
-      subQuery: false 
+      order: [["createdAt", "DESC"]]
     });
 
     return {
-      totalItems: count,
+      totalItems,
       data: rows,
       currentPage: parseInt(page),
-      totalPages: Math.ceil(count / limit)
+      totalPages
     };
   }
 

@@ -63,33 +63,47 @@ class BarangNonHandmadeGudangService {
     }
   }
 
-  static async getAll(page = 1, limit = 1, search = "", category) {
+  static async getAll(page = 1, limit = 10, search = "", category) {
     const offset = (page - 1) * limit;
 
     const whereConditions = {
       is_deleted: false
-    }
+    };
 
     if (category) {
       whereConditions.kategori_barang_id = category;
     }
-    
+
     if (search) {
       whereConditions.nama_barang = { [Op.like]: `%${search}%` };
     }
 
-    const { rows, count } = await BarangNonHandmadeGudang.findAndCountAll({
+    // 1. Fetch all matching IDs (no includes)
+    const matchingItems = await BarangNonHandmadeGudang.findAll({
       where: whereConditions,
+      attributes: ["barang_nonhandmade_id"],
+      raw: true
+    });
+
+    const allIds = [...new Set(matchingItems.map(item => item.barang_nonhandmade_id))];
+    const totalItems = allIds.length;
+    const totalPages = Math.ceil(totalItems / limit);
+    const paginatedIds = allIds.slice(offset, offset + limit);
+
+    // 2. Fetch paginated full data
+    const rows = await BarangNonHandmadeGudang.findAll({
+      where: {
+        barang_nonhandmade_id: paginatedIds,
+        is_deleted: false
+      },
       attributes: {
         exclude: ["kategori_barang_id", "jenis_barang_id"]
       },
       include: [
         {
           model: KategoriBarangGudang,
-          as: 'kategori',
-          where: {
-            is_deleted: false
-          },
+          as: "kategori",
+          where: { is_deleted: false },
           attributes: ["nama_kategori_barang"]
         },
         {
@@ -105,19 +119,17 @@ class BarangNonHandmadeGudangService {
           }
         }
       ],
-      order: [["createdAt", "DESC"]],
-      limit: parseInt(limit),
-      offset: parseInt(offset),
-      subQuery: false 
+      order: [["createdAt", "DESC"]]
     });
 
     return {
-      totalItems: count,
+      totalItems,
       data: rows,
       currentPage: parseInt(page),
-      totalPages: Math.ceil(count / limit)
+      totalPages
     };
   }
+
 
   static async getById(id) {
     return await BarangNonHandmadeGudang.findOne({

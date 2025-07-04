@@ -14,7 +14,7 @@ class PackagingService {
 
     const whereConditions = {
       is_deleted: false
-    }
+    };
 
     if (category) {
       whereConditions.kategori_barang_id = category;
@@ -25,10 +25,27 @@ class PackagingService {
     }
 
     if (toko_id) {
-      whereConditions.toko_id = toko_id
+      whereConditions.toko_id = toko_id;
     }
-    const { rows, count } = await Packaging.findAndCountAll({
+
+    // 1. Fetch all matching IDs
+    const matchingItems = await Packaging.findAll({
       where: whereConditions,
+      attributes: ["packaging_id"],
+      raw: true
+    });
+
+    const allIds = [...new Set(matchingItems.map(item => item.packaging_id))];
+    const totalItems = allIds.length;
+    const totalPages = Math.ceil(totalItems / limit);
+    const paginatedIds = allIds.slice(offset, offset + limit);
+
+    // 2. Fetch paginated full data
+    const rows = await Packaging.findAll({
+      where: {
+        packaging_id: paginatedIds,
+        is_deleted: false
+      },
       include: [
         {
           model: JenisBarang,
@@ -46,19 +63,17 @@ class PackagingService {
           attributes: ["kategori_barang_id", "nama_kategori_barang"]
         }
       ],
-      order: [['createdAt', 'DESC']],
-      limit: parseInt(limit),
-      offset: parseInt(offset),
-      subQuery: false 
+      order: [["createdAt", "DESC"]]
     });
 
     return {
-      totalItems: count,
+      totalItems,
       data: rows,
       currentPage: parseInt(page),
-      totalPages: Math.ceil(count / limit)
+      totalPages
     };
   }
+
 
   static async getById(id) {
     return await Packaging.findOne({

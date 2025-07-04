@@ -50,12 +50,13 @@ class BarangHandmadeService {
     return barangHandmade;
   }
 
-static async getAll(toko_id, cabang_id, page = 1, limit = 10, search = "", category) {
+  static async getAll(toko_id, cabang_id, page = 1, limit = 10, search = "", category) {
     const offset = (page - 1) * limit;
 
+    // 1. Prepare base filters
     const whereConditionsBarangHandmade = {
       is_deleted: false
-    }
+    };
 
     const whereConditionsToko = {
       is_deleted: false
@@ -65,7 +66,7 @@ static async getAll(toko_id, cabang_id, page = 1, limit = 10, search = "", categ
       is_deleted: false
     };
 
-   if (search) {
+    if (search) {
       whereConditionsBarangHandmade.nama_barang = { [Op.like]: `%${search}%` };
     }
 
@@ -81,8 +82,55 @@ static async getAll(toko_id, cabang_id, page = 1, limit = 10, search = "", categ
       whereConditionsBarangHandmade.kategori_barang_id = category;
     }
 
-    const { count, rows } = await BarangHandmade.findAndCountAll({
+    // 2. Get all matching barang_handmade IDs
+    const matchingItems = await BarangHandmade.findAll({
       where: whereConditionsBarangHandmade,
+      include: [
+        {
+          model: RincianBiaya,
+          as: "rincian_biaya",
+          required: true,
+          where: { is_deleted: false },
+          include: [
+            {
+              model: Cabang,
+              as: "cabang",
+              required: true,
+              where: whereConditionsCabang,
+              include: [
+                {
+                  model: Toko,
+                  as: "toko",
+                  required: true,
+                  where: whereConditionsToko
+                }
+              ]
+            },
+            {
+              model: DetailRincianBiaya,
+              as: "detail_rincian_biaya",
+              required: false,
+              where: { biaya_toko_id: null }
+            }
+          ]
+        }
+      ],
+      attributes: ["barang_handmade_id"],
+      raw: true
+    });
+
+    const allIds = [...new Set(matchingItems.map(item => item.barang_handmade_id))];
+    const totalItems = allIds.length;
+    const totalPages = Math.ceil(totalItems / limit);
+
+    const paginatedIds = allIds.slice(offset, offset + limit);
+
+    // 3. Fetch full data by paginated IDs
+    const rows = await BarangHandmade.findAll({
+      where: {
+        barang_handmade_id: paginatedIds,
+        is_deleted: false
+      },
       include: [
         {
           model: KategoriBarang,
@@ -102,53 +150,40 @@ static async getAll(toko_id, cabang_id, page = 1, limit = 10, search = "", categ
         {
           model: RincianBiaya,
           as: "rincian_biaya",
-          required: true,
-          where: {
-            is_deleted: false
-          },
           include: [
             {
               model: Cabang,
               as: "cabang",
               attributes: ["cabang_id", "nama_cabang"],
-              required: true,
-              where: whereConditionsCabang, // This is where the issue might be exposed
               include: [
                 {
                   model: Toko,
                   as: "toko",
-                  attributes: ["toko_id", "nama_toko"],
-                  required: true,
-                  where: whereConditionsToko
+                  attributes: ["toko_id", "nama_toko"]
                 }
               ]
             },
             {
               model: DetailRincianBiaya,
               as: "detail_rincian_biaya",
-              where: {
-                biaya_toko_id: null
-              },
-              attributes: {
-                exclude: ["biaya_toko_id"]
-              }
-            },
+              where: { biaya_toko_id: null },
+              required: false,
+              attributes: { exclude: ["biaya_toko_id"] }
+            }
           ]
         }
       ],
-      order: [["createdAt", "DESC"]],
-      limit: parseInt(limit),
-      offset: parseInt(offset),
-      subQuery: false // <--- ADD THIS LINE
+      order: [["createdAt", "DESC"]]
     });
 
     return {
-      totalItems: count,
+      totalItems,
       data: rows,
       currentPage: parseInt(page),
-      totalPages: Math.ceil(count / limit)
+      totalPages
     };
   }
+
 
 
 

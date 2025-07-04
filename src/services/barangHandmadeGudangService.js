@@ -80,30 +80,44 @@ class BarangHandmadeGudangService {
     }
   }
 
-  static async getAll(page = 1, limit = 1, search = "", category) {
+  static async getAll(page = 1, limit = 10, search = "", category) {
     const offset = (page - 1) * limit;
 
     const whereConditions = {
       is_deleted: false
-    }
+    };
 
     if (category) {
       whereConditions.kategori_barang_id = category;
     }
-    
+
     if (search) {
       whereConditions.nama_barang = { [Op.like]: `%${search}%` };
     }
 
-    const { rows, count } = await BarangHandmadeGudang.findAndCountAll({
+    // 1. Fetch all matching IDs (avoid JOIN here)
+    const matchingItems = await BarangHandmadeGudang.findAll({
       where: whereConditions,
+      attributes: ["barang_handmade_id"],
+      raw: true
+    });
+
+    const allIds = [...new Set(matchingItems.map(item => item.barang_handmade_id))];
+    const totalItems = allIds.length;
+    const totalPages = Math.ceil(totalItems / limit);
+    const paginatedIds = allIds.slice(offset, offset + limit);
+
+    // 2. Fetch full data by paginated IDs
+    const rows = await BarangHandmadeGudang.findAll({
+      where: {
+        barang_handmade_id: paginatedIds,
+        is_deleted: false
+      },
       include: [
         {
           model: KategoriBarangGudang,
-          as: 'kategori',
-          where: {
-            is_deleted: false
-          },
+          as: "kategori",
+          where: { is_deleted: false },
           attributes: ["nama_kategori_barang"]
         },
         {
@@ -113,33 +127,29 @@ class BarangHandmadeGudangService {
         },
         {
           model: RincianBahanGudang,
-          as: 'rincian_bahan',
-          where: {
-            is_deleted: false
-          },
+          as: "rincian_bahan",
+          where: { is_deleted: false },
           attributes: ["barang_mentah_id", "harga_satuan", "kuantitas", "total_biaya"],
           include: [
             {
               model: BarangMentah,
-              as: 'barang_mentah',
+              as: "barang_mentah",
               attributes: ["image", "nama_barang"]
             }
           ]
         }
       ],
-      order: [['createdAt', 'DESC']],
-      limit: parseInt(limit),
-      offset: parseInt(offset),
-      subQuery: false 
+      order: [["createdAt", "DESC"]]
     });
 
     return {
-      totalItems: count,
+      totalItems,
       data: rows,
       currentPage: parseInt(page),
-      totalPages: Math.ceil(count / limit)
+      totalPages
     };
   }
+
 
   static async getById(id) {
     return await BarangHandmadeGudang.findOne({
