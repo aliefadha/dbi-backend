@@ -271,7 +271,8 @@ class LaporanKeuanganService {
     const pemasukan = await DeskripsiPemasukan.findAll({
       where: {
         is_deleted: false,
-        ...(toko_id && { toko_id: toko_id })
+        ...(toko_id && { toko_id: toko_id }),
+        ...(cabang_id && { cabang_id: cabang_id }) // <-- Make sure this is present!
       },
       attributes: ['pemasukan_id', 'deskripsi', 'jumlah_pemasukan',],
       include: [
@@ -333,7 +334,8 @@ class LaporanKeuanganService {
     const penjualanData = await Penjualan.findAll({
       where: {
         ...whereClause,
-        ...(toko_id && { toko_id: toko_id })
+        ...(toko_id && { toko_id: toko_id }),
+        ...(cabang_id && { cabang_id: cabang_id }) // <-- Add this line!
       },
       attributes: ['penjualan_id', 'tanggal', 'total_penjualan'],
       include: [
@@ -1235,7 +1237,7 @@ class LaporanKeuanganService {
           },
           {
             model: BarangNonHandmade,
-            as: 'barang_non_handmade',
+            as: 'barang_non_handled',
             attributes: ["nama_barang"]
           },
           {
