@@ -265,7 +265,8 @@ class DataKaryawanService {
     
         // Calculate achieved and not achieved based on the count  
         Object.values(groupedKpi).forEach(kpi => {  
-            const totalDaysInMonth = new Date(tahun, bulan, 0).getDate();  
+            // const totalDaysInMonth = new Date(tahun, bulan, 0).getDate(); 
+            const totalDaysInMonth = 28;
             let tercapai = kpi.count; // Use the count directly  
             let tidakTercapai = 0;  
             let persentaseTercapai = 0;  
