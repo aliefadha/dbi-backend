@@ -135,7 +135,7 @@ class ProduksiGudangService {
     });
   }
 
-  static async update(id, data) {
+   static async update(id, data) {
     const transaction = await sequelize.transaction();
     try {
       const { jumlah_produksi, total_menit, image, tanggal, karyawan_id, status } = data;
@@ -170,6 +170,8 @@ class ProduksiGudangService {
       });
       if (!produksiGudang) return null;
 
+      const statusSebelumnya = produksiGudang.status;
+
       await produksiGudang.update({
         jumlah_produksi,
         total_menit,
@@ -179,29 +181,53 @@ class ProduksiGudangService {
         karyawan_id
       }, { transaction });
 
-      const bahanProduction = produksiGudang.produk.flatMap(item =>
-        item.barang.rincian_bahan
-      );
-      if (status === "diterima") {
-        // Process stock updates
-        for (const bahan of bahanProduction) {
-          const stockRecord = await StokBarangGudang.findOne({
-            where: {
-              barang_mentah_id: bahan.barang_mentah_id,
-              is_deleted: false
-            },
-            transaction
-          });
-          if (!stockRecord) {
-            throw new Error(`Stok tidak ditemukan`);
+
+      if (status === "diterima" && statusSebelumnya !== "diterima") {
+        
+        // Iterasi setiap jenis barang yang diproduksi dalam sesi ini
+        for (const produkItem of produksiGudang.produk) {
+          const jumlahDihasilkan = produkItem.jumlah;
+          const barangHandmade = produkItem.barang;
+
+          // 1. Kurangi stok bahan mentah yang digunakan
+          for (const rincianBahan of barangHandmade.rincian_bahan) {
+            const stokBahanMentah = await StokBarangGudang.findOne({
+              where: {
+                barang_mentah_id: rincianBahan.barang_mentah_id,
+                is_deleted: false
+              },
+              transaction
+            });
+
+            if (!stokBahanMentah) {
+              throw new Error(`Stok untuk bahan mentah (ID: ${rincianBahan.barang_mentah_id}) tidak ditemukan.`);
+            }
+
+            // Kurangi stok sesuai resep x jumlah yang dihasilkan
+            await stokBahanMentah.decrement('jumlah_stok', {
+              by: rincianBahan.kuantitas * jumlahDihasilkan,
+              transaction
+            });
           }
-          await stockRecord.decrement('jumlah_stok', {
-            by: (bahan.kuantitas * produksiGudang.jumlah_produksi),
+
+          // 2. Tambah stok barang jadi (handmade) yang dihasilkan
+          const [stokBarangJadi, isCreated] = await StokBarangGudang.findOrCreate({
+              where: { barang_handmade_id: barangHandmade.barang_handmade_id },
+              defaults: {
+                  barang_handmade_id: barangHandmade.barang_handmade_id,
+                  jumlah_stok: 0, 
+                  is_deleted: false
+              },
+              transaction
+          });
+
+          await stokBarangJadi.increment('jumlah_stok', {
+            by: jumlahDihasilkan,
             transaction
           });
         }
 
-        // Process karyawan data
+        // Proses data karyawan (absensi dan gaji)
         const karyawanData = await Karyawan.findOne({
           where: { 
             karyawan_id: produksiGudang.karyawan_id,
@@ -210,19 +236,17 @@ class ProduksiGudangService {
         });
 
         if (!karyawanData) {  
-          throw new Error("Karyawan not found");  
+          throw new Error("Karyawan tidak ditemukan");  
         } 
         
         const tanggalAbsen = new Date(tanggal);
         const gajiPokokPermenit = karyawanData.jumlah_gaji_pokok / karyawanData.waktu_kerja_sebulan_menit;
         let gajiPokokPerhari = gajiPokokPermenit * produksiGudang.total_menit;
 
-        // Check if the date is Saturday and subtract 60 minutes worth of pay
-        if (tanggalAbsen.getDay() === 6) { // 6 represents Saturday
-            gajiPokokPerhari -= 60 * gajiPokokPermenit; // Subtract 60 minutes worth of pay
+        if (tanggalAbsen.getDay() === 6) { 
+            gajiPokokPerhari -= 60 * gajiPokokPermenit;
         }
 
-        // Create absensi record
         await AbsensiKaryawan.create({
           image: produksiGudang.image,
           karyawan_id: produksiGudang.karyawan_id,
@@ -241,7 +265,7 @@ class ProduksiGudangService {
       }
 
       await transaction.commit();
-      return produksiGudang.produk;
+      return produksiGudang;
     } catch (error) {
       await transaction.rollback();
       throw error;
