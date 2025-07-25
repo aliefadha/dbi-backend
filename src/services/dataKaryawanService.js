@@ -142,7 +142,9 @@ class DataKaryawanService {
                 tanggal: {
                     [Op.between]: [startDate, endDate]
                 },
-            }
+            },
+            distinct: true,
+            col: "tanggal"
         });
     
         const cutiKaryawanRecords = await CutiKaryawan.findAll({  
