@@ -1,4 +1,5 @@
 const BarangHandmadeGudang = require("../models/barangHandmadeGudang");
+const BarangMentah = require("../models/barangMentah");
 const BarangNonHandmadeGudang = require("../models/barangNonHandmadeGudang");
 const BarangProduksiGudang = require("../models/barangProduksiGudang");
 const RincianBahanGudang = require("../models/rincianBahanGudang");
@@ -88,7 +89,12 @@ class BarangProduksiGudangService {
             {
               model: RincianBahanGudang,
               as: "rincian_bahan",
-              attributes: ["barang_mentah_id", "kuantitas"]
+              attributes: ["barang_mentah_id", "kuantitas"],
+              include: [{
+                model: BarangMentah,
+                as: "barang_mentah",
+                attributes: ["nama_barang"]
+              }]
             }
           ],
           transaction
@@ -109,7 +115,8 @@ class BarangProduksiGudangService {
           });
 
           if (!bahanStockRecord || bahanStockRecord.jumlah_stok < (bahan.kuantitas * data.jumlah)) {
-            throw new Error(`Stok barang mentah tidak cukup.`);
+            const namaBarangMentah = bahan.barang_mentah ? bahan.barang_mentah.nama_barang : `ID ${bahan.barang_mentah_id}`;
+            throw new Error(`Stok untuk '${namaBarangMentah}' tidak mencukupi. Dibutuhkan ${bahan.kuantitas * data.jumlah}, tersedia ${bahanStockRecord ? bahanStockRecord.jumlah_stok : 0}.`);
           }
           bahanStockRecords.push({ record: bahanStockRecord, kuantitas: bahan.kuantitas });
         }
