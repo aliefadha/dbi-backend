@@ -103,10 +103,11 @@ class BarangProduksiGudangService {
         if (!barangHandmade) {
           throw new Error(`Barang handmade tidak ditemukan`);
         }
+        const stockErrors = [];
 
-        const bahanStockRecords = [];
         for (const bahan of barangHandmade.rincian_bahan) {
-          const bahanStockRecord = await StokBarangGudang.findOne({
+          // Mengganti nama variabel agar lebih jelas
+          const stokBahanMentah = await StokBarangGudang.findOne({
             where: {
               barang_mentah_id: bahan.barang_mentah_id,
               is_deleted: false
@@ -114,12 +115,20 @@ class BarangProduksiGudangService {
             transaction
           });
 
-          if (!bahanStockRecord || bahanStockRecord.jumlah_stok < (bahan.kuantitas * data.jumlah)) {
+          const kuantitasDibutuhkan = bahan.kuantitas * data.jumlah;
+
+          if (!stokBahanMentah || stokBahanMentah.jumlah_stok < kuantitasDibutuhkan) {
             const namaBarangMentah = bahan.barang_mentah ? bahan.barang_mentah.nama_barang : `ID ${bahan.barang_mentah_id}`;
-            throw new Error(`Stok untuk '${namaBarangMentah}' tidak mencukupi. Dibutuhkan ${bahan.kuantitas * data.jumlah}, tersedia ${bahanStockRecord ? bahanStockRecord.jumlah_stok : 0}.`);
+            // Memperbaiki kesalahan: menggunakan stokBahanMentah, bukan stokBahan
+            const stokTersedia = stokBahanMentah ? stokBahanMentah.jumlah_stok : 0;
+            stockErrors.push(`'${namaBarangMentah}' (butuh ${kuantitasDibutuhkan}, tersedia ${stokTersedia})`);
           }
-          bahanStockRecords.push({ record: bahanStockRecord, kuantitas: bahan.kuantitas });
         }
+        
+        if (stockErrors.length > 0) {
+          throw new Error(`Stok tidak mencukupi untuk bahan berikut: ${stockErrors.join(', ')}.`);
+        }
+        
         const createdProduct = await BarangProduksiGudang.create(data, {
           transaction,
         });
