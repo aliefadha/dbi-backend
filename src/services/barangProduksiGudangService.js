@@ -1,5 +1,5 @@
-const { Op } = require("sequelize");
 const BarangHandmadeGudang = require("../models/barangHandmadeGudang");
+const BarangMentah = require("../models/barangMentah");
 const BarangNonHandmadeGudang = require("../models/barangNonHandmadeGudang");
 const BarangProduksiGudang = require("../models/barangProduksiGudang");
 const RincianBahanGudang = require("../models/rincianBahanGudang");
@@ -73,13 +73,13 @@ class BarangProduksiGudangService {
     return true;
   }
 
- static async createMany(dataArray, options = {}) {
+  static async createMany(dataArray, options = {}) {
     const transaction = options.transaction;
+    const createdProdukList = [];
 
     try {
-      // Tahap 1: Agregasi (Penjumlahan) Total Kebutuhan Bahan Baku
-      const totalBahanDibutuhkan = new Map();
       for (const data of dataArray) {
+        // Check if barang_handmade exists
         const barangHandmade = await BarangHandmadeGudang.findOne({
           where: {
             barang_handmade_id: data.barang_handmade_id,
@@ -89,65 +89,46 @@ class BarangProduksiGudangService {
             {
               model: RincianBahanGudang,
               as: "rincian_bahan",
-              attributes: ["barang_mentah_id", "kuantitas"]
+              attributes: ["barang_mentah_id", "kuantitas"],
+              include: [{
+                model: BarangMentah,
+                as: "barang_mentah",
+                attributes: ["nama_barang"]
+              }]
             }
           ],
           transaction
         });
 
         if (!barangHandmade) {
-          throw new Error(`Barang handmade dengan ID ${data.barang_handmade_id} tidak ditemukan.`);
+          throw new Error(`Barang handmade tidak ditemukan`);
         }
 
+        const bahanStockRecords = [];
         for (const bahan of barangHandmade.rincian_bahan) {
-          const kuantitasDiperlukan = bahan.kuantitas * data.jumlah;
-          const totalSaatIni = totalBahanDibutuhkan.get(bahan.barang_mentah_id) || 0;
-          totalBahanDibutuhkan.set(bahan.barang_mentah_id, totalSaatIni + kuantitasDiperlukan);
-        }
-      }
-
-      // Tahap 2: Validasi Stok Secara Massal
-      const semuaBahanIds = Array.from(totalBahanDibutuhkan.keys());
-      if (semuaBahanIds.length === 0) {
-        // Jika tidak ada bahan yang dibutuhkan, langsung proses
-        return await this.createRecords(dataArray, transaction);
-      }
-
-      const stokTersediaRecords = await StokBarangGudang.findAll({
-        where: {
-          barang_mentah_id: { [Op.in]: semuaBahanIds },
-          is_deleted: false
-        },
-        include: [{ model: BarangMentah, as: 'barang_mentah', attributes: ['nama_barang'] }],
-        transaction
-      });
+          const bahanStockRecord = await StokBarangGudang.findOne({
+            where: {
+              barang_mentah_id: bahan.barang_mentah_id,
+              is_deleted: false
+            },
+            transaction
+          });
 
           if (!bahanStockRecord || bahanStockRecord.jumlah_stok < (bahan.kuantitas * data.jumlah)) {
-            throw new Error(`Stok barang mentah tidak cukup.`);
+            const namaBarangMentah = bahan.barang_mentah ? bahan.barang_mentah.nama_barang : `ID ${bahan.barang_mentah_id}`;
+            throw new Error(`Stok untuk '${namaBarangMentah}' tidak mencukupi. Dibutuhkan ${bahan.kuantitas * data.jumlah}, tersedia ${bahanStockRecord ? bahanStockRecord.jumlah_stok : 0}.`);
           }
           bahanStockRecords.push({ record: bahanStockRecord, kuantitas: bahan.kuantitas });
         }
+        const createdProduct = await BarangProduksiGudang.create(data, {
+          transaction,
+        });
+        createdProdukList.push(createdProduct);
       }
-
-      if (stockErrors.length > 0) {
-        throw new Error(`Stok tidak mencukupi untuk bahan berikut: ${stockErrors.join(', ')}.`);
-      }
-
-      // Tahap 3: Jika Stok Cukup, Buat Semua Catatan Produksi
-      return await this.createRecords(dataArray, transaction);
-
+      return createdProdukList;
     } catch (error) {
-      throw error;
+      throw new Error(error.message);
     }
-  }
-
-  static async createRecords(dataArray, transaction) {
-    const createdProdukList = [];
-    for (const data of dataArray) {
-      const createdProduct = await BarangProduksiGudang.create(data, { transaction });
-      createdProdukList.push(createdProduct);
-    }
-    return createdProdukList;
   }
 
   static async deleteByProduksi(id, options = {}) {
