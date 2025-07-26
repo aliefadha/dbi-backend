@@ -1,3 +1,4 @@
+const { Op } = require("sequelize");
 const BarangHandmadeGudang = require("../models/barangHandmadeGudang");
 const BarangMentah = require("../models/barangMentah");
 const BarangNonHandmadeGudang = require("../models/barangNonHandmadeGudang");
