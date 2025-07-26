@@ -1,6 +1,5 @@
 const { Op } = require("sequelize");
 const BarangHandmadeGudang = require("../models/barangHandmadeGudang");
-const BarangMentah = require("../models/barangMentah");
 const BarangNonHandmadeGudang = require("../models/barangNonHandmadeGudang");
 const BarangProduksiGudang = require("../models/barangProduksiGudang");
 const RincianBahanGudang = require("../models/rincianBahanGudang");
@@ -82,8 +81,17 @@ class BarangProduksiGudangService {
       const totalBahanDibutuhkan = new Map();
       for (const data of dataArray) {
         const barangHandmade = await BarangHandmadeGudang.findOne({
-          where: { barang_handmade_id: data.barang_handmade_id, is_deleted: false },
-          include: [{ model: RincianBahanGudang, as: "rincian_bahan" }],
+          where: {
+            barang_handmade_id: data.barang_handmade_id,
+            is_deleted: false
+          },
+          include: [
+            {
+              model: RincianBahanGudang,
+              as: "rincian_bahan",
+              attributes: ["barang_mentah_id", "kuantitas"]
+            }
+          ],
           transaction
         });
 
@@ -114,18 +122,10 @@ class BarangProduksiGudangService {
         transaction
       });
 
-      const stokTersediaMap = new Map(
-        stokTersediaRecords.map(stok => [stok.barang_mentah_id, stok])
-      );
-      
-      const stockErrors = [];
-      for (const [barangMentahId, kuantitasDibutuhkan] of totalBahanDibutuhkan.entries()) {
-        const stokRecord = stokTersediaMap.get(barangMentahId);
-
-        if (!stokRecord || stokRecord.jumlah_stok < kuantitasDibutuhkan) {
-          const namaBarang = stokRecord?.barang_mentah?.nama_barang || `ID ${barangMentahId}`;
-          const stokTersedia = stokRecord ? stokRecord.jumlah_stok : 0;
-          stockErrors.push(`'${namaBarang}' (butuh ${kuantitasDibutuhkan}, tersedia ${stokTersedia})`);
+          if (!bahanStockRecord || bahanStockRecord.jumlah_stok < (bahan.kuantitas * data.jumlah)) {
+            throw new Error(`Stok barang mentah tidak cukup.`);
+          }
+          bahanStockRecords.push({ record: bahanStockRecord, kuantitas: bahan.kuantitas });
         }
       }
 
