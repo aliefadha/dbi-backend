@@ -73,71 +73,80 @@ class BarangProduksiGudangService {
     return true;
   }
 
-  static async createMany(dataArray, options = {}) {
+ static async createMany(dataArray, options = {}) {
     const transaction = options.transaction;
-    const createdProdukList = [];
 
     try {
+      // Tahap 1: Agregasi (Penjumlahan) Total Kebutuhan Bahan Baku
+      const totalBahanDibutuhkan = new Map();
       for (const data of dataArray) {
-        // Check if barang_handmade exists
         const barangHandmade = await BarangHandmadeGudang.findOne({
-          where: {
-            barang_handmade_id: data.barang_handmade_id,
-            is_deleted: false
-          },
-          include: [
-            {
-              model: RincianBahanGudang,
-              as: "rincian_bahan",
-              attributes: ["barang_mentah_id", "kuantitas"],
-              include: [{
-                model: BarangMentah,
-                as: "barang_mentah",
-                attributes: ["nama_barang"]
-              }]
-            }
-          ],
+          where: { barang_handmade_id: data.barang_handmade_id, is_deleted: false },
+          include: [{ model: RincianBahanGudang, as: "rincian_bahan" }],
           transaction
         });
 
         if (!barangHandmade) {
-          throw new Error(`Barang handmade tidak ditemukan`);
+          throw new Error(`Barang handmade dengan ID ${data.barang_handmade_id} tidak ditemukan.`);
         }
-        const stockErrors = [];
 
         for (const bahan of barangHandmade.rincian_bahan) {
-          // Mengganti nama variabel agar lebih jelas
-          const stokBahanMentah = await StokBarangGudang.findOne({
-            where: {
-              barang_mentah_id: bahan.barang_mentah_id,
-              is_deleted: false
-            },
-            transaction
-          });
-
-          const kuantitasDibutuhkan = bahan.kuantitas * data.jumlah;
-
-          if (!stokBahanMentah || stokBahanMentah.jumlah_stok < kuantitasDibutuhkan) {
-            const namaBarangMentah = bahan.barang_mentah ? bahan.barang_mentah.nama_barang : `ID ${bahan.barang_mentah_id}`;
-            // Memperbaiki kesalahan: menggunakan stokBahanMentah, bukan stokBahan
-            const stokTersedia = stokBahanMentah ? stokBahanMentah.jumlah_stok : 0;
-            stockErrors.push(`'${namaBarangMentah}' (butuh ${kuantitasDibutuhkan}, tersedia ${stokTersedia})`);
-          }
+          const kuantitasDiperlukan = bahan.kuantitas * data.jumlah;
+          const totalSaatIni = totalBahanDibutuhkan.get(bahan.barang_mentah_id) || 0;
+          totalBahanDibutuhkan.set(bahan.barang_mentah_id, totalSaatIni + kuantitasDiperlukan);
         }
-        
-        if (stockErrors.length > 0) {
-          throw new Error(`Stok tidak mencukupi untuk bahan berikut: ${stockErrors.join(', ')}.`);
-        }
-        
-        const createdProduct = await BarangProduksiGudang.create(data, {
-          transaction,
-        });
-        createdProdukList.push(createdProduct);
       }
-      return createdProdukList;
+
+      // Tahap 2: Validasi Stok Secara Massal
+      const semuaBahanIds = Array.from(totalBahanDibutuhkan.keys());
+      if (semuaBahanIds.length === 0) {
+        // Jika tidak ada bahan yang dibutuhkan, langsung proses
+        return await this.createRecords(dataArray, transaction);
+      }
+
+      const stokTersediaRecords = await StokBarangGudang.findAll({
+        where: {
+          barang_mentah_id: { [Op.in]: semuaBahanIds },
+          is_deleted: false
+        },
+        include: [{ model: BarangMentah, as: 'barang_mentah', attributes: ['nama_barang'] }],
+        transaction
+      });
+
+      const stokTersediaMap = new Map(
+        stokTersediaRecords.map(stok => [stok.barang_mentah_id, stok])
+      );
+      
+      const stockErrors = [];
+      for (const [barangMentahId, kuantitasDibutuhkan] of totalBahanDibutuhkan.entries()) {
+        const stokRecord = stokTersediaMap.get(barangMentahId);
+
+        if (!stokRecord || stokRecord.jumlah_stok < kuantitasDibutuhkan) {
+          const namaBarang = stokRecord?.barang_mentah?.nama_barang || `ID ${barangMentahId}`;
+          const stokTersedia = stokRecord ? stokRecord.jumlah_stok : 0;
+          stockErrors.push(`'${namaBarang}' (butuh ${kuantitasDibutuhkan}, tersedia ${stokTersedia})`);
+        }
+      }
+
+      if (stockErrors.length > 0) {
+        throw new Error(`Stok tidak mencukupi untuk bahan berikut: ${stockErrors.join(', ')}.`);
+      }
+
+      // Tahap 3: Jika Stok Cukup, Buat Semua Catatan Produksi
+      return await this.createRecords(dataArray, transaction);
+
     } catch (error) {
-      throw new Error(error.message);
+      throw error;
     }
+  }
+
+  static async createRecords(dataArray, transaction) {
+    const createdProdukList = [];
+    for (const data of dataArray) {
+      const createdProduct = await BarangProduksiGudang.create(data, { transaction });
+      createdProdukList.push(createdProduct);
+    }
+    return createdProdukList;
   }
 
   static async deleteByProduksi(id, options = {}) {
