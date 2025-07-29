@@ -51,7 +51,7 @@ class BarangCustomService {
         { model: KategoriBarang, as: "kategori" },
         { model: StokBarang, as: "stok_barang", attributes: ["jumlah_stok"] }
       ],
-      order: [["createdAt", "DESC"]]
+      order: [["nama_barang", "ASC"]]
     });
 
     return {

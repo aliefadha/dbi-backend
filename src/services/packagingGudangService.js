@@ -44,7 +44,7 @@ class PackagingGudangService {
           attributes: ["jumlah_stok"]
         }
       ],
-      order: [["createdAt", "DESC"]]
+      order: [["nama_packaging", "ASC"]]
     });
 
     return {

@@ -173,7 +173,7 @@ class BarangHandmadeService {
           ]
         }
       ],
-      order: [["createdAt", "DESC"]]
+      order: [["nama_barang", "ASC"]]
     });
 
     return {

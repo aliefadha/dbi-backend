@@ -63,7 +63,7 @@ class PackagingService {
           attributes: ["kategori_barang_id", "nama_kategori_barang"]
         }
       ],
-      order: [["createdAt", "DESC"]]
+      order: [["nama_packaging", "ASC"]]
     });
 
     return {
