@@ -123,18 +123,32 @@ class KaryawanService {
     }
 
     static async getTerbaik(toko_id, cabang, bulan, tahun) {
-        const result = await AbsensiKaryawanService.getAll(bulan, tahun, toko_id, cabang);
-        const data = result.map((item) => ({
-            karyawan_id: item.karyawan.karyawan_id,
-            nama_karyawan: item.karyawan.nama_karyawan,
-            Image: item.karyawan.image,
-            kpi: item.totalPersentaseTercapai
-        }))
-        return data
-            .sort((a, b) => b.totalPersentaseTercapai - a.totalPersentaseTercapai)
-            .slice(0, 10);
-    }
+    const result = await AbsensiKaryawanService.getAll(bulan, tahun, toko_id, cabang);
 
+    const toNumber = (v) => {
+        if (v == null) return 0;
+        if (typeof v === 'number') return v;
+        // handle "94,64%" or "94.64%" or "94.64"
+        const s = String(v).replace('%','').trim().replace(',', '.');
+        const n = parseFloat(s);
+        return Number.isFinite(n) ? n : 0;
+    };
+
+    const data = result.map((item) => {
+        const kpiNum = toNumber(item.totalPersentaseTercapai);
+        return {
+        karyawan_id: item.karyawan.karyawan_id,
+        nama_karyawan: item.karyawan.nama_karyawan,
+        image: item.karyawan.image,
+        kpi: kpiNum,                 // numeric for sorting
+        kpi_display: `${kpiNum.toFixed(2)}%`, // if you need a string to show
+        };
+    });
+
+    return data
+        .sort((a, b) => b.kpi - a.kpi || a.nama_karyawan.localeCompare(b.nama_karyawan)) // tie-breaker by name
+        .slice(0, 10);
+    }
 }
 
 module.exports = KaryawanService;
