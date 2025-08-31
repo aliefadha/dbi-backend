@@ -10,101 +10,107 @@ const Toko = require("../models/toko");
 
 class DataKaryawanService {
     static async getListAbsensiByKaryawan(id, bulan, tahun) {
-        const startDate = new Date(tahun, bulan - 1, 1);
-        const endDate = new Date(tahun, bulan, 0);
-        endDate.setHours(23, 59, 59, 999);
-        
+        // Pastikan rentang tanggal pakai waktu lokal (Jakarta)
+        const startDate = new Date(tahun, bulan - 1, 1, 0, 0, 0, 0);
+        const endDate   = new Date(tahun, bulan, 0, 23, 59, 59, 999);
+
         const karyawan = await Karyawan.findByPk(id);
+
         const absensiRecord = await AbsensiKaryawan.findAll({
             where: {
-                karyawan_id: id,
-                tanggal: {
-                    [Op.between]: [startDate, endDate]
-                },
+            karyawan_id: id,
+            tanggal: { [Op.between]: [startDate, endDate] },
             },
             order: [['tanggal', 'ASC'], ['jam_masuk', 'ASC']]
         });
-    
+
         let totalGajiPokok = 0;
         let totalMenit = 0;
-    
+
+        // Helper: format tanggal LOKAL (tanpa UTC shift)
+        const toLocalDateStr = (d) => {
+            const dt = new Date(d);
+            const y = dt.getFullYear();
+            const m = String(dt.getMonth() + 1).padStart(2, '0');
+            const day = String(dt.getDate()).padStart(2, '0');
+            return `${y}-${m}-${day}`;
+        };
+
+        // Helper: normalisasi menit lintas tengah malam (kalau kamu perlu hitung selisih di sini)
+        const normalizeMinutes = (menit) => {
+            if (menit == null) return 0;
+            return menit < 0 ? menit + 24 * 60 : menit;
+        };
+
         if (karyawan.jenis_karyawan !== 'Umum') {
             absensiRecord.forEach(absen => {
-                if (absen.total_menit) totalMenit += absen.total_menit;
-                if (absen.gaji_pokok_perhari) totalGajiPokok += absen.gaji_pokok_perhari;
+            // Jika field total_menit dari DB kadang negatif saat shift belum “rollover” ke besok:
+            const menit = normalizeMinutes(absen.total_menit);
+            totalMenit += menit;
+
+            if (absen.gaji_pokok_perhari) totalGajiPokok += absen.gaji_pokok_perhari;
             });
-    
-            return {
-                absensiRecord,
-                totalGajiPokok,
-                totalMenit,
-            };
+
+            return { absensiRecord, totalGajiPokok, totalMenit };
         }
-    
+
         const grouped = {};
-    
+
         absensiRecord.forEach(absen => {
-            const date = absen.tanggal.toISOString().split('T')[0];
-    
-            if (!grouped[date]) {
-                grouped[date] = [];
-            }
-    
+            // >>> PERBAIKAN 1: pakai tanggal lokal
+            const date = toLocalDateStr(absen.tanggal);
+
+            if (!grouped[date]) grouped[date] = [];
+
             let currentGroup = grouped[date][grouped[date].length - 1];
-    
+
             if (!currentGroup || (currentGroup.jam_masuk && currentGroup.jam_keluar)) {
-                // Buat group baru kalau perlu
-                currentGroup = {
-                    tanggal: date,
-                    jam_masuk: null,
-                    jam_keluar: null,
-                    total_menit: 0,
-                    total_gaji_pokok: 0,
-                };
-                grouped[date].push(currentGroup);
+            currentGroup = {
+                tanggal: date,
+                jam_masuk: null,
+                jam_keluar: null,
+                total_menit: 0,
+                total_gaji_pokok: 0,
+            };
+            grouped[date].push(currentGroup);
             }
-    
-            const absenJam = absen.jam_masuk || absen.jam_keluar;
-    
+
             if (absen.jam_masuk && !currentGroup.jam_masuk) {
-                currentGroup.jam_masuk = {
-                    jam: absen.jam_masuk,
-                    foto: absen.image,
-                    lokasi: absen.gmaps,
-                    absensi_karyawan_id: absen.absensi_karyawan_id,
-                };
+            currentGroup.jam_masuk = {
+                jam: absen.jam_masuk,
+                foto: absen.image,
+                lokasi: absen.gmaps,
+                absensi_karyawan_id: absen.absensi_karyawan_id,
+            };
             } else if (absen.jam_keluar && !currentGroup.jam_keluar) {
-                currentGroup.jam_keluar = {
-                    jam: absen.jam_keluar,
-                    foto: absen.image,
-                    lokasi: absen.gmaps,
-                    absensi_karyawan_id: absen.absensi_karyawan_id,
-                };
+            currentGroup.jam_keluar = {
+                jam: absen.jam_keluar,
+                foto: absen.image,
+                lokasi: absen.gmaps,
+                absensi_karyawan_id: absen.absensi_karyawan_id,
+            };
             }
-    
-            if (absen.total_menit) {
-                currentGroup.total_menit += absen.total_menit;
-                totalMenit += absen.total_menit;
-            }
-    
+
+            // >>> PERBAIKAN 2: normalisasi menit negatif (lintas tengah malam)
+            const menit = normalizeMinutes(absen.total_menit);
+            currentGroup.total_menit += menit;
+            totalMenit += menit;
+
             if (absen.gaji_pokok_perhari) {
-                currentGroup.total_gaji_pokok += absen.gaji_pokok_perhari;
-                totalGajiPokok += absen.gaji_pokok_perhari;
+            currentGroup.total_gaji_pokok += absen.gaji_pokok_perhari;
+            totalGajiPokok += absen.gaji_pokok_perhari;
             }
         });
-    
+
         const mergedAbsensi = Object.values(grouped).flat();
-    
+
         return {
             absensiRecord: mergedAbsensi,
             totalGajiPokok,
             totalMenit,
         };
     }
-    
-    
-    
-    
+
 
     static async getDataAbsensiByKaryawan(id, bulan, tahun) {
         const startDate = new Date(tahun, bulan - 1, 1);
