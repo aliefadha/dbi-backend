@@ -121,21 +121,23 @@ class KaryawanService {
 
         return workbook;
     }
+    static async getTerbaik(toko_id, cabang, bulan, tahun) {
+        const result = await AbsensiKaryawanService.getAll(bulan, tahun, toko_id, cabang);
 
-   static async getTerbaik(toko_id, cabang, bulan, tahun) {
-    const result = await AbsensiKaryawanService.getAll(bulan, tahun, toko_id, cabang);
+        const data = result.map((item) => ({
+            karyawan_id: item.karyawan.karyawan_id,
+            nama_karyawan: item.karyawan.nama_karyawan,
+            Image: item.karyawan.image,
+            kpi: Number(item.totalPersentaseTercapai) || 0,
+        }));
 
-    const data = result.map((item) => ({
-        karyawan_id: item.karyawan.karyawan_id,
-        nama_karyawan: item.karyawan.nama_karyawan,
-        Image: item.karyawan.image,
-        kpi: Number(item.totalPersentaseTercapai) || 0, // ensure number
-    }));
+        const top10 = [...data]                 // copy to avoid side effects
+            .sort((a, b) => b.kpi - a.kpi         // DESC by KPI
+                || a.nama_karyawan.localeCompare(b.nama_karyawan))
+            .slice(0, 10);
 
-    return data
-        .sort((a, b) => b.kpi - a.kpi || a.nama_karyawan.localeCompare(b.nama_karyawan))
-        .slice(0, 10);
-    }
+        return top10;
+        }
 
 }
 
