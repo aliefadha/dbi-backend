@@ -124,20 +124,31 @@ class KaryawanService {
     static async getTerbaik(toko_id, cabang, bulan, tahun) {
         const result = await AbsensiKaryawanService.getAll(bulan, tahun, toko_id, cabang);
 
-        const data = result.map((item) => ({
+        const data = result.map((item) => {
+            // Normalisasi KPI ke number
+            const raw = item.totalPersentaseTercapai;
+            let kpiNum = Number.isFinite(raw) ? raw : parseFloat(String(raw ?? '').replace('%', '').trim());
+            if (!Number.isFinite(kpiNum)) kpiNum = 0;
+
+            return {
             karyawan_id: item.karyawan.karyawan_id,
-            nama_karyawan: item.karyawan.nama_karyawan,
+            nama_karyawan: item.karyawan.nama_karyawan || '',
             Image: item.karyawan.image,
-            kpi: Number(item.totalPersentaseTercapai) || 0,
-        }));
+            kpi: kpiNum,
+            };
+        });
 
-        const top10 = [...data]                 // copy to avoid side effects
-            .sort((a, b) => b.kpi - a.kpi         // DESC by KPI
-                || a.nama_karyawan.localeCompare(b.nama_karyawan))
-            .slice(0, 10);
+        // Sort DESC by KPI, lalu ASC by name (case-insensitive, locale Indonesia)
+        const sorted = data.sort((a, b) => {
+            const ka = Number.isFinite(a.kpi) ? a.kpi : -Infinity;
+            const kb = Number.isFinite(b.kpi) ? b.kpi : -Infinity;
+            if (kb !== ka) return kb - ka;
+            return a.nama_karyawan.localeCompare(b.nama_karyawan, 'id', { sensitivity: 'base' });
+        });
 
+        const top10 = sorted.slice(0, 10);
         return top10;
-        }
+    }
 
 }
 

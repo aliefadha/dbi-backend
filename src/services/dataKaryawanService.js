@@ -2,32 +2,127 @@ const AbsensiKaryawan = require("../models/absensiKaryawan");
 const Karyawan = require("../models/karyawan"); 
 const DivisiKaryawan = require("../models/divisiKaryawan");
 const Cabang = require("../models/cabang");
-const { Op } = require("sequelize");
+const { Op, Sequelize } = require("sequelize");
 const CutiKaryawan = require("../models/cutiKaryawan");
 const KpiKaryawan = require("../models/kpiKaryawan");
 const Kpi = require("../models/kpi");
 const Toko = require("../models/toko");
 
 class DataKaryawanService {
-    static async getListAbsensiByKaryawan(id, bulan, tahun) {
-        // Pastikan rentang tanggal pakai waktu lokal (Jakarta)
+   static async getDataAbsensiByKaryawan(id, bulan, tahun) {
+        // Rentang tanggal pakai waktu lokal (Jakarta)
+        const startDate = new Date(tahun, bulan - 1, 1, 0, 0, 0, 0);
+        const endDate   = new Date(tahun, bulan, 0, 23, 59, 59, 999);
+
+        const karyawan = await Karyawan.findOne({
+            where: { karyawan_id: id },
+            include: [
+            { model: Toko, as: 'toko', attributes: ['nama_toko'] },
+            { model: Cabang, as: 'cabang', attributes: ['nama_cabang'] },
+            { model: Cabang, as: 'cabang_first', attributes: ['nama_cabang'] },
+            { model: DivisiKaryawan, as: 'divisi', attributes: ['nama_divisi'] },
+            ],
+        });
+
+        const kehadiran = await AbsensiKaryawan.count({
+            where: {
+            karyawan_id: id,
+            tanggal: { [Op.between]: [startDate, endDate] },
+            },
+            distinct: true,
+            col: 'tanggal',
+        });
+
+        // --- Hitung Cuti yang Overlap Bulan Tertentu ---
+        const cutiKaryawanRecords = await CutiKaryawan.findAll({
+            where: {
+            karyawan_id: id,
+            tanggal_mulai: { [Op.lte]: endDate },
+            tanggal_selesai: { [Op.gte]: startDate },
+            status: 'Diterima',
+            },
+        });
+
+        let totalCutiDays = 0;
+        for (const cuti of cutiKaryawanRecords) {
+            const cutiStart = new Date(cuti.tanggal_mulai);
+            const cutiEnd   = new Date(cuti.tanggal_selesai);
+            const overlapStart = cutiStart < startDate ? startDate : cutiStart;
+            const overlapEnd   = cutiEnd > endDate ? endDate : cutiEnd;
+            const days = Math.max(0, Math.floor((overlapEnd - overlapStart) / (1000 * 60 * 60 * 24)) + 1);
+            totalCutiDays += days;
+        }
+        const totalDaysInMonth = new Date(tahun, bulan, 0).getDate();
+        totalCutiDays = Math.min(Math.floor(totalCutiDays), totalDaysInMonth);
+
+        let tidakHadir = Math.max(0, 28 - totalCutiDays - kehadiran);
+        tidakHadir = Math.floor(tidakHadir);
+
+        // --- Ambil list absensi + total menit & gaji dasar (sudah dibersihkan) ---
+        const { totalGajiPokok: totalGajiPokokFromList, totalMenit } =
+            await this.getListAbsensiByKaryawan(id, bulan, tahun);
+
+        // --- FINALISASI GAJI POKOK ---
+        // Untuk 'Umum': base = prorata(rate * totalMenit), di-cap ke jumlah_gaji_pokok
+        // Untuk selain 'Umum': pakai hasil penjumlahan dari per-hari (yang sudah di-clamp >= 0)
+        let finalTotalGajiPokok = totalGajiPokokFromList;
+
+        if (karyawan?.jenis_karyawan === 'Umum') {
+            const baseGaji   = Number(karyawan.jumlah_gaji_pokok) || 0;
+            const targetMenit = Number(karyawan.waktu_kerja_sebulan_menit) || 0;
+            if (baseGaji > 0 && targetMenit > 0) {
+            const ratePerMinute = baseGaji / targetMenit;
+            const prorated = Math.floor(ratePerMinute * totalMenit);
+            finalTotalGajiPokok = Math.min(prorated, baseGaji);
+            } else {
+            // fallback kalau data target/base tidak valid
+            finalTotalGajiPokok = Math.max(0, finalTotalGajiPokok);
+            }
+        }
+
+        // Bonus & KPI (biarkan seperti semula)
+        const { totalPersentaseTercapai, totalBonusDiterima } = await this.getByKaryawanId(id, bulan, tahun);
+
+        const totalGajiAkhirRaw = finalTotalGajiPokok + totalBonusDiterima;
+
+        const roundedTotalPersentaseTercapai = parseFloat(Number(totalPersentaseTercapai).toFixed(2));
+        const roundedTotalBonusDiterima = Math.round((Number(totalBonusDiterima) || 0) / 1000) * 1000;
+        const roundedTotalGajiAkhir = Math.round(totalGajiAkhirRaw / 1000) * 1000;
+
+        return {
+            karyawan,
+            kehadiran,
+            totalCutiDays,
+            tidakHadir,
+            totalGajiPokok: finalTotalGajiPokok,
+            totalMenit,
+            totalPersentaseTercapai: roundedTotalPersentaseTercapai,
+            totalBonusDiterima: roundedTotalBonusDiterima,
+            totalGajiAkhir: roundedTotalGajiAkhir,
+        };
+        }
+
+        static async getListAbsensiByKaryawan(id, bulan, tahun) {
+        // Rentang tanggal pakai waktu lokal (Jakarta)
         const startDate = new Date(tahun, bulan - 1, 1, 0, 0, 0, 0);
         const endDate   = new Date(tahun, bulan, 0, 23, 59, 59, 999);
 
         const karyawan = await Karyawan.findByPk(id);
 
-        const absensiRecord = await AbsensiKaryawan.findAll({
+        const absensiRecordRaw = await AbsensiKaryawan.findAll({
             where: {
             karyawan_id: id,
             tanggal: { [Op.between]: [startDate, endDate] },
             },
-            order: [['tanggal', 'ASC'], ['jam_masuk', 'ASC']]
+            order: [
+            ['tanggal', 'ASC'],
+            [Sequelize.literal('CASE WHEN jam_masuk IS NULL THEN 1 ELSE 0 END'), 'ASC'],
+            ['jam_masuk', 'ASC'],
+            ['jam_keluar', 'ASC'],
+            ],
         });
 
-        let totalGajiPokok = 0;
-        let totalMenit = 0;
-
-        // Helper: format tanggal LOKAL (tanpa UTC shift)
+        // Helpers (inline—tidak perlu dideklarasi global)
         const toLocalDateStr = (d) => {
             const dt = new Date(d);
             const y = dt.getFullYear();
@@ -35,46 +130,35 @@ class DataKaryawanService {
             const day = String(dt.getDate()).padStart(2, '0');
             return `${y}-${m}-${day}`;
         };
-
-        // Helper: normalisasi menit lintas tengah malam (kalau kamu perlu hitung selisih di sini)
         const normalizeMinutes = (menit) => {
-            if (menit == null) return 0;
+            if (menit == null || isNaN(menit)) return 0;
+            // jika DB kadang menyimpan menit negatif untuk shift lintas hari
             return menit < 0 ? menit + 24 * 60 : menit;
         };
 
-        if (karyawan.jenis_karyawan !== 'Umum') {
-            absensiRecord.forEach(absen => {
-            // Jika field total_menit dari DB kadang negatif saat shift belum “rollover” ke besok:
-            const menit = normalizeMinutes(absen.total_menit);
-            totalMenit += menit;
-
-            if (absen.gaji_pokok_perhari) totalGajiPokok += absen.gaji_pokok_perhari;
-            });
-
-            return { absensiRecord, totalGajiPokok, totalMenit };
-        }
-
+        // --- Kelompokkan per tanggal untuk tampilan per hari (tetap sederhana & stabil) ---
         const grouped = {};
+        let totalMenit = 0;
+        let totalGajiPokokNonUmum = 0; // sum harian untuk non-Umum (clamped >= 0)
 
-        absensiRecord.forEach(absen => {
-            // >>> PERBAIKAN 1: pakai tanggal lokal
-            const date = toLocalDateStr(absen.tanggal);
+        for (const absen of absensiRecordRaw) {
+            const dateKey = toLocalDateStr(absen.tanggal);
+            if (!grouped[dateKey]) grouped[dateKey] = [];
 
-            if (!grouped[date]) grouped[date] = [];
-
-            let currentGroup = grouped[date][grouped[date].length - 1];
-
+            // pilih grup aktif (hari yang sama)
+            let currentGroup = grouped[dateKey][grouped[dateKey].length - 1];
             if (!currentGroup || (currentGroup.jam_masuk && currentGroup.jam_keluar)) {
             currentGroup = {
-                tanggal: date,
+                tanggal: dateKey,
                 jam_masuk: null,
                 jam_keluar: null,
                 total_menit: 0,
                 total_gaji_pokok: 0,
             };
-            grouped[date].push(currentGroup);
+            grouped[dateKey].push(currentGroup);
             }
 
+            // catat jam masuk/keluar kalau ada
             if (absen.jam_masuk && !currentGroup.jam_masuk) {
             currentGroup.jam_masuk = {
                 jam: absen.jam_masuk,
@@ -91,128 +175,58 @@ class DataKaryawanService {
             };
             }
 
-            // >>> PERBAIKAN 2: normalisasi menit negatif (lintas tengah malam)
+            // akumulasi menit dari field DB (distandarkan)
             const menit = normalizeMinutes(absen.total_menit);
             currentGroup.total_menit += menit;
             totalMenit += menit;
 
-            if (absen.gaji_pokok_perhari) {
-            currentGroup.total_gaji_pokok += absen.gaji_pokok_perhari;
-            totalGajiPokok += absen.gaji_pokok_perhari;
+            // untuk non-Umum saja, tetap jumlahkan gaji_pokok_perhari dari DB (clamp >= 0)
+            if (karyawan?.jenis_karyawan !== 'Umum') {
+            const dailyFromDb = Math.max(0, Number(absen.gaji_pokok_perhari) || 0);
+            currentGroup.total_gaji_pokok += dailyFromDb;
+            totalGajiPokokNonUmum += dailyFromDb;
             }
-        });
+        }
 
+        // Flatten hasil grup
         const mergedAbsensi = Object.values(grouped).flat();
+
+        // --- Distribusi gaji pokok untuk 'Umum': prorata menit per hari, di-cap total base ---
+        let totalGajiPokok = totalGajiPokokNonUmum;
+
+        if (karyawan?.jenis_karyawan === 'Umum') {
+            const baseGaji   = Number(karyawan.jumlah_gaji_pokok) || 0;
+            const targetMenit = Number(karyawan.waktu_kerja_sebulan_menit) || 0;
+
+            if (baseGaji > 0 && targetMenit > 0) {
+            const ratePerMinute = baseGaji / targetMenit;
+            let sisaCap = Math.min(baseGaji, Math.floor(ratePerMinute * totalMenit)); // cap bulanan
+
+            // alokasikan ke masing-masing hari berdasarkan menit hari tsb
+            for (const day of mergedAbsensi) {
+                if (sisaCap <= 0) {
+                day.total_gaji_pokok = 0;
+                continue;
+                }
+                const pay = Math.min(sisaCap, Math.floor((day.total_menit || 0) * ratePerMinute));
+                day.total_gaji_pokok = pay;
+                sisaCap -= pay;
+            }
+
+            totalGajiPokok = baseGaji - sisaCap; // sama dengan min(rate*totalMenit, baseGaji)
+            } else {
+            // data target/base tidak valid => pakai 0
+            totalGajiPokok = 0;
+            for (const day of mergedAbsensi) day.total_gaji_pokok = 0;
+            }
+        }
 
         return {
             absensiRecord: mergedAbsensi,
             totalGajiPokok,
             totalMenit,
         };
-    }
-
-
-    static async getDataAbsensiByKaryawan(id, bulan, tahun) {
-        const startDate = new Date(tahun, bulan - 1, 1);
-        const endDate = new Date(tahun, bulan, 0);
-        endDate.setHours(23, 59, 59, 999);
-        const karyawan = await Karyawan.findOne({
-            where: { karyawan_id: id },
-            include: [
-                {
-                    model: Toko,
-                    as: 'toko',
-                    attributes: ['nama_toko']
-                },
-                {
-                    model: Cabang,
-                    as: 'cabang',
-                    attributes: ['nama_cabang']
-                },
-                {
-                    model: Cabang,
-                    as: 'cabang_first',
-                    attributes: ['nama_cabang']
-                },
-                {
-                    model: DivisiKaryawan,
-                    as: 'divisi',
-                    attributes: ['nama_divisi']
-                }
-            ]
-        });
-    
-        const kehadiran = await AbsensiKaryawan.count({
-            where: {
-                karyawan_id: id,
-                tanggal: {
-                    [Op.between]: [startDate, endDate]
-                },
-            },
-            distinct: true,
-            col: "tanggal"
-        });
-    
-        const cutiKaryawanRecords = await CutiKaryawan.findAll({  
-            where: {  
-                karyawan_id: id,  
-                tanggal_mulai: {  
-                    [Op.lte]: endDate // Start date should be less than or equal to end of the month  
-                },  
-                tanggal_selesai: {  
-                    [Op.gte]: startDate // End date should be greater than or equal to start of the month  
-                },
-                status: 'Diterima'  
-            }  
-        });  
-        let totalCutiDays = 0;  
-    
-        // Calculate the number of days of leave that fall within the specified month  
-        for (const cutiKaryawan of cutiKaryawanRecords) {  
-            const cutiStart = new Date(cutiKaryawan.tanggal_mulai);  
-            const cutiEnd = new Date(cutiKaryawan.tanggal_selesai);  
-    
-            // Calculate the actual start and end dates for the overlap  
-            const overlapStart = cutiStart < startDate ? startDate : cutiStart;  
-            const overlapEnd = cutiEnd > endDate ? endDate : cutiEnd;  
-    
-            // Calculate the number of overlapping days  
-            const cutiDays = Math.max(0, (overlapEnd - overlapStart) / (1000 * 60 * 60 * 24) + 1); // +1 to include the end day  
-            totalCutiDays += cutiDays; // Accumulate the total cuti days  
-        }  
-    
-        // Ensure that the total cuti days do not exceed the number of days in the month
-        const totalDaysInMonth = new Date(tahun, bulan, 0).getDate();
-        totalCutiDays = Math.min(totalCutiDays, totalDaysInMonth);
-    
-        // Round down the total cuti days to the nearest whole number
-        totalCutiDays = Math.floor(totalCutiDays);
-    
-        let tidakHadir = Math.max(0, 28 - totalCutiDays - kehadiran);
-        tidakHadir = Math.floor(tidakHadir);
-    
-        const { totalPersentaseTercapai, totalBonusDiterima } = await this.getByKaryawanId(id, bulan, tahun);  
-    
-        const { totalGajiPokok, totalMenit } = await this.getListAbsensiByKaryawan(id, bulan, tahun);
-    
-        const totalGajiAkhir = totalGajiPokok + totalBonusDiterima;
-    
-        const roundedTotalPersentaseTercapai = parseFloat(totalPersentaseTercapai.toFixed(2));
-        const roundedTotalGajiAkhir = Math.round(totalGajiAkhir / 1000) * 1000;
-        const roundedTotalBonusDiterima = Math.round(totalBonusDiterima / 1000) * 1000;
-    
-        return {  
-            karyawan,  
-            kehadiran,  
-            totalCutiDays,
-            tidakHadir,
-            totalGajiPokok,
-            totalMenit,
-            totalPersentaseTercapai: roundedTotalPersentaseTercapai,
-            totalBonusDiterima: roundedTotalBonusDiterima,
-            totalGajiAkhir: roundedTotalGajiAkhir
-        };
-    }
+        }
 
     static async getByKaryawanId(id, bulan, tahun){
         const startDate = new Date(tahun, bulan - 1, 1);      
